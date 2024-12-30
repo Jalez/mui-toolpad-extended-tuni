@@ -1,10 +1,13 @@
 /** @format */
 
+import { BrowserRouter } from 'react-router-dom';
+import { EduMLProvider } from './EduMLToolpad';
+
 const App = () => {
   return (
-    <div>
-      <h1>Hello World!</h1>
-    </div>
+    <BrowserRouter>
+      <EduMLProvider></EduMLProvider>
+    </BrowserRouter>
   );
 };
 

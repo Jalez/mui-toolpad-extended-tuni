@@ -1,3 +1,15 @@
-src
+# Source files
+src/
+# Test files
+**/*.test.ts
+**/*.test.tsx
+# Config files
+.eslintrc
+.prettierrc
+tsconfig.json
+vite.config.ts
+# Other
+coverage/
+.github/
 !.npmignore
 !dist

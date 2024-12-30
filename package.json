@@ -3,18 +3,41 @@
   "private": false,
   "description": "Extended Toolpad",
   "author": "Jaakko Rajala",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "type": "module",
-  "main": "dist/index.js",
-  "module": "dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.es.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jalez/mui-toolpad-extended-tuni"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "react",
+    "mui",
+    "toolpad",
+    "education"
+  ],
+  "license": "MIT",
+  "sideEffects": false,
   "scripts": {
     "clean": "rm -rf dist && rm -rf build && rm -rf coverage && rm -rf node_modules/.cache",
     "dev": "vite --open --port 3000",
-    "build": "tsc -p tsconfig.app.json && vite build",
+    "build": "tsc && vite build",
+    "prepare": "rm -rf ./dist && npm run build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest --coverage"
@@ -23,13 +46,13 @@
     "cross-spawn": "7.0.5"
   },
   "dependencies": {
-    "@emotion/react": "^11.13.5",
-    "@emotion/styled": "^11.13.5",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
     "@fontsource/roboto": "^5.0.14",
     "@mui/base": "^5.0.0-beta.67",
-    "@mui/icons-material": "^6.1.8",
+    "@mui/icons-material": "^6.0.0",
     "@mui/lab": "^6.0.0-beta.14",
-    "@mui/material": "^6.1.8",
+    "@mui/material": "^6.0.0",
     "@mui/system": "^6.2.1",
     "@testing-library/user-event": "^14.5.2",
     "@toolpad/core": "^0.10.0",
@@ -39,9 +62,9 @@
     "lodash": "^4.17.21",
     "notistack": "^3.0.1",
     "rc-slider": "^11.1.7",
-    "react": "^18.3.1",
+    "react": "^18.0.0",
     "react-chartjs-2": "^5.2.0",
-    "react-dom": "^18.3.1",
+    "react-dom": "^18.0.0",
     "react-loading-skeleton": "^3.3.1",
     "react-router-dom": "^6.27.0",
     "react-slider": "^2.0.6",
@@ -70,13 +93,16 @@
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.0",
     "vite": "^5.4.0",
-    "vitest": "^2.1.3"
+    "vitest": "^2.1.3",
+    "vite-plugin-dts": "^1.7.0"
   },
   "peerDependencies": {
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
+    "@mui/icons-material": "^6.0.0",
     "@mui/material": "^6.0.0",
-    "@mui/icons-material": "^6.0.0"
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
   },
   "msw": {
     "workerDirectory": [

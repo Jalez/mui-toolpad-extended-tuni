@@ -22,6 +22,7 @@ export const getUsers = async (courseId?: string): Promise<UserData[]> => {
     const response = await axios.get(
       `api/users/${courseId ? `?course_id=${courseId}` : ''}`
     );
+    console.log('response', response);
 
     return response.data;
   } catch (error) {

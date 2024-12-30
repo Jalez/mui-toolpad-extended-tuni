@@ -68,36 +68,45 @@ export const useUserStore = create<UserState>((set) => ({
   setTestUsers: (users) => set({ testUsers: users }),
   setUser: (user) => set({ user }),
   getUser: async (courseId) => {
-    set({ fetchState: 'loading' });
-    set({ testUsers: defaultTestUsers });
-    const user = await getCurrentUser(courseId);
+    try {
+      set({ fetchState: 'loading' });
+      set({ testUsers: defaultTestUsers });
+      const user = await getCurrentUser(courseId);
 
-    user.image = user.role === 'student' ? studentImage : teacherImage;
-    if (user) {
-      let image;
-      if (user.role === 'student') {
-        image = studentImage;
-      } else if (user.role === 'teacher') {
-        image = teacherImage;
-      } else {
-        image = guestImage;
+      user.image = user.role === 'student' ? studentImage : teacherImage;
+      if (user) {
+        let image;
+        if (user.role === 'student') {
+          image = studentImage;
+        } else if (user.role === 'teacher') {
+          image = teacherImage;
+        } else {
+          image = guestImage;
+        }
+        set({
+          user: { ...user, image },
+          fetchState: 'idle',
+          testUsers: defaultTestUsers.filter((u) => u.role !== user.role),
+        });
       }
-      set({
-        user: { ...user, image },
-        fetchState: 'idle',
-        testUsers: defaultTestUsers.filter((u) => u.role !== user.role),
-      });
+    } catch (error) {
+      console.log('Error getting user', error);
+      set({ fetchState: 'error' });
     }
   },
   getUsers: async () => {
-    set({ fetchState: 'loading' });
-    const users = await getUsers();
-    users.forEach((user) => {
-      user.image = user.role === 'student' ? studentImage : teacherImage;
-    });
-    if (users) {
-      set({ users, fetchState: 'idle' });
-    } else {
+    try {
+      set({ fetchState: 'loading' });
+      const users = await getUsers();
+      users.forEach((user) => {
+        user.image = user.role === 'student' ? studentImage : teacherImage;
+      });
+      if (users) {
+        set({ users, fetchState: 'idle' });
+      } else {
+        set({ fetchState: 'error' });
+      }
+    } catch (error) {
       set({ fetchState: 'error' });
     }
   },
