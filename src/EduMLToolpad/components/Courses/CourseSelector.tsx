@@ -6,7 +6,7 @@ import useCourseStore from '../../store/useCourseStore';
 import { useEffect, useState } from 'react';
 import CourseList from './CourseList';
 import { useNavigate } from 'react-router-dom';
-import { slugify } from '../../../educhatRoutes/utils/slugify';
+import { slugify } from '../../utils/slugify';
 
 const CourseSelector = () => {
   const { courses, currentCourse } = useCourseStore();
@@ -17,8 +17,6 @@ const CourseSelector = () => {
     setMounted(true);
     return () => setMounted(false);
   }, []);
-
-
 
   return (
     <Fade in={mounted} timeout={500}>

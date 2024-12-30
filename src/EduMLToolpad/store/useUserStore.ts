@@ -71,7 +71,7 @@ export const useUserStore = create<UserState>((set) => ({
     set({ fetchState: 'loading' });
     set({ testUsers: defaultTestUsers });
     const user = await getCurrentUser(courseId);
-    
+
     user.image = user.role === 'student' ? studentImage : teacherImage;
     if (user) {
       let image;

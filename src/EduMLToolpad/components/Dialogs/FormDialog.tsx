@@ -2,7 +2,6 @@
 
 // components/FormDialog.tsx
 
-import React from 'react';
 import {
   DialogTitle,
   DialogContent,

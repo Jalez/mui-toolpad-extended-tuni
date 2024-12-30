@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/useUserStore';
-import { NavigationStoreItem, NavigationPageStoreItem } from '../store/useNavigationStore';
+import { NavigationPageStoreItem } from '../store/useNavigationStore';
 import { SvgIconComponent } from "@mui/icons-material";
 
 export type ToolSelectorItem = {

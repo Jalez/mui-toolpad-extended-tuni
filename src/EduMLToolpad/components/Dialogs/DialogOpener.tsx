@@ -2,7 +2,6 @@
 
 import { Button, MenuItem } from '@mui/material';
 
-import React from 'react';
 import useDialogStore, { dialogType } from '../../store/useDialogStore';
 import { iconByType } from '../tools/iconsByType';
 

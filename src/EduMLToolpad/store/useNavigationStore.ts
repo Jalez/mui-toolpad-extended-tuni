@@ -1,13 +1,15 @@
-import { SvgIconComponent } from "@mui/icons-material";
-import { create } from "zustand";
-import HelpIcon from "@mui/icons-material/Help";
-import ContactPageIcon from "@mui/icons-material/ContactPage";
-import { slugify } from "../../educhatRoutes/utils/slugify";
-import SchoolIcon from "@mui/icons-material/School";
-import { Course } from "./useCourseStore";
+/** @format */
+
+import { SvgIconComponent } from '@mui/icons-material';
+import { create } from 'zustand';
+import HelpIcon from '@mui/icons-material/Help';
+import ContactPageIcon from '@mui/icons-material/ContactPage';
+import SchoolIcon from '@mui/icons-material/School';
+import { Course } from './useCourseStore';
+import { slugify } from '../utils/slugify';
 // Base interface for common properties
 interface NavigationItemBase {
-  kind: "header" | "page";
+  kind: 'header' | 'page';
   title: string;
   actionFC?: React.FC;
 }
@@ -19,11 +21,11 @@ export interface ToolMetadata {
 }
 
 export interface NavigationHeaderItem extends NavigationItemBase {
-  kind: "header";
+  kind: 'header';
 }
 
 export interface NavigationPageStoreItem extends NavigationItemBase {
-  kind: "page";
+  kind: 'page';
   segment: string;
   iconFC?: SvgIconComponent; // Updated type to SvgIconComponent
   icon?: JSX.Element;
@@ -38,12 +40,12 @@ export type NavigationStoreItem =
 
 // Update DEFAULTNAVIGATION to use icon components
 const DEFAULTNAVIGATION: NavigationStoreItem[] = [
-  { kind: "header", title: "Other" },
+  { kind: 'header', title: 'Other' },
   {
-    segment: "help",
-    title: "Help",
+    segment: 'help',
+    title: 'Help',
     iconFC: HelpIcon,
-    kind: "page",
+    kind: 'page',
     // metadata: {
     //   description: "Get help and documentation",
     //   forRoles: ["student", "teacher", "guest"],
@@ -51,10 +53,10 @@ const DEFAULTNAVIGATION: NavigationStoreItem[] = [
     // }
   },
   {
-    segment: "contact",
-    title: "Contact",
+    segment: 'contact',
+    title: 'Contact',
     iconFC: ContactPageIcon,
-    kind: "page",
+    kind: 'page',
   },
 ];
 
@@ -73,18 +75,18 @@ type ViewStore = {
 export const useNavigationStore = create<ViewStore>((set) => ({
   navigation: DEFAULTNAVIGATION,
   baseSections: {
-    header: { kind: "header", title: "Other" },
+    header: { kind: 'header', title: 'Other' },
     contact: {
-      segment: "contact",
-      title: "Contact",
+      segment: 'contact',
+      title: 'Contact',
       iconFC: ContactPageIcon,
-      kind: "page",
+      kind: 'page',
     },
     help: {
-      segment: "help",
-      title: "Help",
+      segment: 'help',
+      title: 'Help',
       iconFC: HelpIcon,
-      kind: "page",
+      kind: 'page',
     },
   },
 
@@ -93,19 +95,20 @@ export const useNavigationStore = create<ViewStore>((set) => ({
   setNavigation: (navigation) => set({ navigation }),
   updateSection: (course, sectionId, items) =>
     set((state) => {
+      console.log('Updating section: ', course, sectionId, items);
       const slugifiedCourseTitle = slugify(course.title);
       const existingSection = state.sections[slugifiedCourseTitle];
 
       const courseSections: NavigationPageStoreItem =
         existingSection ||
         ({
-          kind: "page",
+          kind: 'page',
           segment: slugifiedCourseTitle,
           title: course.title,
           iconFC: SchoolIcon,
           metadata: {
             description: course.description,
-            forRoles: ["student", "teacher"],
+            forRoles: ['student', 'teacher'],
             isRootTool: true,
           },
           children: [] as NavigationPageStoreItem[],
@@ -122,7 +125,7 @@ export const useNavigationStore = create<ViewStore>((set) => ({
         newNavigation.push(state.baseSections[section]);
       }
       for (const section in newSections) {
-        console.log("Item: ", newSections[section]);
+        console.log('Item: ', newSections[section]);
         newNavigation.push(newSections[section]);
       }
 
@@ -139,10 +142,10 @@ export const filterNavigationByRole = (role: string): NavigationStoreItem[] => {
     teacher: DEFAULTNAVIGATION,
     student: DEFAULTNAVIGATION.filter(
       (item) =>
-        item.kind !== "header" || item.title !== "Exercise Session manager"
+        item.kind !== 'header' || item.title !== 'Exercise Session manager'
     ),
     guest: DEFAULTNAVIGATION.filter(
-      (item) => item.kind !== "header" || item.title !== "Exercise statistics"
+      (item) => item.kind !== 'header' || item.title !== 'Exercise statistics'
     ),
   };
 

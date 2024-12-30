@@ -22,7 +22,7 @@ export const SizableContentHeader = () => {
     <PageContainer
       title=''
       // maxWidth={false} // Disable maxWidth to use full width
-      breadcrumbs={activePage?.breadcrumbs}
+      breadcrumbs={breadcrumbs}
       sx={{
         display: 'flex',
         flexDirection: 'row',
