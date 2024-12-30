@@ -1,7 +1,9 @@
 {
-  "name": "extended-toolpad",
+  "name": "mui-toolpad-extended-tuni",
   "private": false,
-  "version": "0.0.0",
+  "description": "Extended Toolpad",
+  "author": "Jaakko Rajala",
+  "version": "1.0.0",
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.js",

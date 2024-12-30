@@ -9,12 +9,12 @@ This project is an extended version of MUI Toolpad, originally developed by MUI.
 Install with:
 
 ```bash
-npm install @yourusername/eduml-toolpad
+npm install @jalez/mui-toolpad-extended-tuni'
 ```
 
 Use in your React project:
 
 ```typescript
-import { EduMLProvider } from '@yourusername/eduml-toolpad';
+import { EduMLProvider } from '@jalez/mui-toolpad-extended-tuni';
 // ...existing code...
 ```
