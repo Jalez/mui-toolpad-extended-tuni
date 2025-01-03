@@ -4,6 +4,12 @@
 
 A React library extending MUI Toolpad functionality with additional features for educational applications. This library provides components and tools for building interactive educational interfaces.
 
+## Breaking Changes in v2.0.0
+
+1. Renamed `EduMLProvider` to `LMSProvider` (EduMLProvider is now deprecated)
+2. All routing components must now be imported from this package
+3. State management is now centralized through the package
+
 ## Prerequisites
 
 This library requires the following peer dependencies:
@@ -18,21 +24,21 @@ This library requires the following peer dependencies:
 ## Installation
 
 ```bash
-npm install @jalez/mui-toolpad-extended-tuni
+npm install mui-toolpad-extended-tuni
 ```
 
 ## Basic Usage
 
-1. Wrap your application with `EduMLProvider`:
+1. Setup your application with `LMSProvider` and routing:
 
 ```tsx
 import { BrowserRouter } from 'react-router-dom';
-import { EduMLProvider } from '@jalez/mui-toolpad-extended-tuni';
+import { LMSProvider } from 'mui-toolpad-extended-tuni';
 
 function App() {
   return (
     <BrowserRouter>
-      <EduMLProvider>{/* Your application content */}</EduMLProvider>
+      <LMSProvider>{/* Your application content */}</LMSProvider>
     </BrowserRouter>
   );
 }
@@ -45,7 +51,7 @@ import {
   useUserStore,
   useCourseStore,
   useNavigationStore,
-} from '@jalez/mui-toolpad-extended-tuni';
+} from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
   const { user } = useUserStore();
@@ -62,20 +68,19 @@ function MyComponent() {
 
 ## Core Components
 
-### EduMLProvider
+### LMSProvider
 
 The main provider component that sets up the application context:
 
 ```tsx
-import { BrowserRouter } from 'react-router-dom';
-import { EduMLProvider } from '@jalez/mui-toolpad-extended-tuni';
+import { LMSProvider, BrowserRouter } from 'mui-toolpad-extended-tuni';
 
 function App() {
   return (
     <BrowserRouter>
-      <EduMLProvider>
+      <LMSProvider>
         <YourComponents />
-      </EduMLProvider>
+      </LMSProvider>
     </BrowserRouter>
   );
 }
@@ -86,7 +91,7 @@ function App() {
 A customizable loading indicator with animations:
 
 ```tsx
-import { LoadingScreen } from '@jalez/mui-toolpad-extended-tuni';
+import { LoadingScreen } from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
   return isLoading ? <LoadingScreen /> : <YourContent />;
@@ -98,7 +103,7 @@ function MyComponent() {
 Built-in notification system using notistack:
 
 ```tsx
-import { useNotificationStore } from '@jalez/mui-toolpad-extended-tuni';
+import { useNotificationStore } from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
   const { addNotificationData } = useNotificationStore();
@@ -113,20 +118,20 @@ function MyComponent() {
 }
 ```
 
-### EduMLDialog
+### ExtendedDialog
 
 A responsive dialog component:
 
 ```tsx
-import { EduMLDialog } from '@jalez/mui-toolpad-extended-tuni';
+import { ExtendedDialog } from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
   const [open, setOpen] = useState(false);
 
   return (
-    <EduMLDialog open={open} onClose={() => setOpen(false)}>
+    <ExtendedDialog open={open} onClose={() => setOpen(false)}>
       <DialogContent>Your content here</DialogContent>
-    </EduMLDialog>
+    </ExtendedDialog>
   );
 }
 ```
@@ -138,7 +143,7 @@ function MyComponent() {
 A component for listing and selecting courses:
 
 ```tsx
-import { CourseSelector } from '@jalez/mui-toolpad-extended-tuni';
+import { CourseSelector } from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
   return <CourseSelector />;
@@ -150,7 +155,7 @@ function MyComponent() {
 Manages course-specific tools and LTI configuration:
 
 ```tsx
-import { CourseTools } from '@jalez/mui-toolpad-extended-tuni';
+import { CourseTools } from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
   return <CourseTools />;
@@ -162,7 +167,7 @@ function MyComponent() {
 For teachers to set up course authentication:
 
 ```tsx
-import { LtiLoginUrlForm } from '@jalez/mui-toolpad-extended-tuni';
+import { LtiLoginUrlForm } from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
   return <LtiLoginUrlForm />;
@@ -176,7 +181,7 @@ function MyComponent() {
 Catches and handles React component errors:
 
 ```tsx
-import { ErrorBoundary } from '@jalez/mui-toolpad-extended-tuni';
+import { ErrorBoundary } from 'mui-toolpad-extended-tuni';
 
 function App() {
   return (
@@ -192,7 +197,7 @@ function App() {
 Detects and displays warnings for null states:
 
 ```tsx
-import { NullStateWarning } from '@jalez/mui-toolpad-extended-tuni';
+import { NullStateWarning } from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
   const states = [{ user: currentUser }, { course: currentCourse }];
@@ -274,7 +279,7 @@ import {
   slugify,
   camelCaseToUnderscore,
   underscoreToCamelCase,
-} from '@jalez/mui-toolpad-extended-tuni';
+} from 'mui-toolpad-extended-tuni';
 
 // Convert strings to URL-friendly format
 const slug = slugify('My Course Title'); // 'my-course-title'
@@ -290,7 +295,7 @@ const camelCase = underscoreToCamelCase('my_variable'); // 'myVariable'
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from '@jalez/mui-toolpad-extended-tuni';
+} from 'mui-toolpad-extended-tuni';
 
 // Convert API responses
 const camelCaseData = convertObjectKeysToCamelCase(apiResponse);
@@ -302,7 +307,7 @@ const underscoreData = convertObjectKeysToUnderscore(requestData);
 The library includes pre-configured Axios instance for API communications:
 
 ```tsx
-import { axiosInstance } from '@jalez/mui-toolpad-extended-tuni';
+import { axiosInstance } from 'mui-toolpad-extended-tuni';
 
 // Handles CSRF tokens and base URL automatically
 const response = await axiosInstance.get('/api/endpoint');
@@ -332,7 +337,7 @@ interface CourseRaw {
 The library includes a customizable Material-UI theme:
 
 ```tsx
-import { EduMLTheme } from '@jalez/mui-toolpad-extended-tuni';
+import { EduMLTheme } from 'mui-toolpad-extended-tuni';
 
 // Theme includes predefined:
 // - Color schemes (light/dark)

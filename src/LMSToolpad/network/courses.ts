@@ -1,7 +1,7 @@
 /** @format */
 
 import { Course, CourseRaw } from '../store/useCourseStore';
-import axios from '../network/axiosConfig';
+import axios from './axiosConfig';
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,

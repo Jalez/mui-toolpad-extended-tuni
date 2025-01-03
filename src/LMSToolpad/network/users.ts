@@ -1,6 +1,6 @@
 /** @format */
 
-import axios from '../network/axiosConfig';
+import axios from './axiosConfig';
 import { UserData } from '../store/useUserStore';
 
 export const getCurrentUser = async (courseId?: string): Promise<UserData> => {

@@ -7,6 +7,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+diff.txt
 node_modules
 # DON'T ignore dist folder if you're publishing from GitHub
 # dist

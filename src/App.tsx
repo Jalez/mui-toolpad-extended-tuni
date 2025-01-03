@@ -1,7 +1,7 @@
 /** @format */
 
 import { BrowserRouter } from 'react-router-dom';
-import { EduMLProvider } from './EduMLToolpad';
+import { EduMLProvider } from './LMSToolpad';
 
 const App = () => {
   return (
