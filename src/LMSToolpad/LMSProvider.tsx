@@ -26,19 +26,25 @@ export interface EduMLProviderProps {
 }
 
 /**
- * EduMLProvider must be wrapped in a Router component from react-router-dom
- * Example:
- * ```tsx
- * import { BrowserRouter } from 'react-router-dom';
+ * Main provider component for the LMS system.
  *
+ * @version 2.1.0
+ * @breaking-changes
+ * - Renamed from EduMLProvider to LMSProvider
+ * - Updated authentication handling for course instances
+ * - Added support for course code level navigation
+ * - Improved context sharing between microservices
+ *
+ * @example
+ * ```tsx
  * <BrowserRouter>
- *   <EduMLProvider>
+ *   <LMSProvider>
  *     {children}
- *   </EduMLProvider>
+ *   </LMSProvider>
  * </BrowserRouter>
  * ```
  */
-const EduMLProvider = ({ children }: EduMLProviderProps) => {
+const LMSProvider = ({ children }: EduMLProviderProps) => {
   const [loggingIn, setLoggingIn] = useState(false);
   const { user, getUser, logout } = useUserStore();
   const { currentCourse, getCourses, setCurrentCourseUrl, getCourseByUrl } =
@@ -179,4 +185,4 @@ const EduMLProvider = ({ children }: EduMLProviderProps) => {
   );
 };
 
-export default EduMLProvider;
+export default LMSProvider;

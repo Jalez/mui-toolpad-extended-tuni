@@ -77,6 +77,9 @@ export {
 export { default as MicroserviceRoutes } from './LMSToolpad/components/MicroserviceRoutes';
 export type { MicroserviceConfig } from './LMSToolpad/components/MicroserviceRoutes';
 
+export { buildMicroServiceNavigation } from './LMSToolpad/components/MicroserviceNavigationBuilder';
+export type { BuildMicroServiceNavigationProps } from './LMSToolpad/components/MicroserviceNavigationBuilder';
+
 /**
  * **NETWORK**
  */

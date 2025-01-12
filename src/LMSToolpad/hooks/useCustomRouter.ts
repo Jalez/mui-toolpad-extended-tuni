@@ -1,13 +1,14 @@
-import { useLocation, useNavigate } from "react-router-dom";
+/** @format */
+
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function useCustomRouter() {
   const navigate = useNavigate();
   const location = useLocation();
-  console.log("location", location, navigate)
   return {
     pathname: location.pathname,
     searchParams: new URLSearchParams(location.search),
-    navigate: navigate
+    navigate: navigate,
     // navigate: (url: string, options: { history?: "replace" } = {}) => {
     //   const method = options?.history === "replace" ? "replace" : "push";
     //   navigate(url, { replace: method === "replace" });
