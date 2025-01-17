@@ -50,8 +50,8 @@ export { default as CourseTools } from './LMSToolpad/components/Courses/CourseTo
 
 export { default as LoadingScreen } from './LMSToolpad/components/LoadingScreen';
 
-export { default as ToolSelector } from './LMSToolpad/components/ToolSelector';
-export type { ToolSelectorItem } from './LMSToolpad/components/ToolSelector';
+export { default as ToolSelector } from './LMSToolpad/components/Tool/ToolSelector';
+export type { ToolSelectorItem } from './LMSToolpad/components/Tool/ToolSelector';
 
 export { default as DialogOpener } from './LMSToolpad/components/Dialogs/DialogOpener';
 
@@ -60,6 +60,8 @@ export { default as FormDialog } from './LMSToolpad/components/Dialogs/FormDialo
 export { default as IconWithBadge } from './LMSToolpad/components/IconWithBadge';
 
 export { default as ExtendedDialog } from './LMSToolpad/components/EduMLDialog';
+
+export { default as CenteredHeading } from './LMSToolpad/components/CenteredHeading';
 
 /**
  * **TOOLS**
@@ -74,11 +76,11 @@ export {
   convertObjectKeysToUnderscore,
 } from './LMSToolpad/utils/caseConverter';
 
-export { default as MicroserviceRoutes } from './LMSToolpad/components/MicroserviceRoutes';
-export type { MicroserviceConfig } from './LMSToolpad/components/MicroserviceRoutes';
+export { default as MicroserviceRoutes } from './LMSToolpad/components/Microservices/MicroserviceRoutes';
+export type { MicroserviceConfig } from './LMSToolpad/components/Microservices/MicroserviceRoutes';
 
-export { buildMicroServiceNavigation } from './LMSToolpad/components/MicroserviceNavigationBuilder';
-export type { BuildMicroServiceNavigationProps } from './LMSToolpad/components/MicroserviceNavigationBuilder';
+export { buildMicroServiceNavigation } from './LMSToolpad/components/Microservices/MicroserviceNavigationBuilder';
+export type { BuildMicroServiceNavigationProps } from './LMSToolpad/components/Microservices/MicroserviceNavigationBuilder';
 
 /**
  * **NETWORK**

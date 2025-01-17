@@ -4,6 +4,23 @@
 
 A React library extending MUI Toolpad functionality with additional features for educational applications. This library provides components and tools for building interactive educational interfaces.
 
+## Version 2.1.0
+
+### Recent Changes
+
+- Enhanced course navigation structure with support for course instances
+- Improved MicroserviceRoutes component with better TypeScript support
+- Added new CourseInstanceSelector and CourseCodeLoader components
+- Updated navigation store with better course instance handling
+- Introduced new course filtering utilities
+- Improved sidebar footer with responsive design
+
+### Breaking Changes
+
+- Navigation structure now requires course code and instance properties
+- MicroserviceRoutes configuration requires updated navigation builder function
+- Course data structure updated to include code and instance fields
+
 ## Breaking Changes in v2.0.0
 
 1. Renamed `EduMLProvider` to `LMSProvider` (EduMLProvider is now deprecated)

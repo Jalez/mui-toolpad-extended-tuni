@@ -1,14 +1,19 @@
 /** @format */
 
 import { ReactNode, useEffect, useState } from 'react';
-import { DashboardLayout, Navigation, Router, Session } from '@toolpad/core';
+import {
+  AppTheme,
+  DashboardLayout,
+  Navigation,
+  Router,
+  Session,
+} from '@toolpad/core';
 import { AppProvider } from '@toolpad/core/react-router-dom';
 import { useNavigationStore } from './store/useNavigationStore';
 import { useUserStore } from './store/useUserStore';
 import useCourseStore from './store/useCourseStore';
 import useCustomRouter from './hooks/useCustomRouter';
 import { Logo } from './components/Logo';
-import { EduMLTheme } from './theme/EduMLTheme';
 import { addIcons } from './components/tools/addIcons';
 import { addActions } from './components/tools/addActions';
 import Notifications from './components/Notifications';
@@ -19,6 +24,9 @@ import { SizableContentHeader } from './layout/breadcrumbs/SizableContentHeader'
 import SidebarFooter from './components/sidebar/Footer';
 import { ToolbarAccount } from './components/toolbar/Account';
 import { CustomActions } from './components/toolbar/Actions';
+import Dialogs from './components/Dialogs/Dialogs';
+import { useThemeStore } from './store/useThemeStore';
+import { createTheme, Theme } from '@mui/material';
 
 export interface EduMLProviderProps {
   children?: ReactNode;
@@ -45,6 +53,7 @@ export interface EduMLProviderProps {
  * ```
  */
 const LMSProvider = ({ children }: EduMLProviderProps) => {
+  // const createdTheme = createTheme(ThemeTemplate);
   const [loggingIn, setLoggingIn] = useState(false);
   const { user, getUser, logout } = useUserStore();
   const { currentCourse, getCourses, setCurrentCourseUrl, getCourseByUrl } =
@@ -56,11 +65,17 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
   );
   const [parentUrl, setParentUrl] = useState<string | null>(null);
   const { addNotificationData } = useNotificationStore();
+  const { theme } = useThemeStore();
+  const [lmsTheme, setLmsTheme] = useState<Theme>(createTheme(theme));
 
   // Fetch the user on mount and whenever loggingIn or currentCourse.id changes
   useEffect(() => {
     getUser(currentCourse?.id);
   }, [loggingIn, currentCourse?.id, getUser]);
+
+  useEffect(() => {
+    setLmsTheme(createTheme(theme));
+  }, [theme]);
 
   // If user is known, fetch courses
   useEffect(() => {
@@ -161,7 +176,7 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
           title: '',
         }}
         navigation={(currentCourse && currentNavigation) || []}
-        theme={EduMLTheme}
+        theme={lmsTheme}
         router={router as Router}
         session={session}
         authentication={{
@@ -178,6 +193,7 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
           <SizableContentHeader />
 
           {children}
+          <Dialogs />
           <Notifications />
         </DashboardLayout>
       </AppProvider>

@@ -3,10 +3,12 @@
 import { Box, Typography } from '@mui/material';
 
 import useCourseStore from '../store/useCourseStore';
+import { usePlatformSettingsStore } from '../store/usePlatformSettingsStore';
 // import logo from '/static/images/tuni.png';
 
 export const Logo = () => {
-  const { setCurrentCourse} = useCourseStore((state) => state);
+  const { setCurrentCourse } = useCourseStore((state) => state);
+  const { platform } = usePlatformSettingsStore();
   // <img
   //   style={{
   //     maxWidth: "30px",
@@ -20,7 +22,7 @@ export const Logo = () => {
   // />
   return (
     <Box
-    onClick={() => setCurrentCourse(null)}
+      onClick={() => setCurrentCourse(null)}
       sx={{
         height: '100%',
         display: 'flex',
@@ -30,7 +32,7 @@ export const Logo = () => {
         // gap: '0.5rem',
       }}>
       <Typography variant='h1' component='h1'>
-        {'EduML'}
+        {platform.name}
       </Typography>
       {/* {user && user.id && <DevelopmentTools />} */}
     </Box>

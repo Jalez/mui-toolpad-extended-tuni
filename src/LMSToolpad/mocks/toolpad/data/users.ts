@@ -1,30 +1,46 @@
 /** @format */
 
-
 export type UserRawBackendData = {
   id: string;
   name: string;
   email: string;
   role?: string;
+  enrollmentStatus?: {
+    status: 'enrolled' | 'pending' | 'rejected';
+    date: string;
+  };
 };
-
-
 
 export const basicUsersDataResponse: UserRawBackendData[] = [
   {
     id: '1',
-    name: 'Test User 1',
-    email: 'test.user1@com',
+    name: 'Teacher User',
+    email: 'teacher@edu.com',
+    role: 'teacher',
+    enrollmentStatus: {
+      status: 'enrolled',
+      date: new Date().toISOString(),
+    },
   },
   {
     id: '2',
-    name: 'Test User 2',
-    email: 'test.user2@com',
+    name: 'Student One',
+    email: 'student1@edu.com',
+    role: 'student',
+    enrollmentStatus: {
+      status: 'enrolled',
+      date: '2024-01-01T00:00:00.000Z',
+    },
   },
   {
     id: '3',
-    name: 'Test User 3',
-    email: 'test.user3@com',
+    name: 'Student Two',
+    email: 'student2@edu.com',
+    role: 'student',
+    enrollmentStatus: {
+      status: 'pending',
+      date: '2024-02-01T00:00:00.000Z',
+    },
   },
   {
     id: '4',

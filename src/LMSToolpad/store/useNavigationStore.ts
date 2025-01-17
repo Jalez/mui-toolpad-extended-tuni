@@ -29,6 +29,7 @@ export interface NavigationPageStoreItem extends NavigationItemBase {
   iconFC?: SvgIconComponent; // Updated type to SvgIconComponent
   icon?: JSX.Element;
   children?: NavigationPageStoreItem[]; // Can only contain page items
+  view?: React.ComponentType; // Changed from JSX.Element
   action?: JSX.Element;
   metadata?: ToolMetadata; // Added tool metadata
 }
@@ -41,16 +42,16 @@ export type NavigationStoreItem =
 const DEFAULTNAVIGATION: NavigationStoreItem[] = [
   { kind: 'header', title: 'Other' },
   {
+    kind: 'page', // Added kind here
     segment: 'help',
     title: 'Help',
     iconFC: HelpIcon,
-    kind: 'page',
   },
   {
+    kind: 'page', // Added kind here
     segment: 'contact',
     title: 'Contact',
     iconFC: ContactPageIcon,
-    kind: 'page',
   },
 ];
 
@@ -67,6 +68,7 @@ type ViewStore = {
   baseSections: Record<string, NavigationStoreItem>;
   sections: Record<string, NavigationPageStoreItem>; // Changed to nested structure
   setNavigation: (navigation: NavigationStoreItem[]) => void;
+  allMicroserviceNavigation: NavigationPageStoreItem[];
   updateSection: (course: Course, items: NavigationPageStoreItem[]) => void;
   addSection: ({
     segment,
@@ -78,6 +80,9 @@ type ViewStore = {
   updateCourseInstanceSection: (
     course: Course,
     items: NavigationPageStoreItem[]
+  ) => void;
+  addMicroserviceNavigation: (
+    microserviceNavigation: NavigationPageStoreItem
   ) => void;
 };
 
@@ -114,7 +119,23 @@ export const useNavigationStore = create<ViewStore>((set) => ({
   },
 
   sections: {},
+  // usedMicroserviceNavigation: [],
+  allMicroserviceNavigation: [],
+  addMicroserviceNavigation: (item) =>
+    set((state) => {
+      const existingMicroservice = state.allMicroserviceNavigation.find(
+        (microservice) => microservice.segment === item.segment
+      );
 
+      if (!existingMicroservice) {
+        return {
+          allMicroserviceNavigation:
+            state.allMicroserviceNavigation.concat(item),
+        };
+      }
+
+      return state;
+    }),
   setNavigation: (navigation) => set({ navigation }),
   updateSection: (course, items) =>
     set((state) => {
@@ -147,7 +168,6 @@ export const useNavigationStore = create<ViewStore>((set) => ({
         newNavigation.push(state.baseSections[section]);
       }
       for (const section in newSections) {
-        console.log('Item: ', newSections[section]);
         newNavigation.push(newSections[section]);
       }
 
@@ -158,7 +178,6 @@ export const useNavigationStore = create<ViewStore>((set) => ({
     }),
   addSection: ({ segment, title, Icon, description, instances }) =>
     set((state) => {
-      console.log('Adding section:', { segment, title, instances });
       const existingSection = state.sections[segment] || {
         kind: 'page',
         segment: segment,
@@ -188,8 +207,6 @@ export const useNavigationStore = create<ViewStore>((set) => ({
         ...Object.values(newSections),
       ];
 
-      console.log('New navigation:', newNavigation);
-
       return {
         sections: newSections,
         navigation: newNavigation,
@@ -198,71 +215,69 @@ export const useNavigationStore = create<ViewStore>((set) => ({
   updateCourseInstanceSection: (course, items) =>
     set((state) => {
       const segmentIdentifier = course.code;
+
+      // Initialize section if it doesn't exist
+      if (!state.sections[segmentIdentifier]) {
+        state.sections[segmentIdentifier] = {
+          kind: 'page',
+          segment: course.code,
+          title: course.code.toUpperCase(),
+          metadata: {
+            description: course.description,
+            forRoles: ['student', 'teacher'],
+            isRootTool: true,
+          },
+          children: [],
+        };
+      }
+
       const existingSection = state.sections[segmentIdentifier];
+      const children = existingSection.children || [];
 
-      const courseSections: NavigationPageStoreItem = existingSection || {
-        kind: 'page',
-        segment: course.code,
-        title: course.code.toUpperCase(),
-        metadata: {
-          description: course.description,
-          forRoles: ['student', 'teacher'],
-          isRootTool: true,
-        },
-        children: [],
-      };
-
-      const children = courseSections.children || [];
-      const otherChildren = children.filter(
-        (item) => item.segment !== course.instance
-      );
-
-      // Find existing instance section or create new one
-      const existingInstance = children.find(
+      // Find or create instance section with guaranteed children array
+      let instanceSection: NavigationPageStoreItem = children.find(
         (item) => item.segment === course.instance
-      );
-      console.log('Existing instance: ', existingInstance);
-      const existingInstanceChildren = existingInstance?.children || [];
-
-      // For each new item, replace existing ones with matching segments or add new
-      const updatedInstanceChildren = existingInstanceChildren.slice();
-      items.forEach((newItem) => {
-        const index = updatedInstanceChildren.findIndex(
-          (child) => child.segment === newItem.segment
-        );
-        if (index !== -1) {
-          updatedInstanceChildren[index] = newItem;
-        } else {
-          updatedInstanceChildren.push(newItem);
-        }
-      });
-
-      // Create or update the instance section with preserved children
-      const instanceSection: NavigationPageStoreItem = {
+      ) || {
         kind: 'page',
         segment: course.instance,
         title: course.instance,
-        children: updatedInstanceChildren,
+        children: [],
       };
-      console.log('Instance section: ', instanceSection);
 
-      // Combine other course instance children with the updated instance
-      courseSections.children = [...otherChildren, instanceSection];
+      // Ensure children array exists
+      if (!instanceSection.children) {
+        instanceSection.children = [];
+      }
+
+      // Update or add microservices to instance children
+      items.forEach((item) => {
+        const existingItemIndex = instanceSection.children!.findIndex(
+          (child) => child.segment === item.segment
+        );
+
+        if (existingItemIndex !== -1) {
+          instanceSection.children![existingItemIndex] = item;
+        } else {
+          instanceSection.children!.push(item);
+        }
+      });
+
+      // Update instance in course children
+      const otherChildren = children.filter(
+        (item) => item.segment !== course.instance
+      );
+      existingSection.children = [...otherChildren, instanceSection];
 
       const newSections = {
         ...state.sections,
-        [course.code]: courseSections,
+        [segmentIdentifier]: existingSection,
       };
-      console.log('New sections: ', newSections);
 
-      const newNavigation = [];
-      for (const section in state.baseSections) {
-        newNavigation.push(state.baseSections[section]);
-      }
-
-      for (const section in newSections) {
-        newNavigation.push(newSections[section]);
-      }
+      // Update navigation
+      const newNavigation = [
+        ...Object.values(state.baseSections),
+        ...Object.values(newSections),
+      ];
 
       return {
         sections: newSections,

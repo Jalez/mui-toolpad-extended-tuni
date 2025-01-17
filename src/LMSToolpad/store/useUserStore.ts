@@ -6,9 +6,10 @@ import { fetchState } from '../interfaces';
 import studentImage from '/static/images/student.png';
 import teacherImage from '/static/images/teacher.png';
 import guestImage from '/static/images/guest.png';
+import adminImage from '/static/images/admin.png';
 
 export type userId = string;
-export type role = 'student' | 'teacher' | 'guest';
+export type role = 'student' | 'teacher' | 'guest' | 'admin';
 
 export interface UserData {
   id: userId;
@@ -17,6 +18,12 @@ export interface UserData {
   role: role;
   image?: string;
   color?: string;
+  enrollmentStatus?: {
+    status: 'enrolled' | 'pending' | 'rejected';
+    date: string; // When the enrollment status was last updated
+  };
+  enrollDate?: string; // When the user was actually enrolled in the course
+  requestDate?: string; // When the user initially requested enrollment
 }
 
 const defaultTestUsers = [
@@ -44,6 +51,14 @@ const defaultTestUsers = [
     image: guestImage,
     color: '#f50057',
   },
+  {
+    id: '4',
+    name: 'Admin User',
+    email: 'admin@edu.com',
+    role: 'admin' as role,
+    image: adminImage,
+    color: '#black',
+  },
 ];
 
 export interface UserState {
@@ -51,12 +66,14 @@ export interface UserState {
   user: UserData | null;
   testUsers: UserData[];
   users: UserData[];
+  courseUsers?: UserData[];
   setUser: (user: UserData) => void;
   setTestUsers: (users: UserData[]) => void;
   getUser: (courseId?: string) => void;
   changeRole: (role: 'student' | 'teacher') => void;
   clearUser: () => void;
   getUsers: () => void;
+  fetchCourseUsers: (courseId: string) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -65,6 +82,7 @@ export const useUserStore = create<UserState>((set) => ({
   user: null,
   testUsers: defaultTestUsers,
   users: [],
+  courseUsers: [],
   setTestUsers: (users) => set({ testUsers: users }),
   setUser: (user) => set({ user }),
   getUser: async (courseId) => {
@@ -107,6 +125,15 @@ export const useUserStore = create<UserState>((set) => ({
         set({ fetchState: 'error' });
       }
     } catch (error) {
+      set({ fetchState: 'error' });
+    }
+  },
+  fetchCourseUsers: async (courseId) => {
+    try {
+      set({ fetchState: 'loading' });
+      const users = await getUsers(courseId);
+      set({ courseUsers: users, fetchState: 'idle' });
+    } catch {
       set({ fetchState: 'error' });
     }
   },

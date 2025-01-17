@@ -1,6 +1,6 @@
 /** @format */
 
-export type CourseBackendData = {
+export type CourseRawBackendData = {
   id: string;
   title: string;
   description: string;
@@ -10,16 +10,29 @@ export type CourseBackendData = {
   instance: string;
   lti_login_url?: string;
   services?: string[];
+  image?: string;
+  staff?: string[];
+  visibility: {
+    mode: 'public' | 'enrolled' | 'private';
+    start_date?: string;
+    end_date?: string;
+  };
+  enrollment_status: {
+    open: boolean;
+    start_date?: string;
+    end_date?: string;
+    max_students?: number;
+  };
+  tags?: string[];
+  language?: string;
+  status: 'draft' | 'active' | 'archived';
 };
 
-export type CourseRawBackendData = {
-  title: string;
-  description: string;
-  code: string;
-  instance: string;
-  lti_login_url?: string;
-  services?: string[];
-};
+export interface CourseBackendData extends CourseRawBackendData {
+  id: string;
+  created_at: string;
+  updated_at: string;
+}
 
 export const basicCourses: CourseBackendData[] = [
   {
@@ -32,6 +45,21 @@ export const basicCourses: CourseBackendData[] = [
     instance: 'spring-2024',
     lti_login_url: 'https://example.com/lti/1',
     services: ['edutest'],
+    staff: ['teacher1', 'teacher2'],
+    visibility: {
+      mode: 'public',
+      start_date: '2024-01-01T00:00:00Z',
+      end_date: '2024-12-31T23:59:59Z',
+    },
+    enrollment_status: {
+      open: true,
+      start_date: '2024-01-01T00:00:00Z',
+      end_date: '2024-12-31T23:59:59Z',
+      max_students: 100,
+    },
+    tags: ['programming', 'beginner'],
+    language: 'en',
+    status: 'active',
   },
   {
     id: '2',
@@ -45,6 +73,21 @@ export const basicCourses: CourseBackendData[] = [
     instance: 'fall-2024',
     lti_login_url: 'https://example.com/lti/2',
     services: ['edutest'],
+    staff: ['teacher1', 'teacher2'],
+    visibility: {
+      mode: 'public',
+      start_date: '2024-01-01T00:00:00Z',
+      end_date: '2024-12-31T23:59:59Z',
+    },
+    enrollment_status: {
+      open: true,
+      start_date: '2024-01-01T00:00:00Z',
+      end_date: '2024-12-31T23:59:59Z',
+      max_students: 100,
+    },
+    tags: ['programming', 'beginner'],
+    language: 'en',
+    status: 'active',
   },
   {
     id: '3',
@@ -56,5 +99,20 @@ export const basicCourses: CourseBackendData[] = [
     instance: 'spring-2025',
     lti_login_url: 'https://example.com/lti/3',
     services: [],
+    staff: ['teacher1', 'teacher2'],
+    visibility: {
+      mode: 'public',
+      start_date: '2025-01-01T00:00:00Z',
+      end_date: '2025-12-31T23:59:59Z',
+    },
+    enrollment_status: {
+      open: true,
+      start_date: '2025-01-01T00:00:00Z',
+      end_date: '2025-12-31T23:59:59Z',
+      max_students: 100,
+    },
+    tags: ['programming', 'beginner'],
+    language: 'en',
+    status: 'active',
   },
 ];

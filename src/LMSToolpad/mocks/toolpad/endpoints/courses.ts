@@ -40,6 +40,22 @@ export const createCourseResponse = (
     code: newCourse.code || '',
     instance: newCourse.instance || '',
     lti_login_url: newCourse.lti_login_url || '',
+    image: newCourse.image,
+    staff: newCourse.staff || [],
+    visibility: {
+      mode: newCourse.visibility?.mode || 'private',
+      start_date: newCourse.visibility?.start_date,
+      end_date: newCourse.visibility?.end_date,
+    },
+    enrollment_status: {
+      open: newCourse.enrollment_status?.open || false,
+      start_date: newCourse.enrollment_status?.start_date,
+      end_date: newCourse.enrollment_status?.end_date,
+      max_students: newCourse.enrollment_status?.max_students,
+    },
+    tags: newCourse.tags || [],
+    language: newCourse.language,
+    status: newCourse.status || 'draft',
   };
 
   dataStore.courses.push(course);

@@ -8,11 +8,14 @@ import { useNotificationStore } from '../../store/useNotificationsStore';
 
 import CenteredHeading from '../CenteredHeading';
 import LtiLoginUrlForm from './LtiLoginUrlForm';
-import { NavigationPageStoreItem } from '../../store/useNavigationStore';
-import ToolDisplayer from '../ToolDisplayer';
+import {
+  NavigationPageStoreItem,
+  useNavigationStore,
+} from '../../store/useNavigationStore';
+import ToolDisplayer from '../Tool/ToolDisplayer';
 
 interface CourseToolsProps {
-  microservices: NavigationPageStoreItem[];
+  microservices?: NavigationPageStoreItem[];
 }
 
 /**
@@ -32,30 +35,47 @@ interface CourseToolsProps {
  */
 const CourseTools = ({ microservices }: CourseToolsProps) => {
   const { instance, code } = useParams();
-  const { updateCurrentCourse, currentCourse } = useCourseStore();
+  const { updateStateCourse, currentCourse } = useCourseStore();
   const { addNotificationData } = useNotificationStore();
   const { user } = useUserStore();
   const [show, setShow] = useState(true);
+  const { allMicroserviceNavigation } = useNavigationStore();
+  const [currentMicroservices, setCurrentMicroservices] = useState<
+    NavigationPageStoreItem[] | undefined
+  >(microservices);
+  // Add null checking and default to empty array
+  // console.log('SECTION', allMicroserviceNavigation);
+  useEffect(() => {
+    if (!microservices && code && allMicroserviceNavigation) {
+      setCurrentMicroservices(allMicroserviceNavigation);
+    } else if (microservices) {
+      setCurrentMicroservices(microservices);
+    }
+  }, [microservices, code, instance, allMicroserviceNavigation]);
 
-  // Convert the current navigation section’s children to two lists:
+  // Initialize with empty arrays if no tools are available
   const [usedTools, setUsedTools] = useState<NavigationPageStoreItem[]>(
-    microservices.filter((ms) => currentCourse?.services?.includes(ms.segment))
+    currentMicroservices?.filter((ms) =>
+      currentCourse?.services?.includes(ms.segment)
+    ) || []
   );
   const [availableTools, setAvailableTools] = useState<
     NavigationPageStoreItem[]
   >(
-    microservices.filter((ms) => !currentCourse?.services?.includes(ms.segment))
+    currentMicroservices?.filter(
+      (ms) => !currentCourse?.services?.includes(ms.segment)
+    ) || []
   );
 
   useEffect(() => {
-    if (code && instance) {
+    if (code && instance && currentMicroservices) {
       setUsedTools(
-        microservices.filter((ms) =>
+        currentMicroservices.filter((ms) =>
           currentCourse?.services?.includes(ms.segment)
         )
       );
       setAvailableTools(
-        microservices.filter(
+        currentMicroservices.filter(
           (ms) => !currentCourse?.services?.includes(ms.segment)
         )
       );
@@ -87,7 +107,7 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
       ? currentCourse.services?.filter((svc) => svc !== path) || []
       : [...(currentCourse.services || []), path];
     const updated: Course = { ...currentCourse, services: newServices };
-    await updateCurrentCourse(updated);
+    await updateStateCourse(updated);
   };
   if (!code) return <h1>No course selected!</h1>;
 

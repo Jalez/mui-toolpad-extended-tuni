@@ -1,7 +1,20 @@
 /** @format */
 
-import { Card, CardContent, Typography, Stack } from '@mui/material';
-import { Course } from '../../store/useCourseStore';
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  Typography,
+  Stack,
+  IconButton,
+  Chip,
+  Box,
+} from '@mui/material';
+import useCourseStore, { Course } from '../../store/useCourseStore';
+import SettingsIcon from '@mui/icons-material/Settings';
+
+import useDialogStore from '../../store/useDialogStore';
+import defaultCourseImage from '/static/images/default-course.webp'; // You'll need to add this
 
 type CourseItemProps = {
   course: Course;
@@ -47,6 +60,50 @@ const LastUpdateDate = ({
   </Typography>
 );
 
+const StatusChip = ({ status }: { status: Course['status'] }) => {
+  const colors: Record<Course['status'], 'warning' | 'success' | 'error'> = {
+    draft: 'warning',
+    active: 'success',
+    archived: 'error',
+  };
+
+  return <Chip size='small' label={status} color={colors[status]} />;
+};
+
+const VisibilityInfo = ({
+  visibility,
+}: {
+  visibility: Course['visibility'];
+}) => (
+  <Typography variant='caption' color='text.secondary'>
+    {visibility.mode.charAt(0).toUpperCase() + visibility.mode.slice(1)}
+  </Typography>
+);
+
+const CourseMetadata = ({
+  language,
+  tags,
+}: Pick<Course, 'language' | 'tags'>) => (
+  <Box sx={{ mt: 1, display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+    {language && <Chip size='small' label={language} variant='outlined' />}
+    {tags?.map((tag) => (
+      <Chip key={tag} size='small' label={tag} variant='outlined' />
+    ))}
+  </Box>
+);
+
+const EnrollmentStatus = ({
+  enrollmentStatus,
+}: {
+  enrollmentStatus: Course['enrollmentStatus'];
+}) => (
+  <Typography
+    variant='caption'
+    color={enrollmentStatus.open ? 'success.main' : 'error.main'}>
+    {enrollmentStatus.open ? 'Enrollment Open' : 'Enrollment Closed'}
+  </Typography>
+);
+
 /**
  * Course item component for displaying individual course cards.
  *
@@ -68,23 +125,64 @@ const CourseItem = ({
   onSelect,
   displayMode = 'course',
 }: CourseItemProps) => {
-  const renderContent = () => (
-    <Stack spacing={1}>
-      <CourseTitle title={course.title} />
-      {displayMode !== 'instanceList' && <CourseCode code={course.code} />}
-      {(displayMode === 'instance' || displayMode === 'instanceList') && (
-        <CourseInstance instance={course.instance} />
-      )}
-      <LastUpdateDate date={course.updatedAt} isInactive={isInactive} />
-    </Stack>
-  );
+  const { setOpenDialog } = useDialogStore();
+  const { setCourseToUpdate } = useCourseStore();
+
+  const handleSettingsClick = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setCourseToUpdate(course);
+    setOpenDialog('CourseSettings');
+  };
+
+  const renderContent = () => {
+    const imageUrl = course.image || defaultCourseImage;
+    return (
+      <Stack spacing={1}>
+        <CardMedia
+          component='img'
+          height='140'
+          image={imageUrl}
+          alt={course.title}
+        />
+        <Stack
+          direction='row'
+          alignItems='center'
+          justifyContent='space-between'>
+          <Stack spacing={0.5}>
+            <CourseTitle title={course.title} />
+            {displayMode !== 'instanceList' && (
+              <CourseCode code={course.code} />
+            )}
+            {(displayMode === 'instance' || displayMode === 'instanceList') && (
+              <CourseInstance instance={course.instance} />
+            )}
+          </Stack>
+          <Stack direction='row' spacing={1} alignItems='center'>
+            <StatusChip status={course.status} />
+            <IconButton onClick={handleSettingsClick}>
+              <SettingsIcon />
+            </IconButton>
+          </Stack>
+        </Stack>
+
+        <Stack direction='row' spacing={1} alignItems='center'>
+          <VisibilityInfo visibility={course.visibility} />
+          <EnrollmentStatus enrollmentStatus={course.enrollmentStatus} />
+        </Stack>
+        <CourseMetadata language={course.language} tags={course.tags} />
+        <LastUpdateDate date={course.updatedAt} isInactive={isInactive} />
+      </Stack>
+    );
+  };
 
   return (
     <Card
       sx={{
-        minWidth: 200,
+        minWidth: 275,
         cursor: 'pointer',
-        backgroundColor: isSelected ? 'primary.light' : 'background.paper',
+        border: isSelected ? 2 : 1,
+        borderColor: isSelected ? 'primary.light' : 'background.paper',
         opacity: isInactive ? 0.7 : 1,
         filter: isInactive ? 'grayscale(30%)' : 'none',
         '&:hover': {

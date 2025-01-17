@@ -97,11 +97,6 @@ export async function updateCourse(courseData: Course): Promise<Course> {
 
     const updatedCourse = convertObjectKeysToCamelCase(response.data);
 
-    // Verify the update was successful by checking the returned data
-    if (updatedCourse.ltiLoginUrl !== courseData.ltiLoginUrl) {
-      throw new Error('Update verification failed');
-    }
-
     return updatedCourse;
   } catch (error) {
     throw new Error(`Failed to update the course: ${error}`);

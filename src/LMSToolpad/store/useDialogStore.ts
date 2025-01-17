@@ -1,4 +1,6 @@
-import { create } from "zustand";
+/** @format */
+
+import { create } from 'zustand';
 
 export type dialogType = string | null;
 

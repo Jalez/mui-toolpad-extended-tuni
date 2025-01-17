@@ -6,7 +6,7 @@ import useCourseStore from '../../store/useCourseStore';
 import { useNotificationStore } from '../../store/useNotificationsStore';
 
 const LtiLoginUrlForm = () => {
-  const { currentCourse, updateCurrentCourse } = useCourseStore();
+  const { currentCourse, updateStateCourse } = useCourseStore();
   const { addNotificationData } = useNotificationStore();
   const [ltiLoginUrl, setLtiLoginUrl] = useState(
     currentCourse?.ltiLoginUrl || ''
@@ -28,7 +28,7 @@ const LtiLoginUrlForm = () => {
 
     setLoading(true);
     try {
-      const updatedCourse = await updateCurrentCourse({
+      const updatedCourse = await updateStateCourse({
         ...currentCourse,
         ltiLoginUrl: trimmedUrl,
       });

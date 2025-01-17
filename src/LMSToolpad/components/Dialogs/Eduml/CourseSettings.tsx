@@ -10,7 +10,7 @@ import useDialogStore from '../../../store/useDialogStore';
 
 const CourseSettings = () => {
   const { closeDialog } = useDialogStore();
-  const { currentCourse, updateCurrentCourse } = useCourseStore();
+  const { currentCourse, updateStateCourse } = useCourseStore();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
@@ -31,7 +31,7 @@ const CourseSettings = () => {
       description,
     };
 
-    updateCurrentCourse(updatedCourse);
+    updateStateCourse(updatedCourse);
     closeDialog();
   };
 

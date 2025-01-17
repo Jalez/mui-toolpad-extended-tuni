@@ -29,8 +29,6 @@ const CourseCodeLoader = () => {
 
   useEffect(() => {
     if (!code) return;
-
-    console.log('CourseCodeLoader: Setting course code:', code);
     setCurrentCourseCode(code);
 
     const matchingCourses = courses.filter(
