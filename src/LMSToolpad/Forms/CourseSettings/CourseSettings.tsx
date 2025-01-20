@@ -12,7 +12,7 @@ import useCourseStore, {
 import FormDialog from '../../components/Dialogs/FormDialog';
 import BasicInfoTab from './tabs/BasicInfoTab';
 import { Box, useMediaQuery, useTheme } from '@mui/system';
-import CourseSettingsTabs from './tabs/CourseSettingsTabs';
+import CourseSettingsTabs from './CourseSettingsTabs';
 import { useNotificationStore } from '../../store/useNotificationsStore';
 import { useUserStore } from '../../store/useUserStore';
 

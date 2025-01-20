@@ -8,13 +8,14 @@ import {
   useTheme,
   Tooltip,
 } from '@mui/material';
-import { useState } from 'react';
-import BasicInfoTab from './BasicInfoTab';
-import StaffTab from './StaffTab';
-import EnrollmentTab from './EnrollmentTab';
-import VisibilityTab from './VisibilityTab';
-import { CourseRaw } from '../../../store/useCourseStore';
-import { UserData } from '../../../store/useUserStore';
+import { useState, useEffect } from 'react';
+import BasicInfoTab from './tabs/BasicInfoTab';
+import StaffTab from './tabs/StaffTab';
+import EnrollmentTab from './tabs/EnrollmentTab';
+import VisibilityTab from './tabs/VisibilityTab';
+import { CourseRaw } from '../../store/useCourseStore';
+import { UserData } from '../../store/useUserStore';
+import DataProcessingTab from './tabs/DataProcessingTab';
 
 type CourseSettingsProps = {
   formData: CourseRaw;
@@ -22,14 +23,31 @@ type CourseSettingsProps = {
   courseUsers?: UserData[];
 };
 
-const CourseSettingsTabs = ({
+export default function CourseSettingsTabs({
   formData,
   handleUpdateFormData,
   courseUsers,
-}: CourseSettingsProps) => {
+}: CourseSettingsProps) {
   const theme = useTheme();
   const [tab, setTab] = useState(0);
   const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
+
+  // Ensure dataProcessing is initialized when the form is first loaded
+  useEffect(() => {
+    if (!formData.dataProcessing) {
+      handleUpdateFormData({
+        ...formData,
+        dataProcessing: {
+          purposes: ['course_delivery', 'assessment'],
+          retention: 365,
+          thirdPartyProcessors: [],
+          specialCategories: false,
+          legalBasis: 'consent',
+        },
+      });
+    }
+  }, [formData, handleUpdateFormData]);
+
   return (
     <>
       <Tabs
@@ -66,6 +84,13 @@ const CourseSettingsTabs = ({
           enterNextDelay={100}>
           <Tab label='Staff' />
         </Tooltip>
+        <Tooltip
+          title='Set data processing details. Define purposes, retention period, and legal basis.'
+          arrow
+          enterDelay={500}
+          enterNextDelay={100}>
+          <Tab label='Data Processing' />
+        </Tooltip>
       </Tabs>
 
       <Box sx={{ overflowY: 'auto', flex: 1, p: 1 }}>
@@ -96,9 +121,13 @@ const CourseSettingsTabs = ({
             courseUsers={courseUsers}
           />
         )}
+        {((!isLargeScreen && tab === 4) || (isLargeScreen && tab === 3)) && (
+          <DataProcessingTab
+            formData={formData}
+            setFormData={handleUpdateFormData}
+          />
+        )}
       </Box>
     </>
   );
-};
-
-export default CourseSettingsTabs;
+}

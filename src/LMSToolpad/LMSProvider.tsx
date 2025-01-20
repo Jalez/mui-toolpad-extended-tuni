@@ -1,13 +1,7 @@
 /** @format */
 
 import { ReactNode, useEffect, useState } from 'react';
-import {
-  AppTheme,
-  DashboardLayout,
-  Navigation,
-  Router,
-  Session,
-} from '@toolpad/core';
+import { DashboardLayout, Navigation, Router, Session } from '@toolpad/core';
 import { AppProvider } from '@toolpad/core/react-router-dom';
 import { useNavigationStore } from './store/useNavigationStore';
 import { useUserStore } from './store/useUserStore';
@@ -184,6 +178,18 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
           signOut: handleLogout,
         }}>
         <DashboardLayout
+          //No borders for dashboard layout
+          border={false}
+          sx={{
+            bgcolor: 'background.paper',
+            '& .MuiDrawer-paper': {
+              border: 0,
+            },
+            //Navbar no border
+            '& .MuiAppBar-root': {
+              borderBottom: 0,
+            },
+          }}
           maxWidth={true}
           slots={{
             toolbarAccount: ToolbarAccount,

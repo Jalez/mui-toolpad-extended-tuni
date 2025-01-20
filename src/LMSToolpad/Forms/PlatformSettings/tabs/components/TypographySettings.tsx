@@ -128,7 +128,7 @@ export const TypographySettings = ({
   ): number {
     const variantStyles = theme.typography[variant] as TypographyVariantStyle;
     if (property === 'fontSize') {
-      return parseFloat(variantStyles.fontSize) || 1;
+      return parseFloat(variantStyles.fontSize as string) || 1;
     }
     return (variantStyles[property] as number) || 1;
   }

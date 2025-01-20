@@ -11,7 +11,7 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import { useState } from 'react';
-import { ColumnConfig, SqueezableTableProps, TableCellProps } from './types';
+import { SqueezableTableProps, TableCellProps } from './types';
 
 function SqueezableTableCell<T extends string>({
   columnKey,

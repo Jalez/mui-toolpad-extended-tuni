@@ -39,7 +39,15 @@ const EditableText = ({
     <Box
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      sx={{ position: 'relative', width: '100%' }}>
+      sx={{
+        position: 'relative',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
       <Typography variant='body2' color='text.secondary' gutterBottom>
         {label}
       </Typography>

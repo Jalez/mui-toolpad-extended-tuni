@@ -104,17 +104,51 @@ export interface Platform {
     peerReview: boolean;
     gamification: boolean;
   };
+  admins: {
+    emails: string[];
+    invitePending: string[];
+  };
+  privacy: {
+    gdprEnabled: boolean;
+    dataRetentionPeriod: number; // in days
+    defaultPrivacySettings: {
+      allowAnalytics: boolean;
+      allowPersonalization: boolean;
+      allowCommunications: boolean;
+      allowThirdPartySharing: boolean;
+    };
+    privacyPolicy: {
+      url: string;
+      lastUpdated: string;
+      version: string;
+    };
+    cookieSettings: {
+      necessary: boolean;
+      functional: boolean;
+      analytics: boolean;
+      advertising: boolean;
+      expiryDays: number;
+    };
+    dataProcessingAgreements: {
+      thirdParties: {
+        name: string;
+        purpose: string;
+        dataShared: string[];
+        location: string;
+      }[];
+    };
+  };
 }
 
 interface PlatformSettingsStore {
-  platform: PlatformSettings;
-  platformToUpdate: PlatformSettings | null;
-  updatePlatform: (newPlatform: PlatformSettings) => void;
+  platform: Platform;
+  platformToUpdate: Platform | null;
+  updatePlatform: (newPlatform: Platform) => void;
   updateAISettings: (newAISettings: Partial<AISettings>) => void;
   resetToDefaults: () => void;
 }
 
-const DEFAULT_SETTINGS: PlatformSettings = {
+const DEFAULT_SETTINGS: Platform = {
   name: 'LMS Platform',
   description: 'AI-Enhanced Learning Management System',
   contactEmail: 'admin@example.com',
@@ -193,6 +227,35 @@ const DEFAULT_SETTINGS: PlatformSettings = {
     videoConference: true,
     peerReview: true,
     gamification: true,
+  },
+  admins: {
+    emails: ['admin@example.com'],
+    invitePending: [],
+  },
+  privacy: {
+    gdprEnabled: true,
+    dataRetentionPeriod: 365,
+    defaultPrivacySettings: {
+      allowAnalytics: false,
+      allowPersonalization: false,
+      allowCommunications: false,
+      allowThirdPartySharing: false,
+    },
+    privacyPolicy: {
+      url: 'https://example.com/privacy',
+      lastUpdated: new Date().toISOString(),
+      version: '1.0.0',
+    },
+    cookieSettings: {
+      necessary: true,
+      functional: false,
+      analytics: false,
+      advertising: false,
+      expiryDays: 365,
+    },
+    dataProcessingAgreements: {
+      thirdParties: [],
+    },
   },
 };
 

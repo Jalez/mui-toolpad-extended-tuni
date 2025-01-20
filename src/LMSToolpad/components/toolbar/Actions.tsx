@@ -1,39 +1,22 @@
 /** @format */
 
-import { IconButton, Stack, Tooltip } from '@mui/material';
-import { ToolbarActions } from '@toolpad/core';
-import { useUserStore } from '../../store/useUserStore';
-import SettingsIcon from '@mui/icons-material/Settings';
-import useDialogStore from '../../store/useDialogStore';
+import { Stack } from '@mui/material';
+import { CollapsibleMenu } from './CollapsibleMenu';
+import SearchBar from './SearchBar';
 
 export function CustomActions() {
   return (
-    <Stack direction='row' alignItems='center' spacing={2}>
-      <ToolbarActions />
-      <PlatformSettingsOpener />
+    <Stack
+      direction='row'
+      alignItems='center'
+      justifyContent='space-between'
+      flexWrap='nowrap'
+      sx={{ width: '100%' }}>
+      <SearchBar />
+      {/* Put CollapsibleMenu on the right side */}
+      <Stack direction='row' alignItems='center' spacing={2}>
+        <CollapsibleMenu />
+      </Stack>
     </Stack>
   );
 }
-
-const PlatformSettingsOpener = () => {
-  const { user } = useUserStore();
-  const { setOpenDialog } = useDialogStore();
-
-  if (user?.role !== 'admin') return null;
-
-  const handleOpenPlatformSettings = () => {
-    console.log('Open Platform Settings');
-    setOpenDialog('PlatformSettings');
-  };
-
-  return (
-    <Tooltip title='Platform Settings'>
-      <IconButton
-        onClick={handleOpenPlatformSettings}
-        size='small'
-        color='inherit'>
-        <SettingsIcon />
-      </IconButton>
-    </Tooltip>
-  );
-};

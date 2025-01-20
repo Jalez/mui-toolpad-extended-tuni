@@ -1,3 +1,5 @@
+/** @format */
+
 export interface ColumnConfig<T extends string> {
   key: T;
   minWidth: number;
@@ -8,9 +10,9 @@ export interface ColumnConfig<T extends string> {
 
 export interface SqueezableTableProps<T extends string> {
   columns: ColumnConfig<T>[];
-  renderCell: (columnKey: T, rowData: any) => React.ReactNode;
-  data: any[];
-  maxHeight?: string | number;
+  data: readonly any[] | any[]; // Updated to accept readonly arrays
+  renderCell: (columnKey: T, row: any) => React.ReactNode;
+  maxHeight?: string;
   stickyHeader?: boolean;
 }
 

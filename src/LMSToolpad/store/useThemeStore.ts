@@ -2,13 +2,16 @@
 
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type {
+  Components,
+  Theme,
+  PaletteMode,
+  PaletteOptions,
+} from '@mui/material/styles';
 
 // Add type definitions for typography
-export interface TypographyVariantStyle {
-  fontSize: string;
-  fontWeight: number;
-  lineHeight?: number;
-  textTransform?: string;
+export interface TypographyVariantStyle extends Partial<React.CSSProperties> {
+  // Remove the redundant property type declarations
 }
 
 export interface ThemeTypography {
@@ -33,8 +36,8 @@ export interface shape {
 }
 
 export interface colorScheme {
-  palette: {
-    mode: string;
+  palette: PaletteOptions & {
+    mode: PaletteMode;
     background: {
       default: string;
       paper: string;
@@ -160,6 +163,7 @@ interface ThemeTemplate {
   cssVariables: {
     colorSchemeSelector: string;
   };
+  defaultColorScheme: 'light' | 'dark'; // Add this line
   typography: ThemeTypography;
   shape: shape;
   spacing: number;
@@ -168,7 +172,7 @@ interface ThemeTemplate {
     dark: colorScheme;
   };
   breakpoints: ThemeBreakpoints;
-  components: ThemeComponents;
+  components: Partial<Components<Theme>>; // Update this line
   transitions: ThemeTransitions;
   zIndex: ThemezIndex;
 }
@@ -177,6 +181,7 @@ export const ThemeTemplate: ThemeTemplate = {
   cssVariables: {
     colorSchemeSelector: 'data-toolpad-color-scheme',
   },
+  defaultColorScheme: 'light', // Add this line
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h1: {
@@ -208,7 +213,7 @@ export const ThemeTemplate: ThemeTemplate = {
   colorSchemes: {
     light: {
       palette: {
-        mode: 'light',
+        mode: 'light' as PaletteMode,
         background: {
           default: '#f5f5f5',
           paper: '#ffffff',
@@ -259,7 +264,7 @@ export const ThemeTemplate: ThemeTemplate = {
     },
     dark: {
       palette: {
-        mode: 'dark',
+        mode: 'dark' as PaletteMode,
         background: {
           default: '#303030',
           paper: '#424242',
@@ -321,31 +326,31 @@ export const ThemeTemplate: ThemeTemplate = {
   components: {
     MuiButton: {
       styleOverrides: {
-        root: {
+        root: ({}) => ({
           textTransform: 'none',
           borderRadius: 8,
-        },
+        }),
       },
     },
     MuiPaper: {
       styleOverrides: {
-        root: {
+        root: ({}) => ({
           backgroundImage: 'none',
-        },
+        }),
       },
     },
     MuiDialog: {
       styleOverrides: {
-        paper: {
+        paper: ({}) => ({
           borderRadius: 12,
-        },
+        }),
       },
     },
     MuiCard: {
       styleOverrides: {
-        root: {
+        root: ({}) => ({
           borderRadius: 12,
-        },
+        }),
       },
     },
   },

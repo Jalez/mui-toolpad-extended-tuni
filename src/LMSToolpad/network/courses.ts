@@ -86,13 +86,24 @@ export async function addCourse(courseData: CourseRaw): Promise<Course> {
  * @param courseData - The course data to update
  * @returns Updated course object
  */
-export async function updateCourse(courseData: Course): Promise<Course> {
+export const updateCourse = async (course: Course): Promise<Course> => {
+  // Ensure dataProcessing exists when updating
+  const courseWithDataProcessing = {
+    ...course,
+    dataProcessing: course.dataProcessing || {
+      purposes: ['course_delivery', 'assessment'],
+      retention: 365,
+      thirdPartyProcessors: [],
+      specialCategories: false,
+      legalBasis: 'consent',
+    },
+  };
+
   try {
     // Convert camelCase to snake_case for backend
-
     const response = await axios.put(
-      `api/courses/${courseData.id}/`,
-      convertObjectKeysToUnderscore(courseData)
+      `api/courses/${courseWithDataProcessing.id}/`,
+      convertObjectKeysToUnderscore(courseWithDataProcessing)
     );
 
     const updatedCourse = convertObjectKeysToCamelCase(response.data);
@@ -101,7 +112,7 @@ export async function updateCourse(courseData: Course): Promise<Course> {
   } catch (error) {
     throw new Error(`Failed to update the course: ${error}`);
   }
-}
+};
 
 /**
  * @description Helper function to make a DELETE request to delete a course

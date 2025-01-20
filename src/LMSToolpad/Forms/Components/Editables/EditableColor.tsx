@@ -1,18 +1,16 @@
 /** @format */
 
-import { Box, IconButton, TextField, Typography, Popover } from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
+import { Box, TextField, Typography, Popover } from '@mui/material';
 import { useState } from 'react';
 import { HexColorPicker } from 'react-colorful';
 
 interface EditableColorProps {
   value: string;
   onChange: (value: string) => void;
-  label: string;
+  label?: string;
 }
 
 const EditableColor = ({ value, onChange, label }: EditableColorProps) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -26,15 +24,12 @@ const EditableColor = ({ value, onChange, label }: EditableColorProps) => {
   const open = Boolean(anchorEl);
 
   return (
-    <Box
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      sx={{ position: 'relative' }}>
+    <Box sx={{ position: 'relative' }}>
       <Typography variant='body2' color='text.secondary' gutterBottom>
         {label}
       </Typography>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <IconButton
+        {/* <IconButton
           size='small'
           onClick={handleOpen}
           sx={{
@@ -42,7 +37,7 @@ const EditableColor = ({ value, onChange, label }: EditableColorProps) => {
             transition: 'opacity 0.2s',
           }}>
           <EditIcon fontSize='small' />
-        </IconButton>
+        </IconButton> */}
         <Box
           sx={{
             width: 32,

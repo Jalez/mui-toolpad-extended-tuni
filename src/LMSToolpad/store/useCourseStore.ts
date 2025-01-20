@@ -32,6 +32,21 @@ export interface CourseRaw {
   tags?: string[]; // Course tags for categorization and searching (optional)
   language?: string; // Primary language of instruction (ISO 639-1 code)
   status: 'draft' | 'active' | 'archived'; // Current state of the course
+  dataProcessing: {
+    purposes: string[]; // What the data is used for
+    retention: number; // How long course data is kept after completion (in days)
+    thirdPartyProcessors: {
+      name: string;
+      purpose: string;
+      dataShared: string[];
+    }[];
+    specialCategories: boolean; // Whether course processes special categories of personal data
+    legalBasis:
+      | 'consent'
+      | 'contract'
+      | 'legal_obligation'
+      | 'legitimate_interests';
+  };
 }
 export interface Course extends CourseRaw {
   id: string; // Unique ID for the course
@@ -60,6 +75,13 @@ export const courseTemplate: CourseRaw = {
   tags: [],
   language: '',
   staff: [],
+  dataProcessing: {
+    purposes: ['course_delivery', 'assessment'],
+    retention: 365,
+    thirdPartyProcessors: [],
+    specialCategories: false,
+    legalBasis: 'consent',
+  },
 };
 
 interface CourseStore {

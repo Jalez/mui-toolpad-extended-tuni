@@ -89,21 +89,23 @@ const FormDialog: React.FC<FormDialogProps> = ({
               height: '100%',
               minHeight: 0,
             }}>
-            <Box sx={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+            <Box sx={{ flex: 1, minHeight: 0, overflow: 'auto' }}>
               {children}
             </Box>
             <DialogActions
               sx={{
                 px: 0,
-                // py: 2,
                 borderTop: 1,
                 borderColor: 'divider',
-                // mt: 2,
                 m: 0,
                 p: 0,
               }}>
               <Button onClick={handleClose}>Cancel</Button>
-              <Button type='submit' disabled={!isDirty || disableSubmit}>
+              <Button
+                type='submit'
+                variant='contained'
+                disabled={!isDirty || disableSubmit}
+                color='primary'>
                 {submitText}
               </Button>
             </DialogActions>

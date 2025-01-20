@@ -1,7 +1,12 @@
 /** @format */
 
 import { create } from 'zustand';
-import { getCurrentUser, getUsers, logoutUser } from '../network/users';
+import {
+  getCurrentUser,
+  getUsers,
+  logoutUser,
+  updateUser,
+} from '../network/users';
 import { fetchState } from '../interfaces';
 import studentImage from '/static/images/student.png';
 import teacherImage from '/static/images/teacher.png';
@@ -24,6 +29,21 @@ export interface UserData {
   };
   enrollDate?: string; // When the user was actually enrolled in the course
   requestDate?: string; // When the user initially requested enrollment
+  privacySettings: {
+    allowAnalytics: boolean;
+    allowPersonalization: boolean;
+    allowCommunications: boolean;
+    allowThirdPartySharing: boolean;
+  };
+  gdprConsent: {
+    accepted: boolean;
+    acceptedDate?: string;
+    lastUpdated: string;
+  };
+  dataRetention: {
+    deleteAccountAfterInactivity?: number; // in days
+    deleteDataAfterAccountDeletion?: number; // in days
+  };
 }
 
 const defaultTestUsers = [
@@ -34,6 +54,21 @@ const defaultTestUsers = [
     role: 'teacher' as role,
     image: teacherImage,
     color: '#3f51b5',
+    privacySettings: {
+      allowAnalytics: false,
+      allowPersonalization: false,
+      allowCommunications: false,
+      allowThirdPartySharing: false,
+    },
+    gdprConsent: {
+      accepted: true,
+      acceptedDate: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+    },
+    dataRetention: {
+      deleteAccountAfterInactivity: 365,
+      deleteDataAfterAccountDeletion: 30,
+    },
   },
   {
     id: '2',
@@ -42,6 +77,21 @@ const defaultTestUsers = [
     role: 'student' as role,
     image: studentImage,
     color: '#f50057',
+    privacySettings: {
+      allowAnalytics: false,
+      allowPersonalization: false,
+      allowCommunications: false,
+      allowThirdPartySharing: false,
+    },
+    gdprConsent: {
+      accepted: true,
+      acceptedDate: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+    },
+    dataRetention: {
+      deleteAccountAfterInactivity: 365,
+      deleteDataAfterAccountDeletion: 30,
+    },
   },
   {
     id: '3',
@@ -50,6 +100,21 @@ const defaultTestUsers = [
     role: 'guest' as role,
     image: guestImage,
     color: '#f50057',
+    privacySettings: {
+      allowAnalytics: false,
+      allowPersonalization: false,
+      allowCommunications: false,
+      allowThirdPartySharing: false,
+    },
+    gdprConsent: {
+      accepted: true,
+      acceptedDate: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+    },
+    dataRetention: {
+      deleteAccountAfterInactivity: 365,
+      deleteDataAfterAccountDeletion: 30,
+    },
   },
   {
     id: '4',
@@ -58,15 +123,32 @@ const defaultTestUsers = [
     role: 'admin' as role,
     image: adminImage,
     color: '#black',
+    privacySettings: {
+      allowAnalytics: false,
+      allowPersonalization: false,
+      allowCommunications: false,
+      allowThirdPartySharing: false,
+    },
+    gdprConsent: {
+      accepted: true,
+      acceptedDate: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+    },
+    dataRetention: {
+      deleteAccountAfterInactivity: 365,
+      deleteDataAfterAccountDeletion: 30,
+    },
   },
 ];
 
 export interface UserState {
   fetchState: fetchState;
   user: UserData | null;
+  userToUpdate: UserData | null;
   testUsers: UserData[];
   users: UserData[];
   courseUsers?: UserData[];
+  setUserToUpdate: (user: UserData | null) => void;
   setUser: (user: UserData) => void;
   setTestUsers: (users: UserData[]) => void;
   getUser: (courseId?: string) => void;
@@ -75,14 +157,17 @@ export interface UserState {
   getUsers: () => void;
   fetchCourseUsers: (courseId: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateUser: (userData: UserData) => Promise<UserData>;
 }
 
 export const useUserStore = create<UserState>((set) => ({
   fetchState: 'idle',
   user: null,
+  userToUpdate: null,
   testUsers: defaultTestUsers,
   users: [],
   courseUsers: [],
+  setUserToUpdate: (user) => set({ userToUpdate: user }),
   setTestUsers: (users) => set({ testUsers: users }),
   setUser: (user) => set({ user }),
   getUser: async (courseId) => {
@@ -91,18 +176,24 @@ export const useUserStore = create<UserState>((set) => ({
       set({ testUsers: defaultTestUsers });
       const user = await getCurrentUser(courseId);
 
-      user.image = user.role === 'student' ? studentImage : teacherImage;
+      switch (user.role) {
+        case 'student':
+          user.image = studentImage;
+          break;
+        case 'teacher':
+          user.image = teacherImage;
+          break;
+        case 'guest':
+          user.image = guestImage;
+          break;
+        case 'admin':
+          user.image = adminImage;
+          break;
+      }
       if (user) {
-        let image;
-        if (user.role === 'student') {
-          image = studentImage;
-        } else if (user.role === 'teacher') {
-          image = teacherImage;
-        } else {
-          image = guestImage;
-        }
+        console.log('User', user);
         set({
-          user: { ...user, image },
+          user: { ...user },
           fetchState: 'idle',
           testUsers: defaultTestUsers.filter((u) => u.role !== user.role),
         });
@@ -159,6 +250,25 @@ export const useUserStore = create<UserState>((set) => ({
       set({ user: null });
       return Promise.resolve();
     } catch (error) {
+      return Promise.reject(error);
+    }
+  },
+  updateUser: async (userData) => {
+    try {
+      set({ fetchState: 'loading' });
+      const updatedUser = await updateUser(userData);
+
+      // Update both user and userToUpdate states
+      set((state) => ({
+        fetchState: 'idle',
+        userToUpdate: updatedUser,
+        // If this is the current user, update that too
+        user: state.user?.id === updatedUser.id ? updatedUser : state.user,
+      }));
+
+      return Promise.resolve(updatedUser);
+    } catch (error) {
+      set({ fetchState: 'error' });
       return Promise.reject(error);
     }
   },

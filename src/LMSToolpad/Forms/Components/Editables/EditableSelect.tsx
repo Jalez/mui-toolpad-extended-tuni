@@ -64,34 +64,50 @@ const EditableSelect = ({
     <Box
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      sx={{ position: 'relative' }}>
+      sx={{
+        position: 'relative',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'top',
+        justifyContent: 'space-between',
+      }}>
       <Typography variant='body2' color='text.secondary' gutterBottom>
         {label}
       </Typography>
       <Box
         sx={{
           display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'center',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
         }}>
-        <IconButton
-          size='small'
-          onClick={() => setIsEditing(true)}
+        <Box
           sx={{
-            opacity: isHovered ? 1 : 0,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 1,
           }}>
-          <EditIcon fontSize='small' />
-        </IconButton>
-        <Typography variant='body1'>
-          {options.find((opt) => opt.value === value)?.label ||
-            `No ${label.toLowerCase()} set`}
-        </Typography>
+          <IconButton
+            size='small'
+            onClick={() => setIsEditing(true)}
+            sx={{
+              opacity: isHovered ? 1 : 0,
+            }}>
+            <EditIcon fontSize='small' />
+          </IconButton>
+          <Typography variant='body1'>
+            {options.find((opt) => opt.value === value)?.label ||
+              `No ${label.toLowerCase()} set`}
+          </Typography>
+        </Box>
+        {explanation && (
+          <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
+            {explanation}
+          </Typography>
+        )}
       </Box>
-      {explanation && (
-        <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
-          {explanation}
-        </Typography>
-      )}
     </Box>
   );
 };

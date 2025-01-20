@@ -8,6 +8,7 @@ import AITab from './tabs/AITab';
 import AuthTab from './tabs/AuthTab';
 import CoursesTab from './tabs/CoursesTab';
 import FeaturesTab from './tabs/FeaturesTab';
+import PrivacyTab from './tabs/PrivacyTab';
 import { Platform } from '../../store/usePlatformSettingsStore';
 import { AppTheme } from '../../store/useThemeStore';
 
@@ -17,7 +18,7 @@ interface TabPanelProps {
   value: number;
 }
 
-function TabPanel(props: TabPanelProps) {
+export function TabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
   return (
     <Box
@@ -34,7 +35,7 @@ function TabPanel(props: TabPanelProps) {
 interface PlatformSettingsTabsProps {
   platformSettings: Platform;
   themeSettings: AppTheme;
-  handleUpdatePlatformSettings: (settings: Platform) => void;
+  handleUpdatePlatformSettings: (settings: Partial<Platform>) => void;
   handleUpdateThemeSettings: (settings: AppTheme) => void;
 }
 
@@ -46,6 +47,13 @@ export default function PlatformSettingsTabs({
 }: PlatformSettingsTabsProps) {
   const [value, setValue] = useState(0);
 
+  const handlePartialUpdate = (partialSettings: Partial<Platform>) => {
+    handleUpdatePlatformSettings({
+      ...platformSettings,
+      ...partialSettings,
+    });
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Tabs value={value} onChange={(_, newValue) => setValue(newValue)}>
@@ -55,11 +63,12 @@ export default function PlatformSettingsTabs({
         <Tab label='Authentication' />
         <Tab label='Courses' />
         <Tab label='Features' />
+        <Tab label='Privacy' />
       </Tabs>
       <TabPanel value={value} index={0}>
         <GeneralTab
           settings={platformSettings}
-          onUpdate={handleUpdatePlatformSettings}
+          onUpdate={handlePartialUpdate}
         />
       </TabPanel>
       <TabPanel value={value} index={1}>
@@ -68,25 +77,31 @@ export default function PlatformSettingsTabs({
       <TabPanel value={value} index={2}>
         <AITab
           settings={platformSettings}
-          onUpdate={handleUpdatePlatformSettings}
+          onUpdate={handlePartialUpdate}
         />
       </TabPanel>
       <TabPanel value={value} index={3}>
         <AuthTab
           settings={platformSettings}
-          onUpdate={handleUpdatePlatformSettings}
+          onUpdate={handlePartialUpdate}
         />
       </TabPanel>
       <TabPanel value={value} index={4}>
         <CoursesTab
           settings={platformSettings}
-          onUpdate={handleUpdatePlatformSettings}
+          onUpdate={handlePartialUpdate}
         />
       </TabPanel>
       <TabPanel value={value} index={5}>
         <FeaturesTab
           settings={platformSettings}
-          onUpdate={handleUpdatePlatformSettings}
+          onUpdate={handlePartialUpdate}
+        />
+      </TabPanel>
+      <TabPanel value={value} index={6}>
+        <PrivacyTab
+          settings={platformSettings}
+          onUpdate={handlePartialUpdate}
         />
       </TabPanel>
     </Box>
