@@ -11,6 +11,7 @@ interface EditableNumberProps {
   min?: number;
   max?: number;
   step?: number; // Add step property
+  helperText?: string;
 }
 
 const EditableNumber = ({
@@ -20,6 +21,7 @@ const EditableNumber = ({
   min,
   max,
   step,
+  helperText,
 }: EditableNumberProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -66,6 +68,11 @@ const EditableNumber = ({
         </IconButton>
         <Typography variant='body1'>{value}</Typography>
       </Box>
+      {helperText && (
+        <Typography variant='caption' color='text.secondary'>
+          {helperText}
+        </Typography>
+      )}
     </Box>
   );
 };

@@ -1,9 +1,9 @@
 /** @format */
 import { Box, Fade, Typography } from '@mui/material';
-import { useUserStore } from '../../store/useUserStore';
 import { NavigationPageStoreItem } from '../../store/useNavigationStore';
 import { MicroserviceConfig } from '../Microservices/MicroserviceRoutes';
 import ToolCard from './ToolCard';
+import useCourseStore from '../../store/useCourseStore';
 
 export type ToolDisplayerItem = {
   path: string;
@@ -31,7 +31,7 @@ const ToolDisplayer = ({
   roleCheck,
   isUsed,
 }: ToolDisplayerProps) => {
-  const { user } = useUserStore();
+  const { currentCourse } = useCourseStore();
 
   return (
     <Box sx={{ p: 3 }} data-testid='tool-selector'>
@@ -67,18 +67,21 @@ const ToolDisplayer = ({
                   No tools available {roleCheck ? 'for your role' : ''}
                   {/* If they are a student, you can tell them to let the teacher know */}
                 </Typography>
-                {roleCheck && user?.role === 'student' && (
-                  <Typography variant='body1' sx={{ mb: 4 }}>
-                    Please let your teacher know if you need access to any
-                    tools.
-                  </Typography>
-                )}
+                {roleCheck &&
+                  currentCourse?.data?.myData?.role === 'student' && (
+                    <Typography variant='body1' sx={{ mb: 4 }}>
+                      Please let your teacher know if you need access to any
+                      tools.
+                    </Typography>
+                  )}
               </Box>
             )}
             {navItems.map((item) =>
               !roleCheck ||
               (roleCheck &&
-                item.metadata?.forRoles?.includes(user?.role || '')) ? (
+                item.metadata?.forRoles?.includes(
+                  currentCourse?.data?.myData?.role || ''
+                )) ? (
                 <ToolCard
                   key={item.segment}
                   item={item}

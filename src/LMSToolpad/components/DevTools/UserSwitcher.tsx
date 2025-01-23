@@ -35,9 +35,8 @@ const UserSwitcher: React.FC = () => {
                 width: 32,
                 height: 32,
                 fontSize: '0.95rem',
-                bgcolor: account.color,
               }}
-              src={account.image ?? ''}
+              src={account.image?.thumbnail || account.image?.large}
               alt={account?.name ?? ''}>
               {account.name[0]}
             </Avatar>

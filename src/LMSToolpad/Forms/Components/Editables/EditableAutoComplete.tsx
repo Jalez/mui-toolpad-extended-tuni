@@ -11,19 +11,43 @@ import EditIcon from '@mui/icons-material/Edit';
 import { Box } from '@mui/system';
 import { useState } from 'react';
 
-interface EditableAutocompleteProps {
-  value: string[];
-  onChange: (value: string[]) => void;
+interface EditableAutocompleteProps<T> {
+  value: T[];
+  onChange: (value: T[]) => void;
   label: string;
+  getOptionLabel?: (option: T) => string;
+  helperText?: string;
 }
 
-const EditableAutocomplete = ({
+const EditableAutocomplete = <T extends string | { [key: string]: any }>({
   value,
   onChange,
   label,
-}: EditableAutocompleteProps) => {
+  getOptionLabel,
+  helperText,
+}: EditableAutocompleteProps<T>) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+
+  // Updated getLabel function to handle both string and object types
+  const getLabel = (option: string | T) => {
+    if (typeof option === 'string') {
+      return option;
+    }
+    if (getOptionLabel) {
+      return getOptionLabel(option as T);
+    }
+    return String(option);
+  };
+
+  // Add function to generate unique keys
+  const getKey = (option: T): string => {
+    if (typeof option === 'string') {
+      return option;
+    }
+    // For objects, create a key from their properties
+    return JSON.stringify(option);
+  };
 
   if (isEditing) {
     return (
@@ -35,16 +59,17 @@ const EditableAutocomplete = ({
         autoFocus
         onBlur={() => setIsEditing(false)}
         onChange={(_, newValue) => {
-          onChange(newValue);
+          onChange(newValue as T[]);
         }}
-        renderTags={(value, getTagProps) =>
-          value.map((option, index) => {
+        getOptionLabel={getLabel}
+        renderTags={(tagValue, getTagProps) =>
+          tagValue.map((option, index) => {
             const { key, ...otherProps } = getTagProps({ index });
             return (
               <Chip
                 key={key}
                 {...otherProps}
-                label={option}
+                label={getLabel(option)}
                 variant='outlined'
               />
             );
@@ -55,6 +80,7 @@ const EditableAutocomplete = ({
             {...params}
             label={label}
             placeholder={`Add ${label.toLowerCase()}`}
+            helperText={helperText}
           />
         )}
       />
@@ -87,7 +113,11 @@ const EditableAutocomplete = ({
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
           {value.length > 0 ? (
             value.map((tag) => (
-              <Chip key={tag} label={tag} variant='outlined' />
+              <Chip
+                key={getKey(tag)}
+                label={getLabel(tag)}
+                variant='outlined'
+              />
             ))
           ) : (
             <Typography variant='body1'>

@@ -76,7 +76,7 @@ const MicroserviceRoutes: React.FC<MicroserviceRoutesProps> = ({
   useEffect(() => {
     // If we have a current course, use that for microservice navigation
     if (currentCourse?.id && user) {
-      const isTeacher = user.role === 'teacher';
+      const isTeacher = currentCourse.data?.myData?.role === 'teacher';
       const buildMicroServiceNavigation: NavigationPageStoreItem[] = [];
       microservices.forEach((ms) => {
         if (ms.buildNavigation && typeof ms.buildNavigation === 'function') {
@@ -101,7 +101,7 @@ const MicroserviceRoutes: React.FC<MicroserviceRoutesProps> = ({
       console.log('Matching courses:', matchingCourses);
 
       if (matchingCourses.length > 0) {
-        const isTeacher = user.role === 'teacher';
+        const isTeacher = currentCourse?.data?.myData?.role === 'teacher';
         const buildMicroServiceNavigation: NavigationPageStoreItem[] = [];
 
         microservices.forEach((ms) => {

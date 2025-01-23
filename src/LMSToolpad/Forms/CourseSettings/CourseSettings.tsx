@@ -41,33 +41,31 @@ const CourseSettings = () => {
     event.preventDefault();
     if (!courseToUpdate) return;
 
-    // Convert the form data to the correct format
     const updatedCourse = {
       ...courseToUpdate,
       ...formData,
       tags: formData.tags ?? [],
-      // Ensure dates are in ISO format
       visibility: {
         ...formData.visibility,
         startDate: formData.visibility.startDate
           ? new Date(formData.visibility.startDate).toISOString()
-          : undefined,
+          : null,
         endDate: formData.visibility.endDate
           ? new Date(formData.visibility.endDate).toISOString()
-          : undefined,
+          : null,
       },
-      enrollmentStatus: {
-        ...formData.enrollmentStatus,
-        startDate: formData.enrollmentStatus.startDate
-          ? new Date(formData.enrollmentStatus.startDate).toISOString()
-          : undefined,
-        endDate: formData.enrollmentStatus.endDate
-          ? new Date(formData.enrollmentStatus.endDate).toISOString()
-          : undefined,
-        maxStudents:
-          formData.enrollmentStatus.maxStudents === null
-            ? undefined
-            : formData.enrollmentStatus.maxStudents,
+      enrollment: {
+        ...formData.enrollment,
+        startDate: formData.enrollment?.startDate
+          ? new Date(formData.enrollment.startDate).toISOString()
+          : null,
+        endDate: formData.enrollment?.endDate
+          ? new Date(formData.enrollment.endDate).toISOString()
+          : null,
+        status: {
+          open: formData.enrollment?.status.open ?? false,
+          maxStudents: formData.enrollment?.status.maxStudents,
+        },
       },
     };
 

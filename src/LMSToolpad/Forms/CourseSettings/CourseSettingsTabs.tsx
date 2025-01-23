@@ -16,6 +16,7 @@ import VisibilityTab from './tabs/VisibilityTab';
 import { CourseRaw } from '../../store/useCourseStore';
 import { UserData } from '../../store/useUserStore';
 import DataProcessingTab from './tabs/DataProcessingTab';
+import RelationshipsTab from './tabs/RelationshipsTab';
 
 type CourseSettingsProps = {
   formData: CourseRaw;
@@ -91,6 +92,13 @@ export default function CourseSettingsTabs({
           enterNextDelay={100}>
           <Tab label='Data Processing' />
         </Tooltip>
+        <Tooltip
+          title='Manage course relationships, prerequisites, and related courses'
+          arrow
+          enterDelay={500}
+          enterNextDelay={100}>
+          <Tab label='Relationships' />
+        </Tooltip>
       </Tabs>
 
       <Box sx={{ overflowY: 'auto', flex: 1, p: 1 }}>
@@ -123,6 +131,12 @@ export default function CourseSettingsTabs({
         )}
         {((!isLargeScreen && tab === 4) || (isLargeScreen && tab === 3)) && (
           <DataProcessingTab
+            formData={formData}
+            setFormData={handleUpdateFormData}
+          />
+        )}
+        {((!isLargeScreen && tab === 5) || (isLargeScreen && tab === 4)) && (
+          <RelationshipsTab
             formData={formData}
             setFormData={handleUpdateFormData}
           />

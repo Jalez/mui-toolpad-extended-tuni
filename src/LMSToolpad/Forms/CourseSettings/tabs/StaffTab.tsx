@@ -19,37 +19,38 @@ interface StaffTabProps {
   courseUsers?: UserData[];
 }
 
-export default function StaffTab({
-  formData,
-  setFormData,
-  courseUsers = [],
-}: StaffTabProps) {
-  const staffMembers = courseUsers.filter((user) => user.role === 'teacher');
+export default function StaffTab({ formData, setFormData }: StaffTabProps) {
+  // Get staff members from enrollment data
+  const staffMembers =
+    formData.data?.enrollmentData?.filter((data) => data.role === 'teacher') ||
+    [];
 
-  const handleRemoveStaff = (staffId: string) => {
+  const handleRemoveStaff = (userId: string) => {
     setFormData({
       ...formData,
-      staff: formData.staff?.filter((id) => id !== staffId) || [],
+      data: {
+        ...formData.data,
+        enrollmentData: formData.data?.enrollmentData?.filter(
+          (data) => data.userId !== userId
+        ),
+      },
     });
   };
 
   return (
     <Stack spacing={2}>
-      {/* <Paper sx={{ flex: 1, maxHeight: 400, overflow: 'auto' }}> */}
-      <Typography
-        variant='subtitle1'
-        sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+      <Typography variant='subtitle1'>
         Staff Members ({staffMembers.length})
       </Typography>
       <List>
         {staffMembers.map((staff) => (
           <ListItem
-            key={staff.id}
+            key={staff.userId}
             secondaryAction={
               <IconButton
                 edge='end'
                 aria-label='delete'
-                onClick={() => handleRemoveStaff(staff.id)}>
+                onClick={() => handleRemoveStaff(staff.userId)}>
                 <DeleteIcon />
               </IconButton>
             }>
@@ -58,7 +59,6 @@ export default function StaffTab({
           </ListItem>
         ))}
       </List>
-      {/* </Paper> */}
     </Stack>
   );
 }

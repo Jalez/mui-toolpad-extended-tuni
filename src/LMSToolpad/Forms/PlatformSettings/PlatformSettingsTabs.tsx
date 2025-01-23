@@ -9,7 +9,7 @@ import AuthTab from './tabs/AuthTab';
 import CoursesTab from './tabs/CoursesTab';
 import FeaturesTab from './tabs/FeaturesTab';
 import PrivacyTab from './tabs/PrivacyTab';
-import { Platform } from '../../store/usePlatformSettingsStore';
+import { Platform } from '../../store/usePlatformStore';
 import { AppTheme } from '../../store/useThemeStore';
 
 interface TabPanelProps {
@@ -48,10 +48,7 @@ export default function PlatformSettingsTabs({
   const [value, setValue] = useState(0);
 
   const handlePartialUpdate = (partialSettings: Partial<Platform>) => {
-    handleUpdatePlatformSettings({
-      ...platformSettings,
-      ...partialSettings,
-    });
+    handleUpdatePlatformSettings(partialSettings);
   };
 
   return (
@@ -75,16 +72,10 @@ export default function PlatformSettingsTabs({
         <ThemeTab theme={themeSettings} onUpdate={handleUpdateThemeSettings} />
       </TabPanel>
       <TabPanel value={value} index={2}>
-        <AITab
-          settings={platformSettings}
-          onUpdate={handlePartialUpdate}
-        />
+        <AITab settings={platformSettings} onUpdate={handlePartialUpdate} />
       </TabPanel>
       <TabPanel value={value} index={3}>
-        <AuthTab
-          settings={platformSettings}
-          onUpdate={handlePartialUpdate}
-        />
+        <AuthTab settings={platformSettings} onUpdate={handlePartialUpdate} />
       </TabPanel>
       <TabPanel value={value} index={4}>
         <CoursesTab

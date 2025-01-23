@@ -9,6 +9,7 @@ interface EditableTextProps {
   onChange: (value: string) => void;
   label: string;
   multiline?: boolean;
+  helperText?: string;
 }
 
 const EditableText = ({
@@ -16,6 +17,7 @@ const EditableText = ({
   onChange,
   label,
   multiline,
+  helperText,
 }: EditableTextProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -71,6 +73,9 @@ const EditableText = ({
           {value || `No ${label.toLowerCase()} set`}
         </Typography>
       </Box>
+      <Typography variant='caption' color='text.secondary'>
+        {helperText}
+      </Typography>
     </Box>
   );
 };

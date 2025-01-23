@@ -1,22 +1,19 @@
 /** @format */
 
 import { Grid, Stack } from '@mui/material';
-import { PlatformSettings } from '../../../store/usePlatformSettingsStore';
+import { Platform, PlatformRole } from '../../../store/usePlatformStore';
 import EditableAutoComplete from '../../Components/Editables/EditableAutoComplete';
 import EditableNumber from '../../Components/Editables/EditableNumber';
 import EditableSelect from '../../Components/Editables/EditableSelect';
 import EditableSwitch from '../../Components/Editables/EditableSwitch';
 
 interface CoursesTabProps {
-  settings: PlatformSettings;
-  onUpdate: (settings: Partial<PlatformSettings>) => void;
+  settings: Platform;
+  onUpdate: (settings: Partial<Platform>) => void;
 }
 
 export default function CoursesTab({ settings, onUpdate }: CoursesTabProps) {
-  const handleCoursesUpdate = (
-    key: keyof PlatformSettings['courses'],
-    value: any
-  ) => {
+  const handleCoursesUpdate = (key: keyof Platform['courses'], value: any) => {
     onUpdate({ courses: { ...settings.courses, [key]: value } });
   };
 
@@ -24,12 +21,19 @@ export default function CoursesTab({ settings, onUpdate }: CoursesTabProps) {
     <Stack spacing={3}>
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
-          <EditableAutoComplete
+          <EditableAutoComplete<PlatformRole>
             label='Course Creation Roles'
-            value={settings.courses.whoCanCreateCourses}
+            value={settings.courses.courseCreation.requiredRoles}
             onChange={(value) =>
-              handleCoursesUpdate('whoCanCreateCourses', value)
+              handleCoursesUpdate('courseCreation', {
+                ...settings.courses.courseCreation,
+                requiredRoles: value,
+              })
             }
+            getOptionLabel={(role) =>
+              role.charAt(0).toUpperCase() + role.slice(1)
+            }
+            helperText='Roles that are allowed to create new courses'
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -48,44 +52,36 @@ export default function CoursesTab({ settings, onUpdate }: CoursesTabProps) {
         </Grid>
       </Grid>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
-          <EditableNumber
-            label='Max Courses Per Teacher'
-            value={settings.courses.maxCoursesPerTeacher}
-            onChange={(value) =>
-              handleCoursesUpdate('maxCoursesPerTeacher', value)
-            }
-            min={1}
-          />
-        </Grid>
-        <Grid item xs={12} md={6}>
-          <EditableNumber
-            label='Default Enrollment Duration (days)'
-            value={settings.courses.defaultEnrollmentDuration}
-            onChange={(value) =>
-              handleCoursesUpdate('defaultEnrollmentDuration', value)
-            }
-            min={1}
-          />
-        </Grid>
+      <Grid item xs={12} md={6}>
+        <EditableNumber
+          label='Default Enrollment Duration (days)'
+          value={settings.courses.defaultEnrollmentDuration}
+          onChange={(value) =>
+            handleCoursesUpdate('defaultEnrollmentDuration', value)
+          }
+          min={1}
+        />
       </Grid>
 
       <Grid container spacing={3}>
         <Grid item xs={12} md={6}>
           <EditableSwitch
             label='Require Course Approval'
-            value={settings.courses.requireCourseApproval}
+            value={settings.courses.courseCreation.requireApproval}
             onChange={(value) =>
-              handleCoursesUpdate('requireCourseApproval', value)
+              handleCoursesUpdate('courseCreation', {
+                ...settings.courses.courseCreation,
+                requireApproval: value,
+              })
             }
           />
         </Grid>
         <Grid item xs={12}>
-          <EditableAutoComplete
+          <EditableAutoComplete<string>
             label='Course Categories'
             value={settings.courses.courseCategories}
             onChange={(value) => handleCoursesUpdate('courseCategories', value)}
+            helperText='Categories available for course classification'
           />
         </Grid>
       </Grid>

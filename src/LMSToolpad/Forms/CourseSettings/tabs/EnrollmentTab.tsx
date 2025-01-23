@@ -46,25 +46,21 @@ export default function EnrollmentTab({
 
   console.log('courseUsers in EnrollmentTab:', courseUsers);
 
-  const enrolledStudents = courseUsers.filter((user) => {
-    console.log('Checking user:', user);
-    return (
-      user.role === 'student' && user.enrollmentStatus?.status === 'enrolled'
-    );
-  });
+  // Filter enrolled and pending students using new data structure
+  const enrolledStudents =
+    formData.data?.enrollmentData?.filter(
+      (data) => data.role === 'student' && data.status === 'enrolled'
+    ) || [];
 
-  const pendingStudents = courseUsers.filter((user) => {
-    console.log('Checking user for pending:', user);
-    return (
-      user.role === 'student' && user.enrollmentStatus?.status === 'pending'
-    );
-  });
+  const pendingStudents =
+    formData.data?.enrollmentData?.filter(
+      (data) => data.role === 'student' && data.status === 'pending'
+    ) || [];
 
   console.log('Enrolled students:', enrolledStudents);
   console.log('Pending students:', pendingStudents);
 
   const renderEnrollmentSettings = () => (
-    // <Paper sx={{ p: 2 }}>
     <Stack
       direction={isLargeScreen ? 'row' : 'column'}
       spacing={2}
@@ -72,13 +68,17 @@ export default function EnrollmentTab({
       <FormControlLabel
         control={
           <Switch
-            checked={formData.enrollmentStatus.open}
+            checked={formData.enrollment?.status.open ?? false}
             onChange={(e) =>
               setFormData({
                 ...formData,
-                enrollmentStatus: {
-                  ...formData.enrollmentStatus,
-                  open: e.target.checked,
+                enrollment: {
+                  startDate: formData.enrollment?.startDate ?? null,
+                  endDate: formData.enrollment?.endDate ?? null,
+                  status: {
+                    open: e.target.checked,
+                    maxStudents: formData.enrollment?.status.maxStudents,
+                  },
                 },
               })
             }
@@ -89,26 +89,34 @@ export default function EnrollmentTab({
       <LocalizationProvider dateAdapter={AdapterLuxon}>
         <DateTimePicker
           label='Enrollment Starts'
-          value={parseDate(formData.enrollmentStatus.startDate)}
+          value={parseDate(formData.enrollment?.startDate)}
           onChange={(date) =>
             setFormData({
               ...formData,
-              enrollmentStatus: {
-                ...formData.enrollmentStatus,
-                startDate: date?.toISO() || null,
+              enrollment: {
+                startDate: date?.toISO() ?? null,
+                endDate: formData.enrollment?.endDate ?? null,
+                status: {
+                  open: formData.enrollment?.status.open ?? false,
+                  maxStudents: formData.enrollment?.status.maxStudents,
+                },
               },
             })
           }
         />
         <DateTimePicker
           label='Enrollment Ends'
-          value={parseDate(formData.enrollmentStatus.endDate)}
+          value={parseDate(formData.enrollment?.endDate)}
           onChange={(date) =>
             setFormData({
               ...formData,
-              enrollmentStatus: {
-                ...formData.enrollmentStatus,
-                endDate: date?.toISO() || null,
+              enrollment: {
+                startDate: formData.enrollment?.startDate ?? null,
+                endDate: date?.toISO() ?? null,
+                status: {
+                  open: formData.enrollment?.status.open ?? false,
+                  maxStudents: formData.enrollment?.status.maxStudents,
+                },
               },
             })
           }
@@ -117,23 +125,27 @@ export default function EnrollmentTab({
       <TextField
         label='Maximum Students'
         type='number'
-        value={formData.enrollmentStatus.maxStudents ?? ''}
+        value={formData.enrollment?.status.maxStudents ?? ''}
         onChange={(e) =>
           setFormData({
             ...formData,
-            enrollmentStatus: {
-              ...formData.enrollmentStatus,
-              maxStudents: e.target.value
-                ? parseInt(e.target.value)
-                : undefined,
+            enrollment: {
+              startDate: formData.enrollment?.startDate ?? null,
+              endDate: formData.enrollment?.endDate ?? null,
+              status: {
+                open: formData.enrollment?.status.open ?? false,
+                maxStudents: e.target.value
+                  ? parseInt(e.target.value)
+                  : undefined,
+              },
             },
           })
         }
       />
     </Stack>
-    // </Paper>
   );
 
+  // Update enrollment lists to use new data structure
   const renderEnrollmentLists = () => (
     <Box sx={{ mt: 2 }}>
       {!isLargeScreen && (
@@ -157,14 +169,12 @@ export default function EnrollmentTab({
               Enrolled Students ({enrolledStudents.length})
             </Typography>
             <List>
-              {enrolledStudents.map((student) => (
-                <ListItem key={student.id}>
-                  <Avatar sx={{ mr: 2 }}>{student.name[0]}</Avatar>
+              {enrolledStudents.map((enrollment) => (
+                <ListItem key={enrollment.userId}>
+                  <Avatar sx={{ mr: 2 }}>{enrollment.name[0]}</Avatar>
                   <ListItemText
-                    primary={student.name}
-                    secondary={`Enrolled: ${new Date(
-                      student.enrollDate || student.enrollmentStatus?.date || ''
-                    ).toLocaleDateString()}`}
+                    primary={enrollment.name}
+                    secondary={enrollment.email}
                   />
                 </ListItem>
               ))}
@@ -182,7 +192,7 @@ export default function EnrollmentTab({
             <List>
               {pendingStudents.map((student) => (
                 <ListItem
-                  key={student.id}
+                  key={student.userId}
                   secondaryAction={
                     <Stack direction='row' spacing={1}>
                       <IconButton color='success'>
@@ -194,14 +204,14 @@ export default function EnrollmentTab({
                     </Stack>
                   }>
                   <Avatar sx={{ mr: 2 }}>{student.name[0]}</Avatar>
-                  <ListItemText
+                  {/* <ListItemText
                     primary={student.name}
                     secondary={`Requested: ${new Date(
                       student.requestDate ||
                         student.enrollmentStatus?.date ||
                         ''
                     ).toLocaleDateString()}`}
-                  />
+                  /> */}
                 </ListItem>
               ))}
             </List>

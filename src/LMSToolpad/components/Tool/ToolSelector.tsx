@@ -9,9 +9,9 @@ import {
   CardActionArea,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useUserStore } from '../../store/useUserStore';
 import { NavigationPageStoreItem } from '../../store/useNavigationStore';
 import { SvgIconComponent } from '@mui/icons-material';
+import useCourseStore from '../../store/useCourseStore';
 
 export type ToolSelectorItem = {
   path: string;
@@ -36,7 +36,7 @@ const ToolSelector = ({
   navItems,
   roleCheck,
 }: ToolSelectorProps) => {
-  const { user } = useUserStore();
+  const { currentCourse } = useCourseStore();
 
   const convertedItems: ToolSelectorItem[] = navItems
     ? navItems
@@ -76,7 +76,10 @@ const ToolSelector = ({
             }}>
             {convertedItems.map((item) =>
               !roleCheck ||
-              (roleCheck && item.forRoles?.includes(user?.role || '')) ? (
+              (roleCheck &&
+                item.forRoles?.includes(
+                  currentCourse?.data?.myData?.role || ''
+                )) ? (
                 <ToolCard key={item.path} item={item} />
               ) : null
             )}

@@ -9,8 +9,8 @@ import {
   SignOutButton,
   ToolbarActions,
 } from '@toolpad/core';
-import { useUserStore } from '../../store/useUserStore';
-import useDialogStore from '../../store/useDialogStore';
+import { useUserStore } from '../../../store/useUserStore';
+import useDialogStore from '../../../store/useDialogStore';
 
 export const ToolbarAccount = () => {
   return (
@@ -33,7 +33,14 @@ const AccountMenu = () => {
   };
   return (
     <Stack direction='column'>
-      <Stack direction='row' alignItems='center' spacing={2}>
+      <Stack
+        onClick={(e) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        direction='row'
+        alignItems='center'
+        spacing={2}>
         <AccountPreview variant='expanded' />
         <ToolbarActions />
       </Stack>

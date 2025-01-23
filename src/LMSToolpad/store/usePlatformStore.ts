@@ -8,14 +8,26 @@ export interface AuthSettings {
   minimumPasswordLength: number;
   requireEmailVerification: boolean;
   allowSelfRegistration: boolean;
-  defaultUserRole: 'student' | 'guest';
+  defaultUserRole: PlatformRole;
 }
 
+export type PlatformRole =
+  | 'admin'
+  | 'developer'
+  | 'moderator'
+  | 'creator'
+  | 'user'
+  | 'guest';
+
+export type visibilityMode = 'public' | 'enrolled' | 'private';
+
 export interface CourseSettings {
-  whoCanCreateCourses: ('admin' | 'teacher')[];
-  defaultCourseVisibility: 'public' | 'enrolled' | 'private';
-  maxCoursesPerTeacher: number;
-  requireCourseApproval: boolean;
+  courseCreation: {
+    // Now uses platform roles instead of course roles
+    requiredRoles: PlatformRole[]; // e.g., ['creator', 'admin']
+    requireApproval: boolean;
+  };
+  defaultCourseVisibility: visibilityMode;
   defaultEnrollmentDuration: number; // in days
   courseCategories: string[];
 }
@@ -138,6 +150,10 @@ export interface Platform {
       }[];
     };
   };
+  interface: {
+    resizeMode: boolean;
+    // Add other interface settings here
+  };
 }
 
 interface PlatformSettingsStore {
@@ -146,6 +162,7 @@ interface PlatformSettingsStore {
   updatePlatform: (newPlatform: Platform) => void;
   updateAISettings: (newAISettings: Partial<AISettings>) => void;
   resetToDefaults: () => void;
+  toggleResizeMode: () => void;
 }
 
 const DEFAULT_SETTINGS: Platform = {
@@ -162,13 +179,14 @@ const DEFAULT_SETTINGS: Platform = {
     minimumPasswordLength: 8,
     requireEmailVerification: true,
     allowSelfRegistration: true,
-    defaultUserRole: 'student',
+    defaultUserRole: 'user',
   },
   courses: {
-    whoCanCreateCourses: ['admin', 'teacher'],
+    courseCreation: {
+      requiredRoles: ['admin', 'creator'],
+      requireApproval: true,
+    },
     defaultCourseVisibility: 'enrolled',
-    maxCoursesPerTeacher: 10,
-    requireCourseApproval: true,
     defaultEnrollmentDuration: 180,
     courseCategories: ['Computer Science', 'Mathematics', 'Physics'],
   },
@@ -257,9 +275,12 @@ const DEFAULT_SETTINGS: Platform = {
       thirdParties: [],
     },
   },
+  interface: {
+    resizeMode: false,
+  },
 };
 
-export const usePlatformSettingsStore = create<PlatformSettingsStore>()(
+export const usePlatformStore = create<PlatformSettingsStore>()(
   persist(
     (set) => ({
       platform: DEFAULT_SETTINGS,
@@ -276,6 +297,16 @@ export const usePlatformSettingsStore = create<PlatformSettingsStore>()(
           },
         })),
       resetToDefaults: () => set({ platform: DEFAULT_SETTINGS }),
+      toggleResizeMode: () =>
+        set((state) => ({
+          platform: {
+            ...state.platform,
+            interface: {
+              ...state.platform.interface,
+              resizeMode: !state.platform.interface.resizeMode,
+            },
+          },
+        })),
     }),
     {
       name: 'platform-settings',

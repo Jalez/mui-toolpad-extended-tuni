@@ -1,13 +1,75 @@
 /** @format */
 
 import { create } from 'zustand';
-import {
-  getCourseByUrl,
-  getCourses,
-  getCurrentCourse,
-  updateCourse,
-} from '../network/courses';
+import { getCourseByUrl, getCourses, updateCourse } from '../network/courses';
 import { fetchState } from '../interfaces';
+
+export type courseRole = 'student' | 'teacher' | 'guest';
+
+export type visibilityMode = 'public' | 'enrolled' | 'private';
+
+export type courseEventType =
+  | 'lecture'
+  | 'exercise'
+  | 'exam'
+  | 'deadline'
+  | 'other';
+
+export type courseEventFrequency = 'daily' | 'weekly' | 'biweekly';
+
+export type legalBasis =
+  | 'consent' // Processing is based on explicit user consent
+  | 'contract' // Processing is necessary for fulfilling educational contract
+  | 'legal_obligation' // Processing is required by law (e.g., mandatory reporting)
+  | 'legitimate_interests'; // Processing serves legitimate educational purposes
+
+export type enrollmentStatus = 'enrolled' | 'pending' | 'rejected';
+
+interface EnrollmentData {
+  courseId: string;
+  userId: string;
+  name: string;
+  email: string;
+  role: courseRole;
+  status: enrollmentStatus;
+  // Add other fields like enrollDate, requestDate, etc. if needed
+}
+
+interface CourseEvent {
+  id: string;
+  type: courseEventType;
+  title: string;
+  description?: string;
+  startTime: string; // ISO date string
+  endTime?: string; // ISO date string
+  location?: string; // Physical or virtual location
+  teachers?: EnrollmentData[]; // Array of teacher IDs
+  recurring?: {
+    frequency: courseEventFrequency; // How often the event repeats
+    until: string; // ISO date string
+    exceptions?: string[]; // Array of ISO date strings for cancelled events
+  };
+  maxParticipants?: number;
+  requiresRegistration?: boolean;
+}
+
+export type courseRelationType =
+  | 'prerequisite' // Must complete before taking this course
+  | 'recommended' // Should complete before taking this course
+  | 'parallel' // Can/should be taken simultaneously
+  | 'continues_from' // Natural continuation of this course
+  | 'alternative_to' // Equivalent course (can't take both)
+  | 'part_of' // Part of a larger study module/specialization
+  | 'prepares_for'; // Helps prepare for this advanced course
+
+export type courseLevel = 'basic' | 'intermediate' | 'advanced';
+
+export interface CourseRelation {
+  code: string;
+  type: courseRelationType;
+  description?: string; // Why this course is related
+  required?: boolean; // Is this a hard requirement or just a suggestion
+}
 
 export interface CourseRaw {
   title: string; // Title of the course (required)
@@ -15,23 +77,25 @@ export interface CourseRaw {
   code: string; // Course code (e.g., 'COMP.CS.300') (required)
   instance: string; // Course instance identifier (e.g., 'compcs300-october-2024') (required)
   ltiLoginUrl?: string; // URL to use for LTI login (optional)
-  services?: string[]; // List of services available for this course (optional)
-  image?: string; // URL to course cover image, can be external or internal path (optional)
-  staff?: string[]; // Array of staff member IDs associated with the course (optional)
-  visibility: {
-    mode: 'public' | 'enrolled' | 'private'; // Who can see this course: everyone, enrolled users, or staff only
-    startDate?: string | null; // When the course becomes visible (ISO date string)
-    endDate?: string | null; // When the course visibility ends (ISO date string)
+  services?: string[]; // List of services used by this course (optional)
+  image?: {
+    large: string; //Size should be 1200x800
+    medium: string; //Size should be 600x400
+    thumbnail: string; //Size should be 300x200
   };
-  enrollmentStatus: {
-    open: boolean; // Whether new enrollments are accepted
-    startDate?: string | null; // When enrollment opens (ISO date string)
-    endDate?: string | null; // When enrollment closes (ISO date string)
-    maxStudents?: number; // Maximum number of students allowed (optional)
+  startDate: string | null; // ISO date string for course start date
+  endDate: string | null; // ISO date string for course end date
+  visibility: {
+    mode: visibilityMode; // Who can see this course: everyone, enrolled users, or staff only
+    startDate: string | null; // When the course becomes visible for students
+    endDate: string | null; // When visibility ends for students
+  };
+
+  events: {
+    [key in courseEventType]: CourseEvent[];
   };
   tags?: string[]; // Course tags for categorization and searching (optional)
   language?: string; // Primary language of instruction (ISO 639-1 code)
-  status: 'draft' | 'active' | 'archived'; // Current state of the course
   dataProcessing: {
     purposes: string[]; // What the data is used for
     retention: number; // How long course data is kept after completion (in days)
@@ -41,11 +105,34 @@ export interface CourseRaw {
       dataShared: string[];
     }[];
     specialCategories: boolean; // Whether course processes special categories of personal data
-    legalBasis:
-      | 'consent'
-      | 'contract'
-      | 'legal_obligation'
-      | 'legitimate_interests';
+    legalBasis: legalBasis; // Legal basis for processing personal data
+  };
+  enrollment?: {
+    startDate: string | null; // ISO date string for when enrollment opens
+    endDate: string | null; // ISO date string for when enrollment closes
+    status: {
+      open: boolean; // Whether new enrollments are accepted
+      maxStudents?: number; // Maximum number of students allowed (optional)
+    };
+  };
+  data?: {
+    myData?: {
+      role: courseRole;
+      status: enrollmentStatus;
+    };
+    enrollmentData?: EnrollmentData[];
+  };
+  relationships?: {
+    prerequisites: CourseRelation[]; // Must/should complete these first
+    continuations: CourseRelation[]; // Natural next steps after this course
+    alternatives: CourseRelation[]; // Similar courses
+    related: CourseRelation[]; // Other related courses
+  };
+  studyModule?: {
+    name: string; // ID of the study module this belongs to
+    order?: number; // Order within the module if relevant
+    credits: number; // How many credits this course gives
+    level: courseLevel; // Basic, intermediate, or advanced
   };
 }
 export interface Course extends CourseRaw {
@@ -59,28 +146,52 @@ export const courseTemplate: CourseRaw = {
   instance: '',
   title: '',
   description: '',
-  image: '',
-  status: 'draft' as const, // Explicitly type as const
+  image: {
+    large: '',
+    medium: '',
+    thumbnail: '',
+  },
+  startDate: null,
+  endDate: null,
   visibility: {
-    mode: 'private' as const, // Explicitly type as const
+    mode: 'private' as const,
     startDate: null,
     endDate: null,
   },
-  enrollmentStatus: {
-    open: false,
-    startDate: null,
-    endDate: null,
-    maxStudents: undefined,
+  events: {
+    lecture: [],
+    exercise: [],
+    exam: [],
+    deadline: [],
+    other: [],
   },
   tags: [],
   language: '',
-  staff: [],
   dataProcessing: {
     purposes: ['course_delivery', 'assessment'],
     retention: 365,
     thirdPartyProcessors: [],
     specialCategories: false,
-    legalBasis: 'consent',
+    legalBasis: 'consent', // Default to most restrictive option
+  },
+  enrollment: {
+    startDate: null,
+    endDate: null,
+    status: {
+      open: false,
+      maxStudents: undefined,
+    },
+  },
+  relationships: {
+    prerequisites: [],
+    continuations: [],
+    alternatives: [],
+    related: [],
+  },
+  studyModule: {
+    name: '',
+    credits: 5,
+    level: 'basic',
   },
 };
 
@@ -95,7 +206,6 @@ interface CourseStore {
   setCurrentCourseUrl: (url: string) => void;
   setCurrentCourse: (course: Course | null) => void;
   setCurrentCourseCode: (code: string) => void;
-  getCurrentCourse: () => void;
   updateStateCourse: (course: Course) => Promise<Course>;
   getCourseByUrl: (url: string) => void;
   getCourses: () => void;
@@ -153,14 +263,6 @@ const useCourseStore = create<CourseStore>((set, get) => ({
     } catch (error) {
       console.error('Failed to update the course:', error);
       throw error; // Re-throw to handle in component
-    }
-  },
-  getCurrentCourse: async () => {
-    try {
-      const response = await getCurrentCourse();
-      set({ currentCourse: response });
-    } catch (error) {
-      console.error('Failed to fetch current course:', error);
     }
   },
   getCourses: async () => {

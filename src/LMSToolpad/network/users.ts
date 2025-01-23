@@ -63,7 +63,7 @@ export const updateUser = async (userData: UserData): Promise<UserData> => {
     const updatedUser = convertObjectKeysToCamelCase(response.data);
 
     // Ensure the image is preserved if it's a data URL
-    if (userData.image?.startsWith('data:image')) {
+    if (userData.image?.large?.startsWith('data:image')) {
       updatedUser.image = userData.image;
     }
 

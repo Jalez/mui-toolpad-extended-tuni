@@ -1,24 +1,19 @@
 /** @format */
 
-import { basicCourses, CourseBackendData } from './toolpad/data/courses';
+import { generateCourses } from './toolpad/courses/generators';
 import {
-  basicUserCourseConnections,
-  basicUsersDataResponse,
-  UserCourseConnection,
-  UserRawBackendData,
-} from './toolpad/data/users';
+  CourseBackendData,
+  CourseEnrollmentBackendData,
+} from './toolpad/courses/types';
+import { generateUsers } from './toolpad/users/generators';
+import { UserBackendData } from './toolpad/users/types';
 
 interface DataStore {
-  users: UserRawBackendData[];
-  userCourseConnections: UserCourseConnection[];
-
+  users: UserBackendData[];
   courses: CourseBackendData[];
-  lastReportId: number;
-  lastMessageId: number;
+  enrollmentsByCourse: { [key: string]: CourseEnrollmentBackendData[] };
   lastCourseId: number;
-  lastChannelId: number;
   lastUserId: number;
-  lastArticleId: number;
 }
 
 // Path to the data store JSON file (optional persistence)
@@ -27,23 +22,33 @@ const dataStoreKey = 'dataStore';
 
 export let dataStore: DataStore;
 export const savedDataStore = localStorage.getItem(dataStoreKey);
-if (savedDataStore) {
-  dataStore = JSON.parse(savedDataStore);
-} else {
-  dataStore = {
-    users: [...basicUsersDataResponse],
-    userCourseConnections: [...basicUserCourseConnections],
+const setupDataStore = async () => {
+  if (savedDataStore) {
+    dataStore = JSON.parse(savedDataStore);
+  } else {
+    const users = await generateUsers({
+      teacherCount: 5,
+      studentCount: 50,
+      adminCount: 2,
+    });
+    const { courses, enrollmentsByCourse } = generateCourses({
+      coursesPerYear: 20,
+      startYear: 2021,
+      numberOfYears: 4,
+      users: users,
+    });
+    dataStore = {
+      users: users,
+      courses: courses,
+      enrollmentsByCourse: enrollmentsByCourse,
+      lastCourseId: courses.length,
+      lastUserId: users.length,
+    };
+    saveDataStore(dataStore);
+  }
+};
 
-    courses: [...basicCourses],
-    lastReportId: 4,
-    lastMessageId: 7,
-    lastCourseId: 2,
-    lastChannelId: 2,
-    lastUserId: 1,
-    lastArticleId: 2,
-  };
-  saveDataStore(dataStore);
-}
+setupDataStore();
 
 // Function to save data store to JSON file
 // Function to save data store to LocalStorage
@@ -52,17 +57,26 @@ export function saveDataStore(dataStore: DataStore) {
 }
 
 // Function to reset data store to initial state
-export function resetDataStore() {
+export async function resetDataStore() {
+  // Generate mock data
+  const users = await generateUsers({
+    teacherCount: 5,
+    studentCount: 50,
+    adminCount: 2,
+  });
+  const { courses, enrollmentsByCourse } = generateCourses({
+    coursesPerYear: 20,
+    startYear: 2021,
+    numberOfYears: 4,
+    users: users,
+  });
+
   dataStore = {
-    users: [...basicUsersDataResponse],
-    userCourseConnections: [...basicUserCourseConnections],
-    courses: [...basicCourses],
-    lastReportId: 3,
-    lastMessageId: 3,
-    lastCourseId: 2,
-    lastChannelId: 2,
-    lastUserId: 1,
-    lastArticleId: 2,
+    users: users,
+    courses: courses,
+    enrollmentsByCourse: enrollmentsByCourse,
+    lastCourseId: courses.length,
+    lastUserId: users.length,
   };
   saveDataStore(dataStore);
 }

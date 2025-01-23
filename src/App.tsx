@@ -2,7 +2,6 @@
 
 import { BrowserRouter } from 'react-router-dom';
 import { LMSProvider } from '.';
-import CoreRoutes from './CoreRoutes';
 
 import Microservices from './LMSToolpad/components/Microservices/Microservices';
 
@@ -13,7 +12,6 @@ const App = () => {
   return (
     <BrowserRouter>
       <LMSProvider>
-        <CoreRoutes />
         <Microservices>
           <EduTest />
           <EduTest2 />

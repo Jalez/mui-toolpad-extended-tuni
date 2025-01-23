@@ -1,7 +1,7 @@
 /** @format */
 
 import { Grid, Stack, Typography, Divider } from '@mui/material';
-import { Platform } from '../../../store/usePlatformSettingsStore';
+import { Platform } from '../../../store/usePlatformStore';
 import EditableText from '../../Components/Editables/EditableText';
 import EditableNumber from '../../Components/Editables/EditableNumber';
 import EditableSwitch from '../../Components/Editables/EditableSwitch';
@@ -90,7 +90,9 @@ export default function GeneralTab({ settings, onUpdate }: GeneralTabProps) {
           <EditableNumber
             label='Total Storage Limit (GB)'
             value={settings.storage.totalStorageLimit}
-            onChange={(value) => handleStorageUpdate('totalStorageLimit', value)}
+            onChange={(value) =>
+              handleStorageUpdate('totalStorageLimit', value)
+            }
           />
         </Grid>
       </Grid>

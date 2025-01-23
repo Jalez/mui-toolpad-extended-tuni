@@ -2,10 +2,10 @@
 
 import { Box } from '@mui/material';
 import useCourseStore from '../store/useCourseStore';
+import { useUserStore } from '../store/useUserStore';
 import CourseSelector from './Courses/CourseSelector';
 import LoadingScreen from './LoadingScreen';
-import LayoutToggle from './Courses/LayoutToggle';
-import { useState } from 'react';
+import ResizablePanel from './Common/ResizablePanel';
 
 /**
  * Home component with enhanced layout options.
@@ -19,17 +19,20 @@ import { useState } from 'react';
  */
 const Home = () => {
   const { courses, fetchState } = useCourseStore();
-  const [navigationType, setNavigationType] = useState<'direct' | 'instances'>(
-    'direct'
-  );
+  const { user } = useUserStore();
+  const navigationType = user?.preferences?.navigationType || 'direct';
 
   return (
     <Box sx={{ p: 2 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-        <LayoutToggle value={navigationType} onChange={setNavigationType} />
-      </Box>
-      <CourseSelector courses={courses} navigationType={navigationType} />
-
+      <ResizablePanel
+        defaultWidth={800}
+        defaultHeight={500}
+        minWidth={280}
+        maxWidth={1200}
+        minHeight={200}
+        maxHeight={800}>
+        <CourseSelector courses={courses} navigationType={navigationType} />
+      </ResizablePanel>
       {fetchState === 'loading' && <LoadingScreen />}
     </Box>
   );

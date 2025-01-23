@@ -13,9 +13,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import MicIcon from '@mui/icons-material/Mic';
 import { useState, useEffect } from 'react';
-import DevelopmentTools from '../DevTools/DevelopmentTools';
-import { useUserStore } from '../../store/useUserStore';
-import useDialogStore from '../../store/useDialogStore';
+import DevelopmentTools from '../../DevTools/DevelopmentTools';
+import { useUserStore } from '../../../store/useUserStore';
+import useDialogStore from '../../../store/useDialogStore';
 
 export const CollapsibleMenu = () => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -101,7 +101,7 @@ const PlatformSettingsOpener = () => {
   const { user } = useUserStore();
   const { setOpenDialog } = useDialogStore();
 
-  if (user?.role !== 'admin') return null;
+  if (!user?.platformRoles.includes('admin')) return null;
 
   const handleOpenPlatformSettings = () => {
     console.log('Open Platform Settings');

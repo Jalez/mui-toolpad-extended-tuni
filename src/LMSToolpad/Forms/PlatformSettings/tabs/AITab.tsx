@@ -1,7 +1,7 @@
 /** @format */
 
-import { Grid, Stack } from '@mui/material';
-import { Platform } from '../../../store/usePlatformSettingsStore';
+import { Stack } from '@mui/material';
+import { Platform } from '../../../store/usePlatformStore';
 import EditableText from '../../Components/Editables/EditableText';
 import EditableSwitch from '../../Components/Editables/EditableSwitch';
 import EditableNumber from '../../Components/Editables/EditableNumber';

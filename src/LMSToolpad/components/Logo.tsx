@@ -3,12 +3,12 @@
 import { Box, Typography } from '@mui/material';
 
 import useCourseStore from '../store/useCourseStore';
-import { usePlatformSettingsStore } from '../store/usePlatformSettingsStore';
+import { usePlatformStore } from '../store/usePlatformStore';
 // import logo from '/static/images/tuni.png';
 
 export const Logo = () => {
   const { setCurrentCourse } = useCourseStore((state) => state);
-  const { platform } = usePlatformSettingsStore();
+  const { platform } = usePlatformStore();
   // <img
   //   style={{
   //     maxWidth: "30px",

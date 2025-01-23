@@ -3,10 +3,7 @@
 import { Box } from '@mui/material';
 import FormDialog from '../../components/Dialogs/FormDialog';
 import useDialogStore from '../../store/useDialogStore';
-import {
-  Platform,
-  usePlatformSettingsStore,
-} from '../../store/usePlatformSettingsStore';
+import { Platform, usePlatformStore } from '../../store/usePlatformStore';
 import { useNotificationStore } from '../../store/useNotificationsStore';
 import PlatformSettingsTabs from './PlatformSettingsTabs';
 import { useState, useEffect, useCallback } from 'react';
@@ -15,7 +12,7 @@ import { AppTheme, useThemeStore } from '../../store/useThemeStore';
 
 const PlatformSettings = () => {
   const { closeDialog } = useDialogStore();
-  const { platform, updatePlatform } = usePlatformSettingsStore();
+  const { platform, updatePlatform } = usePlatformStore();
   const { addNotificationData } = useNotificationStore();
   const { theme, updateTheme } = useThemeStore();
   const [localPlatformSettings, setLocalPlatformSettings] = useState(platform); // Initialize with current settings
@@ -60,9 +57,17 @@ const PlatformSettings = () => {
     closeDialog();
   };
 
-  const handlePlatformUpdate = (newPlatformSettings: Platform) => {
-    setLocalPlatformSettings(newPlatformSettings);
-    setIsDirty(checkIfPlatformDirty(newPlatformSettings));
+  const handlePlatformUpdate = (newSettings: Partial<Platform>) => {
+    setLocalPlatformSettings((prev) => ({
+      ...prev,
+      ...newSettings,
+    }));
+    setIsDirty(
+      checkIfPlatformDirty({
+        ...localPlatformSettings,
+        ...newSettings,
+      })
+    );
   };
 
   const handleThemeUpdate = (newThemeSettings: AppTheme) => {

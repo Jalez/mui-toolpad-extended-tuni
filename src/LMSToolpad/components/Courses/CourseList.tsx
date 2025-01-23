@@ -1,11 +1,13 @@
 /** @format */
 
 // CourseList.tsx
-import { List, Typography, Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { Course } from '../../store/useCourseStore';
 import CourseItem from './CourseItem';
 import NoCoursesMessage from './NoCoursesMessage';
-import { groupCoursesByActivity } from '../../utils/courseFilters';
+import { groupCoursesByEnrollment } from '../../utils/courseFilters';
+import ItemReel from './ItemReel';
+import { useUserStore } from '../../store/useUserStore';
 
 type CourseListProps = {
   courses: Course[];
@@ -34,67 +36,86 @@ const CourseList = ({
   onSelectCourse,
   displayMode = 'course',
 }: CourseListProps) => {
-  // Skip unique if we're in instance or instanceList mode
-  const skipUnique =
-    displayMode === 'instance' || displayMode === 'instanceList';
-
-  const { active, inactive } = groupCoursesByActivity(courses, skipUnique);
+  const { user } = useUserStore();
+  const visibleLists = user?.preferences.visibleCourseLists;
+  const { isStudent, isStudentOld, isTeacher, isTeacherOld, available } =
+    groupCoursesByEnrollment(courses);
 
   if (courses.length === 0) return <NoCoursesMessage />;
 
-  return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      <List
-        sx={{
-          p: 2,
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: 2,
-        }}>
-        {active.map((course) => (
-          <CourseItem
-            key={course.id}
-            course={course}
-            isSelected={selectedCourse?.id === course.id}
-            onSelect={onSelectCourse}
-            displayMode={displayMode}
-          />
-        ))}
-      </List>
-      {inactive.length > 0 && (
-        <>
+  const renderCourseSection = (
+    title: string,
+    courseList: Course[],
+    priority: 'high' | 'medium' | 'low' = 'medium'
+  ) => {
+    if (courseList.length === 0) {
+      return (
+        <Box sx={{ mb: 4 }}>
           <Typography
             variant='h6'
-            color='text.secondary'
-            sx={{ mt: 2, px: 2, alignSelf: 'center' }}>
-            Inactive Courses
-          </Typography>
-          <List
             sx={{
-              p: 2,
-              display: 'flex',
-              flexDirection: 'row',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-              alignItems: 'center',
-              gap: 2,
+              color:
+                priority === 'high'
+                  ? 'primary.main'
+                  : priority === 'low'
+                    ? 'text.secondary'
+                    : 'text.primary',
+              textAlign: 'left',
             }}>
-            {inactive.map((course) => (
+            {title}
+          </Typography>
+          <Typography sx={{ px: 2, mt: 1, color: 'text.secondary' }}>
+            There are no courses in this list
+          </Typography>
+        </Box>
+      );
+    }
+
+    return (
+      <Box sx={{ mb: 4, position: 'relative' }}>
+        <Typography
+          variant='h6'
+          sx={{
+            color:
+              priority === 'high'
+                ? 'primary.main'
+                : priority === 'low'
+                  ? 'text.secondary'
+                  : 'text.primary',
+            // mb: 2,
+            // px: 2,
+            textAlign: 'left',
+          }}>
+          {title}
+        </Typography>
+        <ItemReel>
+          {courseList.map((course) => (
+            <Box sx={{ p: 1 }} key={course.id}>
               <CourseItem
-                key={course.id}
                 course={course}
                 isSelected={selectedCourse?.id === course.id}
                 onSelect={onSelectCourse}
                 displayMode={displayMode}
-                isInactive
               />
-            ))}
-          </List>
-        </>
-      )}
+            </Box>
+          ))}
+        </ItemReel>
+      </Box>
+    );
+  };
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+      {visibleLists?.isStudent &&
+        renderCourseSection('My Enrolled Courses', isStudent, 'high')}
+      {visibleLists?.isStudentOld &&
+        renderCourseSection('My Completed Courses', isStudentOld, 'low')}
+      {visibleLists?.isTeacher &&
+        renderCourseSection('My Teaching Courses', isTeacher, 'medium')}
+      {visibleLists?.isTeacherOld &&
+        renderCourseSection('My Past Teaching', isTeacherOld, 'low')}
+      {visibleLists?.available &&
+        renderCourseSection('Available Courses', available, 'medium')}
     </Box>
   );
 };

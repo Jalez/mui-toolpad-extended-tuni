@@ -12,6 +12,7 @@ import {
 import { useEffect } from 'react';
 import ToolDisplayer from '../Tool/ToolDisplayer';
 import useCourseStore from '../../store/useCourseStore';
+import Home from '../Home';
 
 type MicroservicesProps = {
   children: React.ReactNode;
@@ -37,6 +38,9 @@ const Microservices = ({ children }: MicroservicesProps) => {
     <>
       {children}
       <Routes>
+        <Route path='' element={<Home />} index />
+        <Route path='help' element={<div>Help</div>} />
+        <Route path='contact' element={<div>Contact</div>} />
         <Route path=':code' element={<CourseCodeLoader />}>
           <Route index element={<CourseInstanceSelector />} />
           <Route path=':instance' element={<CourseInstanceLoader />}>

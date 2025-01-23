@@ -16,8 +16,8 @@ import { SnackbarProvider } from 'notistack';
 
 import { SizableContentHeader } from './layout/breadcrumbs/SizableContentHeader';
 import SidebarFooter from './components/sidebar/Footer';
-import { ToolbarAccount } from './components/toolbar/Account';
-import { CustomActions } from './components/toolbar/Actions';
+import { ToolbarAccount } from './components/Toolbars/AppToolbar/Account';
+import { CustomActions } from './components/Toolbars/AppToolbar/Actions';
 import Dialogs from './components/Dialogs/Dialogs';
 import { useThemeStore } from './store/useThemeStore';
 import { createTheme, Theme } from '@mui/material';
@@ -80,8 +80,13 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
 
   // Update navigation once we have user and navigation data
   useEffect(() => {
-    if (navigation && currentCourse?.id) {
-      setCurrentNavigation(addActions(addIcons(navigation), user?.role || ''));
+    if (currentCourse?.id) {
+      setCurrentNavigation(
+        addActions(
+          addIcons(navigation),
+          currentCourse?.data?.myData?.role || ''
+        )
+      );
     }
   }, [navigation, user, currentCourse]);
 
@@ -158,8 +163,22 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
     }
   };
 
+  let userSessionData = undefined;
+  if (user?.id) {
+    userSessionData = {
+      id: user?.id,
+      name: user?.name,
+      image:
+        user?.image?.thumbnail ||
+        user?.image?.medium ||
+        user?.image?.large ||
+        '',
+      email: user?.email,
+    };
+  }
+
   const session: Session = {
-    user: (user?.id && user) || undefined,
+    user: userSessionData,
   };
 
   return (
@@ -190,6 +209,7 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
               borderBottom: 0,
             },
           }}
+          defaultSidebarCollapsed={true}
           maxWidth={true}
           slots={{
             toolbarAccount: ToolbarAccount,

@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import CourseList from './CourseList';
 import { useNavigate } from 'react-router-dom';
 import { filterUniqueCourses } from '../../utils/courseFilters';
-import CenteredHeading from '../CenteredHeading';
 
 type CourseSelectorProps = {
   courses: Course[];
@@ -61,16 +60,11 @@ const CourseSelector = ({
     <Fade in={mounted} timeout={500}>
       <Box
         sx={{
-          p: 3,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          gap: 2,
         }}>
-        <CenteredHeading
-          heading='Select a course to get started'
-          subheading='Choose a course to view its content'
-        />
+        {/* <CenteredHeading heading='Active Courses' /> */}
         <CourseList
           courses={displayedCourses}
           selectedCourse={currentCourse}

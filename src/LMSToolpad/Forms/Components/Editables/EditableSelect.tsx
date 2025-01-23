@@ -17,6 +17,7 @@ interface EditableSelectProps {
   label: string;
   options: { value: string; label: string }[];
   explanation?: string;
+  helperText?: string;
 }
 
 const EditableSelect = ({
@@ -25,6 +26,7 @@ const EditableSelect = ({
   label,
   options,
   explanation,
+  helperText,
 }: EditableSelectProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -108,6 +110,11 @@ const EditableSelect = ({
           </Typography>
         )}
       </Box>
+      {helperText && (
+        <Typography variant='caption' color='text.secondary' sx={{ mt: 0.5 }}>
+          {helperText}
+        </Typography>
+      )}
     </Box>
   );
 };

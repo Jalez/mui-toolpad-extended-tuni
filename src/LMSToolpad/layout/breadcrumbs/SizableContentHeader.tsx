@@ -1,7 +1,7 @@
 /** @format */
 
 import { PageContainer, useActivePage } from '@toolpad/core';
-import PageToolbar from '../../components/PageToolBar';
+import PageToolbar from '../../components/Toolbars/PageToolbar/PageToolBar';
 import { useMediaQuery, useTheme } from '@mui/material';
 
 /**

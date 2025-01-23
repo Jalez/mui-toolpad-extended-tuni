@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import useCourseStore, { Course } from '../../store/useCourseStore';
-import { useUserStore } from '../../store/useUserStore';
 import { useNotificationStore } from '../../store/useNotificationsStore';
 
 import CenteredHeading from '../CenteredHeading';
@@ -37,7 +36,6 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
   const { instance, code } = useParams();
   const { updateStateCourse, currentCourse } = useCourseStore();
   const { addNotificationData } = useNotificationStore();
-  const { user } = useUserStore();
   const [show, setShow] = useState(true);
   const { allMicroserviceNavigation } = useNavigationStore();
   const [currentMicroservices, setCurrentMicroservices] = useState<
@@ -88,18 +86,17 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
     return () => clearTimeout(timer);
   }, [currentCourse]);
 
+  // Get course-specific role
+  const isTeacher = currentCourse?.data?.myData?.role === 'teacher';
+
   useEffect(() => {
-    if (
-      currentCourse &&
-      user?.role === 'teacher' &&
-      !currentCourse.ltiLoginUrl
-    ) {
+    if (currentCourse && isTeacher && !currentCourse.ltiLoginUrl) {
       addNotificationData({
         type: 'info',
         message: 'The LTI Login URL is missing for this course.',
       });
     }
-  }, [currentCourse, user, addNotificationData]);
+  }, [currentCourse, isTeacher, addNotificationData]);
 
   const handleToggleService = async (path: string, isUsed: boolean) => {
     if (!currentCourse) return;
@@ -113,10 +110,9 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
 
   return (
     <>
-      {user?.role === 'teacher' && !currentCourse?.ltiLoginUrl && (
-        <LtiLoginUrlForm />
-      )}
-      {user?.role === 'teacher' && (
+      {isTeacher && !currentCourse?.ltiLoginUrl && <LtiLoginUrlForm />}
+
+      {isTeacher ? (
         <>
           <CenteredHeading
             heading='Enabled Tools'
@@ -143,26 +139,24 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
             isUsed={false}
           />
         </>
+      ) : (
+        <>
+          <CenteredHeading
+            heading='Course Tools'
+            subheading='These tools are available for this course. Click on a tool to visit its page.'
+          />
+          <ToolDisplayer
+            show={show}
+            title={
+              currentCourse?.title
+                ? `${currentCourse.title} - Tools`
+                : 'Course Tools'
+            }
+            navItems={usedTools}
+            roleCheck={true}
+          />
+        </>
       )}
-      {!user?.role ||
-        (user?.role !== 'teacher' && (
-          <>
-            <CenteredHeading
-              heading='Course Tools'
-              subheading='These tools are available for this course. Click on a tool to visit its page.'
-            />
-            <ToolDisplayer
-              show={show}
-              title={
-                currentCourse?.title
-                  ? `${currentCourse.title} - Tools`
-                  : 'Course Tools'
-              }
-              navItems={usedTools}
-              roleCheck={true}
-            />
-          </>
-        ))}
     </>
   );
 };

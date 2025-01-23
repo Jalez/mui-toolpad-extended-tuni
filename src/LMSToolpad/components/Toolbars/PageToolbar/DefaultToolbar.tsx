@@ -1,10 +1,9 @@
 /** @format */
 
+import { Box } from '@mui/material';
 import { PageContainerToolbar } from '@toolpad/core';
 
-import { Box } from '@mui/material';
-
-const PageToolbar = () => {
+const DefaultToolbar = () => {
   return (
     <PageContainerToolbar>
       <Box
@@ -13,11 +12,10 @@ const PageToolbar = () => {
           flexDirection: 'row',
           justifyContent: 'right',
           width: '100%',
-        }}>
-        {/* {path === '/educhat/channels' && <ChannelFilter />} */}
-      </Box>
+        }}
+      />
     </PageContainerToolbar>
   );
 };
 
-export default PageToolbar;
+export default DefaultToolbar;

@@ -1,17 +1,13 @@
 /** @format */
 
 import { http, HttpResponse } from 'msw';
-import { getUserRole, UserRawBackendData } from '../data/users';
-import { dataStore } from '../../store';
 import { baseUrl } from '../../../constants';
+import { UserBackendData } from './types';
+import { dataStore } from '../../store';
 
 // Type for response data
 type JsonResponse = {
-  data?:
-    | UserRawBackendData
-    | UserRawBackendData[]
-    | Record<string, never>
-    | { role: 'student' | 'teacher' };
+  data?: UserBackendData | UserBackendData[] | Record<string, never>;
   error?: string;
 };
 
@@ -28,17 +24,22 @@ const createErrorResponse = (
 const handleCreateUser = async (request: Request): Promise<HttpResponse> => {
   try {
     const requestData = (await request.json()) as Record<string, unknown>;
-    const newUser: UserRawBackendData = {
+    const newUser: UserBackendData = {
       id: (dataStore.users.length + 1).toString(),
       name: requestData.name as string,
       email: requestData.email as string,
-      role: requestData.role as UserRawBackendData['role'],
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      platform_roles:
+        (requestData.platform_roles as UserBackendData['platform_roles']) || [
+          'user',
+        ],
       privacy_settings:
-        requestData.privacy_settings as UserRawBackendData['privacy_settings'],
-      gdpr_consent:
-        requestData.gdpr_consent as UserRawBackendData['gdpr_consent'],
+        requestData.privacy_settings as UserBackendData['privacy_settings'],
+      gdpr_consent: requestData.gdpr_consent as UserBackendData['gdpr_consent'],
       data_retention:
-        requestData.data_retention as UserRawBackendData['data_retention'],
+        requestData.data_retention as UserBackendData['data_retention'],
+      preferences: requestData.preferences as UserBackendData['preferences'],
     };
 
     dataStore.users.push(newUser);
@@ -63,7 +64,7 @@ const handleUpdateUser = async (
     const updatedUser = {
       ...dataStore.users[userIndex],
       ...requestData,
-    } as UserRawBackendData;
+    } as UserBackendData;
 
     dataStore.users[userIndex] = updatedUser;
     return HttpResponse.json(updatedUser);
@@ -84,10 +85,13 @@ const handleDeleteUser = async (userId: string): Promise<HttpResponse> => {
     const user = dataStore.users[userIndex];
     //Remove the user from the data store
     dataStore.users = dataStore.users.filter((u) => u.id !== userId);
-    // Clean up course connections
-    dataStore.userCourseConnections = dataStore.userCourseConnections.filter(
-      (ucc) => ucc.userId !== userId
-    );
+
+    // Clean up course enrollments instead of userCourseConnections
+    Object.keys(dataStore.enrollmentsByCourse).forEach((courseId) => {
+      dataStore.enrollmentsByCourse[courseId] = dataStore.enrollmentsByCourse[
+        courseId
+      ].filter((enrollment) => enrollment.user_id !== userId);
+    });
 
     return HttpResponse.json(user);
   } catch (error) {
@@ -95,46 +99,24 @@ const handleDeleteUser = async (userId: string): Promise<HttpResponse> => {
   }
 };
 
-const handleGetCurrentUser = (courseId: string | null): HttpResponse => {
+const handleGetCurrentUser = (): HttpResponse => {
   const userId = dataStore.users[0].id;
-  return getUserDataResponse(userId, courseId || '');
+  const user = dataStore.users.find((u) => u.id === userId);
+  return HttpResponse.json(user);
 };
 
-const handleGetAllUsers = (courseId: string | null): HttpResponse => {
-  let returnedUsers = dataStore.users;
-
-  if (courseId) {
-    const userCourseConnections = dataStore.userCourseConnections.filter(
-      (ucc) => ucc.courseId === courseId
-    );
-
-    returnedUsers = userCourseConnections
-      .map((ucc) => {
-        const user = dataStore.users.find((u) => u.id === ucc.userId);
-        if (user) {
-          return {
-            ...user,
-            role: ucc.role,
-          } as UserRawBackendData;
-        }
-        return undefined;
-      })
-      .filter((user): user is UserRawBackendData => user !== undefined);
-  }
-
-  return HttpResponse.json(returnedUsers);
+const handleGetAllUsers = (): HttpResponse => {
+  return HttpResponse.json(dataStore.users);
 };
 
 // Main handlers
 export const userHandlers = [
-  http.get(baseUrl + 'api/users/current/', async ({ request }) => {
-    const courseId = new URL(request.url).searchParams.get('course_id');
-    return handleGetCurrentUser(courseId);
+  http.get(baseUrl + 'api/users/current/', () => {
+    return handleGetCurrentUser();
   }),
 
-  http.get(baseUrl + 'api/users/', async ({ request }) => {
-    const courseId = new URL(request.url).searchParams.get('course_id');
-    return handleGetAllUsers(courseId);
+  http.get(baseUrl + 'api/users/', () => {
+    return handleGetAllUsers();
   }),
 
   http.post(baseUrl + 'api/users/', async ({ request }) => {
@@ -150,44 +132,18 @@ export const userHandlers = [
   }),
 ];
 
-// Keep existing helper functions
-export const getUserDataResponse = (
-  userId?: string,
-  courseId?: string
-): HttpResponse => {
+// Helper function for getting user data
+export const getUserDataResponse = (userId?: string): HttpResponse => {
   try {
     const user = userId
       ? dataStore.users.find((u) => u.id === userId)
       : dataStore.users[0];
+
     if (user) {
-      if (courseId) {
-        const role = getUserRole(user.id, courseId);
-        if (role) {
-          user.role = role;
-        }
-      }
       return HttpResponse.json(user);
-    } else {
-      return createErrorResponse('User not found', 404);
     }
-  } catch (error) {
     return createErrorResponse('User not found', 404);
-  }
-};
-
-export const getUserRoleForCourseResponse = (
-  userId: string,
-  courseId: string
-): HttpResponse => {
-  const connection = dataStore.userCourseConnections.find(
-    (ucc) => ucc.userId === userId && ucc.courseId === courseId
-  );
-
-  if (connection) {
-    // Cast the role response to satisfy the type system
-    const roleResponse = { role: connection.role } as const;
-    return HttpResponse.json(roleResponse);
-  } else {
-    return createErrorResponse('Role not found', 404);
+  } catch (error) {
+    return createErrorResponse('Internal server error', 500);
   }
 };

@@ -2,13 +2,22 @@
 
 import { Course } from '../store/useCourseStore';
 
+export type CourseGroups = {
+  isStudent: Course[];
+  isStudentOld: Course[];
+  isTeacher: Course[];
+  isTeacherOld: Course[];
+  available: Course[];
+};
+
 export const filterUniqueCourses = (courses: Course[]): Course[] => {
   const courseMap = new Map<string, Course[]>();
 
-  // Group courses by code
+  // Group courses by code AND instance to ensure unique identification
   courses.forEach((course) => {
-    const existing = courseMap.get(course.code) || [];
-    courseMap.set(course.code, [...existing, course]);
+    const key = `${course.code}-${course.instance}`;
+    const existing = courseMap.get(key) || [];
+    courseMap.set(key, [...existing, course]);
   });
 
   // For each group, select the most recently updated instance
@@ -34,6 +43,7 @@ export const isActiveCourse = (course: Course): boolean => {
 // For course codes with multiple instances, check if any instance is active
 export const isActivecode = (courses: Course[], code: string): boolean => {
   const instances = courses.filter((course) => course.code === code);
+  // Remove status check since it no longer exists
   return instances.some(isActiveCourse);
 };
 
@@ -99,4 +109,47 @@ export const groupCoursesByActivity = (
     active: activeCourses,
     inactive: inactiveCourses,
   };
+};
+
+export const groupCoursesByEnrollment = (courses: Course[]): CourseGroups => {
+  const now = new Date();
+
+  console.log('COURSES', courses);
+  return courses.reduce(
+    (acc: CourseGroups, course) => {
+      const hasEnded = course.endDate ? new Date(course.endDate) < now : false;
+      const role = course.data?.myData?.role;
+      const isEnrolled = course.data?.myData?.status === 'enrolled';
+
+      if (role === 'student' && isEnrolled) {
+        if (hasEnded) {
+          acc.isStudentOld.push(course);
+        } else {
+          acc.isStudent.push(course);
+        }
+      } else if (role === 'teacher') {
+        console.log('IS TEACHER', course);
+        if (hasEnded) {
+          acc.isTeacherOld.push(course);
+        } else {
+          acc.isTeacher.push(course);
+        }
+      } else if (!hasEnded && course.visibility.mode === 'public') {
+        // Only add to available if the course:
+        // - hasn't ended
+        // - is public
+        // - user is not enrolled or teaching
+        acc.available.push(course);
+      }
+
+      return acc;
+    },
+    {
+      isStudent: [],
+      isStudentOld: [],
+      isTeacher: [],
+      isTeacherOld: [],
+      available: [],
+    }
+  );
 };

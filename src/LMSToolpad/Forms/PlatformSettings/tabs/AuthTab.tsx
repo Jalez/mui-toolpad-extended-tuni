@@ -1,22 +1,19 @@
 /** @format */
 
 import { Grid, Stack } from '@mui/material';
-import { PlatformSettings } from '../../../store/usePlatformSettingsStore';
 import EditableSwitch from '../../Components/Editables/EditableSwitch';
 import EditableNumber from '../../Components/Editables/EditableNumber';
 import EditableSelect from '../../Components/Editables/EditableSelect';
 import EditableAutoComplete from '../../Components/Editables/EditableAutoComplete';
+import { Platform } from '../../../store/usePlatformStore';
 
 interface AuthTabProps {
-  settings: PlatformSettings;
-  onUpdate: (settings: Partial<PlatformSettings>) => void;
+  settings: Platform;
+  onUpdate: (settings: Partial<Platform>) => void;
 }
 
 export default function AuthTab({ settings, onUpdate }: AuthTabProps) {
-  const handleAuthUpdate = (
-    key: keyof PlatformSettings['auth'],
-    value: any
-  ) => {
+  const handleAuthUpdate = (key: keyof Platform['auth'], value: any) => {
     onUpdate({ auth: { ...settings.auth, [key]: value } });
   };
 
