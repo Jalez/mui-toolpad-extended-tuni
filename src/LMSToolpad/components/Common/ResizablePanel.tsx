@@ -3,9 +3,17 @@
 import { Box, useTheme } from '@mui/material';
 import { useState, useRef, useEffect } from 'react';
 import { usePlatformStore } from '../../store/usePlatformStore';
+import BlurOverlay from './Resizable/BlurOverlay';
+import ResizeIndicator from './Resizable/ResizeIndicator';
+import InternalScrolling from './Resizable/InternalScrolling';
+import ResizeHandlers from './Resizable/ResizeHandlers';
+import { useItemCounts, useResizeContext } from '../../contexts/ResizeContext';
 
 interface ResizablePanelProps {
-  children: React.ReactNode;
+  id: string; // New required prop
+  children:
+    | React.ReactNode
+    | ((dimensions: { width: number; height: number }) => React.ReactNode);
   minHeight?: number;
   maxHeight?: number;
   minWidth?: number;
@@ -15,7 +23,33 @@ interface ResizablePanelProps {
   onResize?: (dimensions: { width: number; height: number }) => void;
 }
 
+const STORAGE_KEY_PREFIX = 'resizable-panel-dimensions-';
+
+const loadDimensions = (
+  id: string,
+  defaultDimensions: { width: number; height: number }
+) => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY_PREFIX + id);
+    return stored ? JSON.parse(stored) : defaultDimensions;
+  } catch {
+    return defaultDimensions;
+  }
+};
+
+const saveDimensions = (
+  id: string,
+  dimensions: { width: number; height: number }
+) => {
+  try {
+    localStorage.setItem(STORAGE_KEY_PREFIX + id, JSON.stringify(dimensions));
+  } catch (error) {
+    console.warn('Failed to save panel dimensions:', error);
+  }
+};
+
 const ResizablePanel = ({
+  id,
   children,
   minHeight = 200,
   maxHeight = 800,
@@ -28,24 +62,16 @@ const ResizablePanel = ({
   const theme = useTheme();
   const { platform } = usePlatformStore();
   const resizeMode = platform.interface.resizeMode;
-  const [dimensions, setDimensions] = useState({
-    width: defaultWidth,
-    height: defaultHeight,
-  });
+  const { snapDimensions } = useResizeContext();
+  const { setItemCounts } = useItemCounts();
+  const [dimensions, setDimensions] = useState(() =>
+    loadDimensions(id, { width: defaultWidth, height: defaultHeight })
+  );
   const [isDragging, setIsDragging] = useState({
     vertical: false,
     horizontal: false,
   });
   const dragStart = useRef({ x: 0, y: 0, width: 0, height: 0 });
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const [scale, setScale] = useState(1);
-  const [dragInProgress, setDragInProgress] = useState(false);
-  const [isHovering, setIsHovering] = useState(false);
-
-  const handleMouseDownCapture = () => {
-    if (!resizeMode) return;
-    setDragInProgress(true);
-  };
 
   const handleMouseDown =
     (direction: 'vertical' | 'horizontal' | 'corner') =>
@@ -64,16 +90,18 @@ const ResizablePanel = ({
       e.preventDefault();
     };
 
-  const handleMouseEnter = () => {
-    if (resizeMode) {
-      setIsHovering(true);
-    }
+  const handleDimensionsChange = (newDimensions: {
+    width: number;
+    height: number;
+  }) => {
+    // console.log('[ResizablePanel] New dimensions:', newDimensions);
+    setDimensions(newDimensions);
+    saveDimensions(id, newDimensions);
+    onResize?.(newDimensions);
   };
 
-  const handleMouseLeave = () => {
-    if (!isDragging.vertical && !isDragging.horizontal) {
-      setIsHovering(false);
-    }
+  const snapToGrid = (value: number, snapSize: number) => {
+    return Math.round(value / snapSize) * snapSize;
   };
 
   useEffect(() => {
@@ -87,27 +115,33 @@ const ResizablePanel = ({
 
       if (isDragging.horizontal) {
         const deltaX = e.clientX - dragStart.current.x;
+        const newWidth = dragStart.current.width + deltaX;
         newDimensions.width = Math.min(
-          Math.max(dragStart.current.width + deltaX, minWidth),
-          maxWidth
+          Math.max(
+            snapToGrid(newWidth, snapDimensions.width),
+            snapToGrid(minWidth, snapDimensions.width)
+          ),
+          snapToGrid(maxWidth, snapDimensions.width)
         );
       }
 
       if (isDragging.vertical) {
         const deltaY = e.clientY - dragStart.current.y;
+        const newHeight = dragStart.current.height + deltaY;
         newDimensions.height = Math.min(
-          Math.max(dragStart.current.height + deltaY, minHeight),
-          maxHeight
+          Math.max(
+            snapToGrid(newHeight, snapDimensions.height),
+            snapToGrid(minHeight, snapDimensions.height)
+          ),
+          snapToGrid(maxHeight, snapDimensions.height)
         );
       }
 
-      setDimensions(newDimensions);
-      onResize?.(newDimensions);
+      handleDimensionsChange(newDimensions);
     };
 
     const handleMouseUp = () => {
       setIsDragging({ vertical: false, horizontal: false });
-      setDragInProgress(false);
     };
 
     if (isDragging.vertical || isDragging.horizontal) {
@@ -127,6 +161,8 @@ const ResizablePanel = ({
     minWidth,
     maxWidth,
     onResize,
+    id,
+    snapDimensions,
   ]);
 
   // Add effect to handle body scrolling
@@ -148,208 +184,69 @@ const ResizablePanel = ({
     };
   }, [isDragging]);
 
-  // Measure unscaled content, then apply fitting scale
+  // Add effect to calculate and log item count using snapDimensions
   useEffect(() => {
-    if (!contentRef.current) return;
-    setScale(1); // reset scale
-    requestAnimationFrame(() => {
-      // measure unscaled content
-      if (!contentRef.current) return;
-      const { height: contentH } = contentRef.current.getBoundingClientRect();
-      const scaleY = dimensions.height / contentH;
-      const newScale = scaleY < 1 ? scaleY : 1;
-      setScale(newScale);
-    });
-  }, [dimensions, children]);
+    if (snapDimensions.width > 0) {
+      const itemsVisible = Math.floor(dimensions.width / snapDimensions.width);
+      console.log(
+        '[ResizablePanel] Currently showing:',
+        itemsVisible,
+        'items',
+        `(Panel width: ${dimensions.width}px, Item width: ${snapDimensions.width}px)`
+      );
+    }
+  }, [dimensions.width, snapDimensions.width]);
+
+  // Add effect to calculate and log both horizontal and vertical item counts
+  useEffect(() => {
+    if (snapDimensions.width > 0 && snapDimensions.height > 0) {
+      const horizontalItemsVisible = Math.floor(
+        dimensions.width / snapDimensions.width
+      );
+      const verticalItemsVisible = Math.floor(
+        dimensions.height / snapDimensions.height
+      );
+
+      setItemCounts({
+        horizontal: horizontalItemsVisible,
+        vertical: verticalItemsVisible,
+      });
+    }
+  }, [
+    dimensions.width,
+    dimensions.height,
+    snapDimensions.width,
+    snapDimensions.height,
+    setItemCounts,
+  ]);
 
   return (
     <Box
       sx={{
         position: 'relative',
-        width: dimensions.width,
+        width: dimensions.width + 25,
         height: dimensions.height,
         backgroundColor: theme.palette.background.paper,
         borderRadius: resizeMode ? 1 : 0,
-        transition: 'all 0.2s ease',
-        boxShadow:
-          isDragging.vertical || isDragging.horizontal
-            ? theme.shadows[8]
-            : resizeMode
-              ? theme.shadows[4]
-              : 'none',
         outline: resizeMode
-          ? `2px dashed ${theme.palette.primary.main}`
+          ? `0.1em dashed ${theme.palette.primary.main}`
           : 'none',
-        outlineOffset: -2,
+        display: 'flex', // Add this
+        flexDirection: 'column', // Add this
+        overflow: 'hidden', // Add this
       }}>
-      {/* Content Container with internal scrolling */}
-      <Box
-        ref={contentRef}
-        sx={{
-          // only scale vertically
-          transform: `scale(1, ${scale})`,
-          transformOrigin: 'top left',
-          // allow horizontal scrolling
-          overflowX: 'auto',
-          overflowY: 'hidden',
-          width: 'fit-content',
-          height: 'fit-content',
-          pointerEvents: 'auto',
-          // Hide scrollbar in Firefox
-          scrollbarWidth: 'thin',
-          // Hide scrollbar in Chrome/Safari
-          '&::-webkit-scrollbar': {
-            width: '8px',
-            backgroundColor: 'transparent',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: theme.palette.divider,
-            borderRadius: '4px',
-          },
-          maxWidth: '100%',
-          visibility:
-            isDragging.vertical ||
-            isDragging.horizontal ||
-            dragInProgress ||
-            isHovering
-              ? 'hidden'
-              : 'visible',
-        }}>
-        {children}
-      </Box>
+      <InternalScrolling dimensions={dimensions}>
+        {typeof children === 'function' ? children(dimensions) : children}
+      </InternalScrolling>
 
-      {/* Visual barrier and interaction prevention during resize */}
       {(isDragging.vertical || isDragging.horizontal) && (
-        <>
-          {/* Blur overlay */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: 'rgba(255, 255, 255, 0.8)',
-              backdropFilter: 'blur(6px)',
-              zIndex: theme.zIndex.modal,
-              transition: 'opacity 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              pointerEvents: 'auto',
-            }}>
-            {/* Optional: Add resize indicator */}
-            <Box
-              sx={{
-                padding: 2,
-                borderRadius: 1,
-                backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                color: 'text.secondary',
-                fontSize: '0.875rem',
-                userSelect: 'none',
-              }}>
-              {`${dimensions.width} × ${dimensions.height}`}
-            </Box>
-          </Box>
-
-          {/* Full screen overlay to capture mouse events */}
-          <Box
-            sx={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: theme.zIndex.modal + 1,
-              cursor: isDragging.horizontal
-                ? 'ew-resize'
-                : isDragging.vertical
-                  ? 'ns-resize'
-                  : 'nwse-resize',
-            }}
-          />
-        </>
+        <BlurOverlay>
+          <ResizeIndicator dimensions={dimensions} />
+        </BlurOverlay>
       )}
 
       {/* Resize handles */}
-      {resizeMode && (
-        <>
-          <Box
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onMouseDownCapture={handleMouseDownCapture}
-            onMouseDown={handleMouseDown('horizontal')}
-            sx={{
-              position: 'absolute',
-              right: 0,
-              top: 0,
-              width: '4px',
-              height: '100%',
-              cursor: 'ew-resize',
-              '&:hover': {
-                backgroundColor: theme.palette.primary.main,
-                opacity: 0.2,
-              },
-              '&:active': {
-                opacity: 0.4,
-              },
-            }}
-          />
-          <Box
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onMouseDownCapture={handleMouseDownCapture}
-            onMouseDown={handleMouseDown('vertical')}
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              height: '4px',
-              width: '100%',
-              cursor: 'ns-resize',
-              '&:hover': {
-                backgroundColor: theme.palette.primary.main,
-                opacity: 0.2,
-              },
-              '&:active': {
-                opacity: 0.4,
-              },
-            }}
-          />
-          <Box
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            onMouseDownCapture={handleMouseDownCapture}
-            onMouseDown={handleMouseDown('corner')}
-            sx={{
-              position: 'absolute',
-              bottom: 0,
-              right: 0,
-              height: '12px',
-              width: '12px',
-              cursor: 'nwse-resize',
-              '&:hover': {
-                '&::after': {
-                  opacity: 0.2,
-                },
-              },
-              '&::after': {
-                content: '""',
-                position: 'absolute',
-                right: 0,
-                bottom: 0,
-                width: 0,
-                height: 0,
-                borderStyle: 'solid',
-                borderWidth: '0 0 12px 12px',
-                borderColor: `transparent transparent ${theme.palette.primary.main} transparent`,
-                opacity: 0.1,
-                transition: 'opacity 0.2s ease',
-              },
-            }}
-          />
-        </>
-      )}
+      {resizeMode && <ResizeHandlers handleMouseDown={handleMouseDown} />}
     </Box>
   );
 };

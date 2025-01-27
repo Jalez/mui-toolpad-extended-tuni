@@ -1,104 +1,53 @@
 /** @format */
 
-import { Box, IconButton, useTheme } from '@mui/material';
-import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import React, { useRef, useState, useEffect } from 'react';
+import { Box, Typography } from '@mui/material';
+
+import React, { useRef } from 'react';
+import { priority } from './NoCourseNotice';
+import { useScrollControls } from '../../hooks/useScrollControls';
+import PaginationDots from '../Common/PaginationDots';
+import { useItemCounts } from '../../contexts/ResizeContext';
 
 type ItemReelProps = {
   title?: string;
   children: React.ReactNode;
+  priority: priority;
+  height: number;
+  itemWidth: number;
 };
 
-const ItemReel = ({ children }: ItemReelProps) => {
-  const theme = useTheme();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [showControls, setShowControls] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
-  const [canScroll, setCanScroll] = useState(false);
-  const [hasDragged, setHasDragged] = useState(false);
-  const [dragThreshold] = useState(5); // Minimum pixels to consider as drag
-  const [dragDistance, setDragDistance] = useState(0);
+const ItemReel = ({
+  children,
+  title,
+  priority,
+  height,
+  itemWidth,
+}: ItemReelProps) => {
+  const { itemCounts } = useItemCounts();
 
-  useEffect(() => {
-    const checkScrollable = () => {
-      if (containerRef.current) {
-        const { scrollWidth, clientWidth } = containerRef.current;
-        setCanScroll(scrollWidth > clientWidth);
-      }
-    };
+  const {
+    containerRef,
+    isDragging,
+    hasDragged,
+    canScroll,
+    scroll,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    currentPage,
+    totalPages,
+    scrollToPage,
+    disableStartButton,
+    disableEndButton,
+  } = useScrollControls({
+    direction: 'horizontal',
+    itemSize: itemWidth,
+    itemsPerPage: itemCounts.horizontal,
+    wrapAround: true,
+  });
 
-    checkScrollable();
-    window.addEventListener('resize', checkScrollable);
-    return () => window.removeEventListener('resize', checkScrollable);
-  }, [children]);
-
-  const scroll = (direction: 'left' | 'right') => {
-    if (!containerRef.current) return;
-
-    const container = containerRef.current;
-    const scrollAmount = container.clientWidth * 0.8;
-
-    if (direction === 'left') {
-      if (container.scrollLeft <= 0) {
-        // Wrap to end - instant jump
-        container.style.scrollBehavior = 'auto';
-        container.scrollLeft = container.scrollWidth;
-        // Wait a frame then scroll smoothly
-        requestAnimationFrame(() => {
-          container.style.scrollBehavior = 'smooth';
-          container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-        });
-      } else {
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-      }
-    } else {
-      if (
-        container.scrollLeft >=
-        container.scrollWidth - container.clientWidth
-      ) {
-        // Wrap to start - instant jump
-        container.style.scrollBehavior = 'auto';
-        container.scrollLeft = 0;
-        // Wait a frame then scroll smoothly
-        requestAnimationFrame(() => {
-          container.style.scrollBehavior = 'smooth';
-          container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-        });
-      } else {
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-      }
-    }
-  };
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    setHasDragged(false);
-    setDragDistance(0);
-    setStartX(e.pageX - containerRef.current!.offsetLeft);
-    setScrollLeft(containerRef.current!.scrollLeft);
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const x = e.pageX - containerRef.current!.offsetLeft;
-    const walk = (x - startX) * 2;
-    setDragDistance(Math.abs(walk));
-    if (Math.abs(walk) > dragThreshold) {
-      setHasDragged(true);
-    }
-    containerRef.current!.scrollLeft = scrollLeft - walk;
-  };
-
-  const handleMouseUp = (e: React.MouseEvent) => {
-    setIsDragging(false);
-    // Prevent click event if we've dragged
-    if (hasDragged) {
-      e.stopPropagation();
-    }
-  };
+  const dragThreshold = 4; // Minimum pixels to consider as drag
+  const dragDistance = 0;
 
   const handleClick = (e: React.MouseEvent) => {
     if (hasDragged || dragDistance > dragThreshold) {
@@ -107,19 +56,39 @@ const ItemReel = ({ children }: ItemReelProps) => {
     }
   };
 
+  // Only render dots if we have more than one item
+
+  const reelRef = useRef<HTMLDivElement>(null);
+
+  if (!children || React.Children.count(children) === 0) {
+    return (
+      <Box
+        sx={{
+          minHeight: height,
+        }}>
+        {title && <ReelTitle title={title} priority={priority} />}
+        <Typography sx={{ px: 2, mt: 1, color: 'text.secondary' }}>
+          There are no courses in this list
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box
+      ref={reelRef}
       sx={{
-        position: 'relative',
-        '&:hover .reel-controls': { opacity: 1 },
-        userSelect: 'none',
-      }}
-      onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
-      onDragStart={(e) => e.preventDefault()}>
+        height: height,
+        display: 'flex',
+        flexDirection: 'column',
+        // width: itemWidth,
+      }}>
+      {title && <ReelTitle title={title} priority={priority} />}
+
       <Box
         ref={containerRef}
         sx={{
+          width: '100%',
           display: 'flex',
           overflowX: 'hidden',
           scrollBehavior: 'smooth',
@@ -131,6 +100,7 @@ const ItemReel = ({ children }: ItemReelProps) => {
           zIndex: 1,
           scrollSnapType: 'x mandatory',
           userSelect: 'none',
+          height: '100%', // Take full height
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
@@ -139,71 +109,53 @@ const ItemReel = ({ children }: ItemReelProps) => {
         onClick={handleClick}>
         {React.Children.map(children, (child) => (
           <Box
+            data-testid='reel-item'
             sx={{
+              width: itemWidth,
               scrollSnapAlign: 'start',
               flexShrink: 0,
-              pl: 1,
+              display: 'flex',
+              padding: 2,
             }}>
             {child}
           </Box>
         ))}
       </Box>
 
-      {/* Control Buttons */}
-      {canScroll && (
-        <Box
-          className='reel-controls'
-          sx={{
-            opacity: showControls ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-            // pointerEvents: showControls ? 'auto' : 'none',
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 2,
-            pointerEvents: 'none', // Let clicks pass through to content
-          }}>
-          <IconButton
-            sx={{
-              position: 'absolute',
-              left: theme.spacing(1),
-              top: '50%',
-              transform: 'translateY(-50%)',
-              bgcolor: 'rgba(0,0,0,0.7)',
-              color: 'white',
-              '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' },
-              zIndex: 3,
-              pointerEvents: 'auto', // Re-enable clicks for button
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              scroll('left');
-            }}>
-            <ChevronLeft />
-          </IconButton>
-          <IconButton
-            sx={{
-              position: 'absolute',
-              right: theme.spacing(1),
-              top: '50%',
-              transform: 'translateY(-50%)',
-              bgcolor: 'rgba(0,0,0,0.7)',
-              color: 'white',
-              '&:hover': { bgcolor: 'rgba(0,0,0,0.8)' },
-              zIndex: 3,
-              pointerEvents: 'auto', // Re-enable clicks for button
-            }}
-            onClick={(e) => {
-              e.stopPropagation();
-              scroll('right');
-            }}>
-            <ChevronRight />
-          </IconButton>
-        </Box>
-      )}
+      <PaginationDots
+        total={totalPages}
+        current={currentPage}
+        onDotClick={scrollToPage}
+        onArrowClick={scroll}
+        showArrows={canScroll}
+        disableStart={disableStartButton}
+        disableEnd={disableEndButton}
+      />
     </Box>
+  );
+};
+
+const ReelTitle = ({
+  title,
+  priority,
+}: {
+  title: string;
+  priority: priority;
+}) => {
+  return (
+    <Typography
+      variant='h6'
+      sx={{
+        color:
+          priority === 'high'
+            ? 'primary.main'
+            : priority === 'low'
+              ? 'text.secondary'
+              : 'text.primary',
+        textAlign: 'left',
+      }}>
+      {title}
+    </Typography>
   );
 };
 

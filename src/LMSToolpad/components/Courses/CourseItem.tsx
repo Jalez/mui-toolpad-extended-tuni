@@ -130,10 +130,12 @@ const CourseItem = ({
     <Card
       elevation={0}
       sx={{
-        width: 280,
-        minHeight: 140,
+        //Ensure everything gets counted in the height and width, including padding
+
+        boxSizing: 'border-box',
         position: 'relative',
         cursor: 'pointer',
+        flex: '1',
         backgroundColor: `${courseColor}08`,
         borderLeft: `4px solid ${courseColor}`,
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -206,7 +208,7 @@ const CourseItem = ({
           sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 1,
+            // gap: 1,
             mb: expanded ? 0 : 'auto',
           }}>
           <Typography variant='caption' color='text.secondary'>

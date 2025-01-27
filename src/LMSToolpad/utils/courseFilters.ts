@@ -114,7 +114,6 @@ export const groupCoursesByActivity = (
 export const groupCoursesByEnrollment = (courses: Course[]): CourseGroups => {
   const now = new Date();
 
-  console.log('COURSES', courses);
   return courses.reduce(
     (acc: CourseGroups, course) => {
       const hasEnded = course.endDate ? new Date(course.endDate) < now : false;
@@ -128,7 +127,6 @@ export const groupCoursesByEnrollment = (courses: Course[]): CourseGroups => {
           acc.isStudent.push(course);
         }
       } else if (role === 'teacher') {
-        console.log('IS TEACHER', course);
         if (hasEnded) {
           acc.isTeacherOld.push(course);
         } else {

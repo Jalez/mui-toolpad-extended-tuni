@@ -1,19 +1,23 @@
 /** @format */
 
-// CourseList.tsx
-import { Box, Typography } from '@mui/material';
 import { Course } from '../../store/useCourseStore';
 import CourseItem from './CourseItem';
 import NoCoursesMessage from './NoCoursesMessage';
 import { groupCoursesByEnrollment } from '../../utils/courseFilters';
 import ItemReel from './ItemReel';
 import { useUserStore } from '../../store/useUserStore';
+import { useSetSnapDimensions } from '../../contexts/ResizeContext';
+
+import VerticalScroller from '../Common/VerticalScroller';
+import { priority } from './NoCourseNotice';
+import { useEffect } from 'react';
 
 type CourseListProps = {
   courses: Course[];
   selectedCourse?: Course | null;
   onSelectCourse: (course: Course) => void;
   displayMode?: 'course' | 'instance' | 'instanceList';
+  containerHeight?: string | number;
 };
 
 /**
@@ -35,88 +39,66 @@ const CourseList = ({
   selectedCourse,
   onSelectCourse,
   displayMode = 'course',
+  containerHeight = '100%',
 }: CourseListProps) => {
   const { user } = useUserStore();
   const visibleLists = user?.preferences.visibleCourseLists;
   const { isStudent, isStudentOld, isTeacher, isTeacherOld, available } =
     groupCoursesByEnrollment(courses);
 
+  const itemReelHeight = 200;
+  const itemReelWidth = 300; // Width of the course item
+
+  // Set snap dimensions for parent ResizablePanel
+  const setSnapDimensions = useSetSnapDimensions();
+
+  useEffect(() => {
+    setSnapDimensions({
+      width: itemReelWidth, // Account for padding
+      height: itemReelHeight,
+    });
+  }, [itemReelWidth, itemReelHeight, setSnapDimensions]);
   if (courses.length === 0) return <NoCoursesMessage />;
 
   const renderCourseSection = (
     title: string,
     courseList: Course[],
-    priority: 'high' | 'medium' | 'low' = 'medium'
+    priority: priority
   ) => {
-    if (courseList.length === 0) {
-      return (
-        <Box sx={{ mb: 4 }}>
-          <Typography
-            variant='h6'
-            sx={{
-              color:
-                priority === 'high'
-                  ? 'primary.main'
-                  : priority === 'low'
-                    ? 'text.secondary'
-                    : 'text.primary',
-              textAlign: 'left',
-            }}>
-            {title}
-          </Typography>
-          <Typography sx={{ px: 2, mt: 1, color: 'text.secondary' }}>
-            There are no courses in this list
-          </Typography>
-        </Box>
-      );
-    }
-
     return (
-      <Box sx={{ mb: 4, position: 'relative' }}>
-        <Typography
-          variant='h6'
-          sx={{
-            color:
-              priority === 'high'
-                ? 'primary.main'
-                : priority === 'low'
-                  ? 'text.secondary'
-                  : 'text.primary',
-            // mb: 2,
-            // px: 2,
-            textAlign: 'left',
-          }}>
-          {title}
-        </Typography>
-        <ItemReel>
-          {courseList.map((course) => (
-            <Box sx={{ p: 1 }} key={course.id}>
-              <CourseItem
-                course={course}
-                isSelected={selectedCourse?.id === course.id}
-                onSelect={onSelectCourse}
-                displayMode={displayMode}
-              />
-            </Box>
-          ))}
-        </ItemReel>
-      </Box>
+      <ItemReel
+        height={itemReelHeight}
+        title={title}
+        priority={priority}
+        itemWidth={itemReelWidth}>
+        {courseList.map((course) => (
+          <CourseItem
+            key={course.id}
+            course={course}
+            isSelected={selectedCourse?.id === course.id}
+            onSelect={onSelectCourse}
+            displayMode={displayMode}
+          />
+        ))}
+      </ItemReel>
     );
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+    <VerticalScroller
+      itemHeight={itemReelHeight}
+      containerHeight={containerHeight}>
       {visibleLists?.isStudent &&
         renderCourseSection('My Enrolled Courses', isStudent, 'high')}
       {visibleLists?.isStudentOld &&
         renderCourseSection('My Completed Courses', isStudentOld, 'low')}
       {visibleLists?.isTeacher &&
-        renderCourseSection('My Teaching Courses', isTeacher, 'medium')}
+        renderCourseSection('My Teaching Courses', isTeacher, 'low')}
       {visibleLists?.isTeacherOld &&
         renderCourseSection('My Past Teaching', isTeacherOld, 'low')}
       {visibleLists?.available &&
-        renderCourseSection('Available Courses', available, 'medium')}
-    </Box>
+        renderCourseSection('Available Courses', available, 'low')}
+    </VerticalScroller>
   );
 };
 
