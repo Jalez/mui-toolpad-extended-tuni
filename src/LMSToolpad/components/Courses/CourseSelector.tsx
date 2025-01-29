@@ -43,28 +43,32 @@ const CourseSelector = ({
 
   const handleCourseSelect = (course: Course) => {
     setCurrentCourse(course);
-    if (navigationType === 'direct') {
-      // For direct, go straight into code + instance
-      navigate(`${course.code}/${course.instance}`);
-    } else {
-      // For 'instances' view, only navigate to course code
-      navigate(`${course.code}`);
-    }
+    // if (navigationType === 'direct') {
+    // For direct, go straight into code + instance
+    navigate(`${course.code}/${course.instance}`);
+    // } else {
+    // For 'instances' view, only navigate to course code
+    // navigate(`${course.code}`);
+    // }
   };
 
   // Remove filtering for direct view, only filter for course view
-  const displayedCourses =
-    navigationType === 'instances' ? filterUniqueCourses(courses) : courses;
+  // const displayedCourses =
+  // navigationType === 'instances' ? filterUniqueCourses(courses) : courses;
 
+  const displayedCourses = courses;
   return (
     <Fade in={mounted} timeout={500}>
-      <CourseList
-        courses={displayedCourses}
-        selectedCourse={currentCourse}
-        onSelectCourse={handleCourseSelect}
-        displayMode={navigationType === 'direct' ? 'instance' : 'course'}
-        containerHeight='100%'
-      />
+      <Box sx={{ height: '100%' }}>
+        <CourseList
+          courses={displayedCourses}
+          selectedCourse={currentCourse}
+          onSelectCourse={handleCourseSelect}
+          // displayMode={navigationType === 'direct' ? 'instance' : 'course'}
+          displayMode={'instance'}
+          containerHeight='100%'
+        />
+      </Box>
     </Fade>
   );
 };

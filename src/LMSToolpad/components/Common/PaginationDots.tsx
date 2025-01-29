@@ -65,7 +65,10 @@ const PaginationDots = ({
         {Array.from({ length: safeTotal }).map((_, index) => (
           <Box
             key={index}
-            onClick={() => onDotClick?.(index)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDotClick?.(index);
+            }}
             sx={{
               width: 6,
               height: 6,
