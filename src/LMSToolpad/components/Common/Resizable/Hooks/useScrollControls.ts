@@ -1,5 +1,11 @@
 /** @format */
 
+/**
+ * useScrollControls:
+ * Manages both mouse/touch dragging and pagination for horizontal/vertical scrollers.
+ * Returns refs and handlers to enable snapping, arrow button controls, and more.
+ */
+
 import { useRef, useState, useEffect } from 'react';
 
 interface ScrollControlsOptions {

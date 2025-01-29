@@ -1,9 +1,9 @@
 /** @format */
 import { Box, Typography } from '@mui/material';
 import React, { useRef } from 'react';
-import { useScrollControls } from '../../hooks/useScrollControls';
+import { useScrollControls } from './Resizable/Hooks/useScrollControls';
 import PaginationDots from './PaginationDots';
-import { useItemCounts } from '../../contexts/ResizeContext';
+import { useItemCounts } from './Resizable/Context/ResizeContext';
 import { priority } from '../Courses/NoCourseNotice';
 
 type HorizontalScrollerProps = {
@@ -69,7 +69,7 @@ const HorizontalScroller = ({
         }}>
         {title && <ReelTitle title={title} priority={priority} />}
         <Typography sx={{ px: 2, mt: 1, color: 'text.secondary' }}>
-          There are no courses in this list
+          This list is empty
         </Typography>
       </Box>
     );

@@ -15,7 +15,9 @@ const BlurOverlay = ({ children }: BlurOverlayProps) => {
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+        //for bgcolor, use theme.palette.background.default
+        bgcolor: theme.palette.background.default,
+        opacity: 0.5,
         zIndex: theme.zIndex.modal,
         transition: 'opacity 0.2s ease',
         display: 'flex',

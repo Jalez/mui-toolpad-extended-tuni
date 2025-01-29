@@ -5,7 +5,7 @@ import CourseItem from './CourseItem';
 import NoCoursesMessage from './NoCoursesMessage';
 import { groupCoursesByEnrollment } from '../../utils/courseFilters';
 import { useUserStore } from '../../store/useUserStore';
-import { useSetSnapDimensions } from '../../contexts/ResizeContext';
+import { useSetSnapDimensions } from '../Common/Resizable/Context/ResizeContext';
 
 import VerticalScroller from '../Common/VerticalScroller';
 import { priority } from './NoCourseNotice';

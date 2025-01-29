@@ -1,13 +1,18 @@
 /** @format */
 
 import { Box, useTheme } from '@mui/material';
-import { useState, useRef, useEffect } from 'react';
+import { useEffect } from 'react';
 import { usePlatformStore } from '../../store/usePlatformStore';
 import BlurOverlay from './Resizable/BlurOverlay';
 import ResizeIndicator from './Resizable/ResizeIndicator';
 import InternalScrolling from './Resizable/InternalScrolling';
 import ResizeHandlers from './Resizable/ResizeHandlers';
-import { useItemCounts, useResizeContext } from '../../contexts/ResizeContext';
+import {
+  useItemCounts,
+  useResizeContext,
+} from './Resizable/Context/ResizeContext';
+import { startDragging } from './Resizable/Hooks/useResizeHandlers';
+import { useResizablePanel } from './Resizable/Hooks/useResizablePanel';
 
 interface ResizablePanelProps {
   id: string; // New required prop
@@ -22,31 +27,6 @@ interface ResizablePanelProps {
   defaultWidth?: number;
   onResize?: (dimensions: { width: number; height: number }) => void;
 }
-
-const STORAGE_KEY_PREFIX = 'resizable-panel-dimensions-';
-
-const loadDimensions = (
-  id: string,
-  defaultDimensions: { width: number; height: number }
-) => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY_PREFIX + id);
-    return stored ? JSON.parse(stored) : defaultDimensions;
-  } catch {
-    return defaultDimensions;
-  }
-};
-
-const saveDimensions = (
-  id: string,
-  dimensions: { width: number; height: number }
-) => {
-  try {
-    localStorage.setItem(STORAGE_KEY_PREFIX + id, JSON.stringify(dimensions));
-  } catch (error) {
-    console.warn('Failed to save panel dimensions:', error);
-  }
-};
 
 const ResizablePanel = ({
   id,
@@ -64,203 +44,25 @@ const ResizablePanel = ({
   const resizeMode = platform.interface.resizeMode;
   const { snapDimensions } = useResizeContext();
   const { setItemCounts } = useItemCounts();
-  const [dimensions, setDimensions] = useState(() =>
-    loadDimensions(id, { width: defaultWidth, height: defaultHeight })
-  );
-  const [isDragging, setIsDragging] = useState({
-    vertical: false,
-    horizontal: false,
-  });
-  const dragStart = useRef({ x: 0, y: 0, width: 0, height: 0 });
 
-  const handleMouseDown =
-    (direction: 'vertical' | 'horizontal' | 'corner') =>
-    (e: React.MouseEvent) => {
-      if (!resizeMode) return;
-      setIsDragging({
-        vertical: direction === 'vertical' || direction === 'corner',
-        horizontal: direction === 'horizontal' || direction === 'corner',
-      });
-      dragStart.current = {
-        x: e.clientX,
-        y: e.clientY,
-        width: dimensions.width,
-        height: dimensions.height,
-      };
-      e.preventDefault();
-    };
+  const { dimensions, isDragging, setIsDragging, dragStart } =
+    useResizablePanel({
+      id,
+      defaultWidth,
+      defaultHeight,
+      minWidth,
+      maxWidth,
+      minHeight,
+      maxHeight,
+      snapDimensions,
+      onResize,
+    });
 
-  // Add touch handling functions
-  const handleTouchStart =
-    (direction: 'vertical' | 'horizontal' | 'corner') =>
-    (e: React.TouchEvent) => {
-      if (!resizeMode) return;
-      const touch = e.touches[0];
-      setIsDragging({
-        vertical: direction === 'vertical' || direction === 'corner',
-        horizontal: direction === 'horizontal' || direction === 'corner',
-      });
-      dragStart.current = {
-        x: touch.clientX,
-        y: touch.clientY,
-        width: dimensions.width,
-        height: dimensions.height,
-      };
-      e.preventDefault();
-    };
+  const handleMouseDown = (direction: 'vertical' | 'horizontal' | 'corner') =>
+    startDragging(direction, resizeMode, dimensions, setIsDragging, dragStart);
 
-  const handleDimensionsChange = (newDimensions: {
-    width: number;
-    height: number;
-  }) => {
-    // console.log('[ResizablePanel] New dimensions:', newDimensions);
-    setDimensions(newDimensions);
-    saveDimensions(id, newDimensions);
-    onResize?.(newDimensions);
-  };
-
-  const snapToGrid = (value: number, snapSize: number) => {
-    return Math.round(value / snapSize) * snapSize;
-  };
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging.vertical && !isDragging.horizontal) return;
-
-      const newDimensions = {
-        width: dimensions.width,
-        height: dimensions.height,
-      };
-
-      if (isDragging.horizontal) {
-        const deltaX = e.clientX - dragStart.current.x;
-        const newWidth = dragStart.current.width + deltaX;
-        newDimensions.width = Math.min(
-          Math.max(
-            snapToGrid(newWidth, snapDimensions.width),
-            snapToGrid(minWidth, snapDimensions.width)
-          ),
-          snapToGrid(maxWidth, snapDimensions.width)
-        );
-      }
-
-      if (isDragging.vertical) {
-        const deltaY = e.clientY - dragStart.current.y;
-        const newHeight = dragStart.current.height + deltaY;
-        newDimensions.height = Math.min(
-          Math.max(
-            snapToGrid(newHeight, snapDimensions.height),
-            snapToGrid(minHeight, snapDimensions.height)
-          ),
-          snapToGrid(maxHeight, snapDimensions.height)
-        );
-      }
-
-      handleDimensionsChange(newDimensions);
-    };
-
-    const handleMouseUp = () => {
-      setIsDragging({ vertical: false, horizontal: false });
-    };
-
-    if (isDragging.vertical || isDragging.horizontal) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [
-    isDragging,
-    dimensions,
-    minHeight,
-    maxHeight,
-    minWidth,
-    maxWidth,
-    onResize,
-    id,
-    snapDimensions,
-  ]);
-
-  // Add touch movement effect
-  useEffect(() => {
-    if (!isDragging.vertical && !isDragging.horizontal) return;
-
-    const handleTouchMove = (e: TouchEvent) => {
-      const touch = e.touches[0];
-      const newDimensions = {
-        width: dimensions.width,
-        height: dimensions.height,
-      };
-
-      if (isDragging.horizontal) {
-        const deltaX = touch.clientX - dragStart.current.x;
-        const newWidth = dragStart.current.width + deltaX;
-        newDimensions.width = Math.min(
-          Math.max(
-            snapToGrid(newWidth, snapDimensions.width),
-            snapToGrid(minWidth, snapDimensions.width)
-          ),
-          snapToGrid(maxWidth, snapDimensions.width)
-        );
-      }
-
-      if (isDragging.vertical) {
-        const deltaY = touch.clientY - dragStart.current.y;
-        const newHeight = dragStart.current.height + deltaY;
-        newDimensions.height = Math.min(
-          Math.max(
-            snapToGrid(newHeight, snapDimensions.height),
-            snapToGrid(minHeight, snapDimensions.height)
-          ),
-          snapToGrid(maxHeight, snapDimensions.height)
-        );
-      }
-
-      handleDimensionsChange(newDimensions);
-    };
-
-    const handleTouchEnd = () => {
-      setIsDragging({ vertical: false, horizontal: false });
-    };
-
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
-
-    return () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [
-    isDragging,
-    dimensions,
-    snapDimensions,
-    minWidth,
-    maxWidth,
-    minHeight,
-    maxHeight,
-  ]);
-
-  // Add effect to handle body scrolling
-  useEffect(() => {
-    if (isDragging.vertical || isDragging.horizontal) {
-      // Disable scrolling when dragging
-      document.body.style.overflow = 'hidden';
-      document.body.style.userSelect = 'none';
-    } else {
-      // Re-enable scrolling when done
-      document.body.style.overflow = '';
-      document.body.style.userSelect = '';
-    }
-
-    return () => {
-      // Cleanup
-      document.body.style.overflow = '';
-      document.body.style.userSelect = '';
-    };
-  }, [isDragging]);
+  const handleTouchStart = (direction: 'vertical' | 'horizontal' | 'corner') =>
+    startDragging(direction, resizeMode, dimensions, setIsDragging, dragStart);
 
   // Add effect to calculate and log item count using snapDimensions
   useEffect(() => {
@@ -301,6 +103,8 @@ const ResizablePanel = ({
   return (
     <Box
       sx={{
+        m: 1,
+
         position: 'relative',
         width: dimensions.width + 25,
         height: dimensions.height,

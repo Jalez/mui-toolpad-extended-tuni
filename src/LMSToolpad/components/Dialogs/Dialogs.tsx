@@ -13,8 +13,6 @@ registerDialog('UserSettings', UserSettings);
 const Dialogs = () => {
   const { openDialog } = useDialogStore();
   if (!openDialog) return null;
-  console.log('Dialogs -> openDialog', openDialog);
-
   const DialogComponent = getDialog(openDialog);
   if (!DialogComponent) return null;
 

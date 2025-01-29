@@ -19,6 +19,7 @@ interface ResizeContextType {
   setItemCounts: (counts: ItemCounts) => void;
 }
 
+// Provides snapDimensions and itemCounts for components that need sizing/resize information.
 const ResizeContext = createContext<ResizeContextType | undefined>(undefined);
 
 export const ResizeProvider = ({ children }: { children: React.ReactNode }) => {

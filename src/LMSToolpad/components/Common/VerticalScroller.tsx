@@ -2,9 +2,9 @@
 
 import { Box } from '@mui/material';
 
-import { useScrollControls } from '../../hooks/useScrollControls';
+import { useScrollControls } from './Resizable/Hooks/useScrollControls';
 import PaginationDots from './PaginationDots';
-import { useItemCounts } from '../../contexts/ResizeContext';
+import { useItemCounts } from './Resizable/Context/ResizeContext';
 
 interface VerticalScrollerProps {
   children: React.ReactNode;

@@ -1,5 +1,11 @@
 /** @format */
 
+/**
+ * useResizeLogic:
+ * Provides basic mouse-driven resizing and constraints
+ * for a component, handling internal dimension state and optional callbacks.
+ */
+
 import { useState, useRef, useEffect } from 'react';
 
 export const useResizeLogic = (
