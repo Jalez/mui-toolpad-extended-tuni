@@ -40,6 +40,9 @@ const VerticalScroller = ({
     scrollToPage,
     disableStartButton,
     disableEndButton,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
   } = useScrollControls({
     direction: 'vertical',
     itemSize: itemHeight,
@@ -66,7 +69,7 @@ const VerticalScroller = ({
           position: 'relative',
           scrollSnapType: snapScroll ? 'y mandatory' : 'none',
           cursor: isDragging ? 'grabbing' : 'grab',
-          touchAction: 'none', // Add this
+          touchAction: 'pan-y', // Enable vertical touch scrolling
           WebkitOverflowScrolling: 'touch', // Add this
           '& > div': {
             scrollSnapAlign: snapScroll ? 'start' : 'none',
@@ -83,7 +86,10 @@ const VerticalScroller = ({
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}>
+        onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}>
         {children}
       </Box>
       {/* <Box sx={{ width: PAGINATION_WIDTH, flexShrink: 0 }}> */}

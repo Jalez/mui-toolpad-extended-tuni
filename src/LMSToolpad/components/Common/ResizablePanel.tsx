@@ -90,6 +90,25 @@ const ResizablePanel = ({
       e.preventDefault();
     };
 
+  // Add touch handling functions
+  const handleTouchStart =
+    (direction: 'vertical' | 'horizontal' | 'corner') =>
+    (e: React.TouchEvent) => {
+      if (!resizeMode) return;
+      const touch = e.touches[0];
+      setIsDragging({
+        vertical: direction === 'vertical' || direction === 'corner',
+        horizontal: direction === 'horizontal' || direction === 'corner',
+      });
+      dragStart.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        width: dimensions.width,
+        height: dimensions.height,
+      };
+      e.preventDefault();
+    };
+
   const handleDimensionsChange = (newDimensions: {
     width: number;
     height: number;
@@ -163,6 +182,65 @@ const ResizablePanel = ({
     onResize,
     id,
     snapDimensions,
+  ]);
+
+  // Add touch movement effect
+  useEffect(() => {
+    if (!isDragging.vertical && !isDragging.horizontal) return;
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      const newDimensions = {
+        width: dimensions.width,
+        height: dimensions.height,
+      };
+
+      if (isDragging.horizontal) {
+        const deltaX = touch.clientX - dragStart.current.x;
+        const newWidth = dragStart.current.width + deltaX;
+        newDimensions.width = Math.min(
+          Math.max(
+            snapToGrid(newWidth, snapDimensions.width),
+            snapToGrid(minWidth, snapDimensions.width)
+          ),
+          snapToGrid(maxWidth, snapDimensions.width)
+        );
+      }
+
+      if (isDragging.vertical) {
+        const deltaY = touch.clientY - dragStart.current.y;
+        const newHeight = dragStart.current.height + deltaY;
+        newDimensions.height = Math.min(
+          Math.max(
+            snapToGrid(newHeight, snapDimensions.height),
+            snapToGrid(minHeight, snapDimensions.height)
+          ),
+          snapToGrid(maxHeight, snapDimensions.height)
+        );
+      }
+
+      handleDimensionsChange(newDimensions);
+    };
+
+    const handleTouchEnd = () => {
+      setIsDragging({ vertical: false, horizontal: false });
+    };
+
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [
+    isDragging,
+    dimensions,
+    snapDimensions,
+    minWidth,
+    maxWidth,
+    minHeight,
+    maxHeight,
   ]);
 
   // Add effect to handle body scrolling
@@ -246,7 +324,12 @@ const ResizablePanel = ({
       )}
 
       {/* Resize handles */}
-      {resizeMode && <ResizeHandlers handleMouseDown={handleMouseDown} />}
+      {resizeMode && (
+        <ResizeHandlers
+          handleMouseDown={handleMouseDown}
+          handleTouchStart={handleTouchStart}
+        />
+      )}
     </Box>
   );
 };

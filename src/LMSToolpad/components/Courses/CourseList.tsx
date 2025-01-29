@@ -4,13 +4,13 @@ import { Course } from '../../store/useCourseStore';
 import CourseItem from './CourseItem';
 import NoCoursesMessage from './NoCoursesMessage';
 import { groupCoursesByEnrollment } from '../../utils/courseFilters';
-import ItemReel from './ItemReel';
 import { useUserStore } from '../../store/useUserStore';
 import { useSetSnapDimensions } from '../../contexts/ResizeContext';
 
 import VerticalScroller from '../Common/VerticalScroller';
 import { priority } from './NoCourseNotice';
 import { useEffect } from 'react';
+import HorizontalScroller from '../Common/HorizontalScroller';
 
 type CourseListProps = {
   courses: Course[];
@@ -66,7 +66,7 @@ const CourseList = ({
     priority: priority
   ) => {
     return (
-      <ItemReel
+      <HorizontalScroller
         height={itemReelHeight}
         title={title}
         priority={priority}
@@ -80,7 +80,7 @@ const CourseList = ({
             displayMode={displayMode}
           />
         ))}
-      </ItemReel>
+      </HorizontalScroller>
     );
   };
 

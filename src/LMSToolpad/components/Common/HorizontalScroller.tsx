@@ -1,14 +1,12 @@
 /** @format */
-
 import { Box, Typography } from '@mui/material';
-
 import React, { useRef } from 'react';
-import { priority } from './NoCourseNotice';
 import { useScrollControls } from '../../hooks/useScrollControls';
-import PaginationDots from '../Common/PaginationDots';
+import PaginationDots from './PaginationDots';
 import { useItemCounts } from '../../contexts/ResizeContext';
+import { priority } from '../Courses/NoCourseNotice';
 
-type ItemReelProps = {
+type HorizontalScrollerProps = {
   title?: string;
   children: React.ReactNode;
   priority: priority;
@@ -16,13 +14,13 @@ type ItemReelProps = {
   itemWidth: number;
 };
 
-const ItemReel = ({
+const HorizontalScroller = ({
   children,
   title,
   priority,
   height,
   itemWidth,
-}: ItemReelProps) => {
+}: HorizontalScrollerProps) => {
   const { itemCounts } = useItemCounts();
 
   const {
@@ -39,6 +37,9 @@ const ItemReel = ({
     scrollToPage,
     disableStartButton,
     disableEndButton,
+    handleTouchStart, // Add these three
+    handleTouchMove, // touch handlers
+    handleTouchEnd, // from useScrollControls
   } = useScrollControls({
     direction: 'horizontal',
     itemSize: itemWidth,
@@ -101,11 +102,15 @@ const ItemReel = ({
           scrollSnapType: 'x mandatory',
           userSelect: 'none',
           height: '100%', // Take full height
+          touchAction: 'pan-x', // Enable horizontal touch scrolling
         }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
         onClick={handleClick}>
         {React.Children.map(children, (child) => (
           <Box
@@ -159,4 +164,4 @@ const ReelTitle = ({
   );
 };
 
-export default ItemReel;
+export default HorizontalScroller;

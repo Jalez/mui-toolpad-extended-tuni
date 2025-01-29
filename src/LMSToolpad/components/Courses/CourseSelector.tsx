@@ -58,15 +58,13 @@ const CourseSelector = ({
 
   return (
     <Fade in={mounted} timeout={500}>
-      <Box sx={{ height: '100%' }}>
-        <CourseList
-          courses={displayedCourses}
-          selectedCourse={currentCourse}
-          onSelectCourse={handleCourseSelect}
-          displayMode={navigationType === 'direct' ? 'instance' : 'course'}
-          containerHeight='100%'
-        />
-      </Box>
+      <CourseList
+        courses={displayedCourses}
+        selectedCourse={currentCourse}
+        onSelectCourse={handleCourseSelect}
+        displayMode={navigationType === 'direct' ? 'instance' : 'course'}
+        containerHeight='100%'
+      />
     </Fade>
   );
 };

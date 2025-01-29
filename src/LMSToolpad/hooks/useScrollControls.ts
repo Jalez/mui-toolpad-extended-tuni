@@ -297,6 +297,65 @@ export const useScrollControls = ({
     }
   };
 
+  // Add touch handling
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    const pos = scrollAxis === 'horizontal' ? touch.pageX : touch.pageY;
+    const scrollPos =
+      scrollAxis === 'horizontal'
+        ? containerRef.current!.scrollLeft
+        : containerRef.current!.scrollTop;
+
+    setIsDragging(true);
+    setHasDragged(false);
+    hasMovedRef.current = false;
+    setDragStart({ pos, scroll: scrollPos });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || !containerRef.current) return;
+
+    const touch = e.touches[0];
+    const currentPos = scrollAxis === 'horizontal' ? touch.pageX : touch.pageY;
+    const delta = dragStart.pos - currentPos;
+
+    if (Math.abs(delta) > 5) {
+      hasMovedRef.current = true;
+      setHasDragged(true);
+
+      // Prevent page scrolling while swiping
+      e.preventDefault();
+
+      if (scrollAxis === 'horizontal') {
+        containerRef.current.scrollLeft = dragStart.scroll + delta;
+      } else {
+        containerRef.current.scrollTop = dragStart.scroll + delta;
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+
+    // Snap to nearest item
+    if (containerRef.current && hasMovedRef.current) {
+      const container = containerRef.current;
+      const currentScroll =
+        scrollAxis === 'horizontal'
+          ? container.scrollLeft
+          : container.scrollTop;
+
+      const snapPoint = Math.round(currentScroll / itemSize) * itemSize;
+
+      container.style.scrollBehavior = 'smooth';
+      if (scrollAxis === 'horizontal') {
+        container.scrollLeft = snapPoint;
+      } else {
+        container.scrollTop = snapPoint;
+      }
+    }
+  };
+
   // Clean up timer on unmount
   useEffect(() => {
     return () => {
@@ -326,5 +385,8 @@ export const useScrollControls = ({
     scrollToPage,
     disableStartButton: !showStartButton,
     disableEndButton: !showEndButton,
+    handleTouchStart,
+    handleTouchMove,
+    handleTouchEnd,
   };
 };

@@ -6,14 +6,19 @@ export type direction = 'horizontal' | 'vertical' | 'corner';
 
 type ResizeHandlesProps = {
   handleMouseDown: (direction: direction) => (e: React.MouseEvent) => void;
+  handleTouchStart: (direction: direction) => (e: React.TouchEvent) => void; // Add this prop
 };
 
-const ResizeHandlers = ({ handleMouseDown }: ResizeHandlesProps) => {
+const ResizeHandlers = ({
+  handleMouseDown,
+  handleTouchStart,
+}: ResizeHandlesProps) => {
   const theme = useTheme();
   return (
     <>
       <Box
         onMouseDown={handleMouseDown('horizontal')}
+        onTouchStart={handleTouchStart('horizontal')} // Add touch handler
         sx={{
           position: 'absolute',
           right: 0,
@@ -28,10 +33,15 @@ const ResizeHandlers = ({ handleMouseDown }: ResizeHandlesProps) => {
           '&:active': {
             opacity: 0.4,
           },
+          '@media (hover: none)': {
+            // Add mobile styles
+            width: '12px', // Wider touch target
+          },
         }}
       />
       <Box
         onMouseDown={handleMouseDown('vertical')}
+        onTouchStart={handleTouchStart('vertical')} // Add touch handler
         sx={{
           position: 'absolute',
           bottom: 0,
@@ -46,10 +56,15 @@ const ResizeHandlers = ({ handleMouseDown }: ResizeHandlesProps) => {
           '&:active': {
             opacity: 0.4,
           },
+          '@media (hover: none)': {
+            // Add mobile styles
+            height: '12px', // Taller touch target
+          },
         }}
       />
       <Box
         onMouseDown={handleMouseDown('corner')}
+        onTouchStart={handleTouchStart('corner')} // Add touch handler
         sx={{
           position: 'absolute',
           bottom: 0,
@@ -74,6 +89,11 @@ const ResizeHandlers = ({ handleMouseDown }: ResizeHandlesProps) => {
             borderColor: `transparent transparent ${theme.palette.primary.main} transparent`,
             opacity: 0.1,
             transition: 'opacity 0.2s ease',
+          },
+          '@media (hover: none)': {
+            // Add mobile styles
+            height: '24px',
+            width: '24px',
           },
         }}
       />
