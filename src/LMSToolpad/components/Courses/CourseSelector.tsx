@@ -6,7 +6,7 @@ import useCourseStore, { Course } from '../../store/useCourseStore';
 import { useEffect, useState } from 'react';
 import CourseList from './CourseList';
 import { useNavigate } from 'react-router-dom';
-import { filterUniqueCourses } from '../../utils/courseFilters';
+// import { filterUniqueCourses } from '../../utils/courseFilters';
 
 type CourseSelectorProps = {
   courses: Course[];

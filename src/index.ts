@@ -44,7 +44,7 @@ export * from './LMSToolpad/store/useNotificationsStore';
  * **COMPONENTS**
  */
 
-export { default as Home } from './LMSToolpad/components/Home';
+export { default as Home } from './LMSToolpad/components/Routes/Home/Home';
 
 export { default as CourseTools } from './LMSToolpad/components/Courses/CourseTools';
 

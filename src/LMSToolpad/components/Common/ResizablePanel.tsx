@@ -19,6 +19,7 @@ interface ResizablePanelProps {
   children:
     | React.ReactNode
     | ((dimensions: { width: number; height: number }) => React.ReactNode);
+  tools?: React.ReactNode; // Add this prop
   minHeight?: number;
   maxHeight?: number;
   minWidth?: number;
@@ -31,6 +32,7 @@ interface ResizablePanelProps {
 const ResizablePanel = ({
   id,
   children,
+  tools,
   minHeight = 200,
   maxHeight = 800,
   minWidth = 280,
@@ -117,6 +119,19 @@ const ResizablePanel = ({
         flexDirection: 'column', // Add this
         overflow: 'hidden', // Add this
       }}>
+      {tools && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 8,
+            right: 8,
+            zIndex: 1,
+            display: 'flex',
+            gap: 1,
+          }}>
+          {tools}
+        </Box>
+      )}
       <InternalScrolling dimensions={dimensions}>
         {typeof children === 'function' ? children(dimensions) : children}
       </InternalScrolling>

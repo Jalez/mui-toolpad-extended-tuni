@@ -1,18 +1,14 @@
 /** @format */
 
-import { Box, IconButton, Tooltip } from '@mui/material';
-import OpenWithIcon from '@mui/icons-material/OpenWith';
+import { Box } from '@mui/material';
 import { PageContainerToolbar } from '@toolpad/core';
 import LayoutToggle from '../../Courses/LayoutToggle';
-import { CourseListVisibilityMenu } from '../../Courses/CourseListVisibilityMenu';
 import { useUserStore } from '../../../store/useUserStore';
-import { usePlatformStore } from '../../../store/usePlatformStore';
+import ResizeToggler from '../../Common/Resizable/Tools/ResizeToggler';
 
 const HomeToolbar = () => {
   const { user, updateUser } = useUserStore();
   const navigationType = user?.preferences?.navigationType || 'direct';
-  const { platform, toggleResizeMode } = usePlatformStore();
-  const resizeMode = platform.interface.resizeMode;
 
   const handleLayoutChange = (value: 'direct' | 'instances') => {
     if (!user) return;
@@ -35,15 +31,7 @@ const HomeToolbar = () => {
           gap: 1,
           width: '100%',
         }}>
-        <Tooltip title={resizeMode ? 'Exit Resize Mode' : 'Enter Resize Mode'}>
-          <IconButton
-            size='small'
-            onClick={toggleResizeMode}
-            color={resizeMode ? 'primary' : 'default'}>
-            <OpenWithIcon />
-          </IconButton>
-        </Tooltip>
-        <CourseListVisibilityMenu />
+        <ResizeToggler />
         <LayoutToggle value={navigationType} onChange={handleLayoutChange} />
       </Box>
     </PageContainerToolbar>

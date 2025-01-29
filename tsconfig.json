@@ -28,6 +28,9 @@
     "allowJs": true,
     "esModuleInterop": true
   },
-  "include": ["src"],
+  "include": [
+    "src",
+    "src/LMSToolpad/components/Common/Resizable/Tools/ResizeToggler.tsx"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

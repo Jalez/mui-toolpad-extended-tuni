@@ -1,11 +1,16 @@
 /** @format */
 
-import useCourseStore from '../store/useCourseStore';
-import { useUserStore } from '../store/useUserStore';
-import CourseSelector from './Courses/CourseSelector';
-import LoadingScreen from './LoadingScreen';
-import ResizablePanel from './Common/ResizablePanel';
-import { ResizeProvider } from './Common/Resizable/Context/ResizeContext';
+import useCourseStore from '../../../store/useCourseStore';
+import { useUserStore } from '../../../store/useUserStore';
+import CourseSelector from '../../Courses/CourseSelector';
+import LoadingScreen from '../../LoadingScreen';
+import ResizablePanel from '../../Common/ResizablePanel';
+import { ResizeProvider } from '../../Common/Resizable/Context/ResizeContext';
+import { registerToolbar } from '../../Toolbars/PageToolbar/toolbarRegistry';
+import HomeToolbar from './HomeToolbar';
+import { CourseListVisibilityMenu } from '../../Courses/CourseListVisibilityMenu';
+
+registerToolbar('/', HomeToolbar);
 
 /**
  * Home component with enhanced layout options.
@@ -26,6 +31,7 @@ const Home = () => {
     <ResizeProvider>
       <ResizablePanel
         id='home-course-selector'
+        tools={<CourseListVisibilityMenu />}
         defaultWidth={800}
         defaultHeight={500}
         minWidth={280}

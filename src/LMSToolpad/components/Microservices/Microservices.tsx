@@ -12,7 +12,7 @@ import {
 import { useEffect } from 'react';
 import ToolDisplayer from '../Tool/ToolDisplayer';
 import useCourseStore from '../../store/useCourseStore';
-import Home from '../Home';
+import Home from '../Routes/Home/Home';
 
 type MicroservicesProps = {
   children: React.ReactNode;
