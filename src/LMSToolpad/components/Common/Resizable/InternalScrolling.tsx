@@ -35,6 +35,8 @@ const InternalScrolling = ({
           backgroundColor: theme.palette.divider,
           borderRadius: '4px',
         },
+        transition: 'width 0.3s ease-in-out, height 0.3s ease-in-out',
+        willChange: 'width, height',
       }}>
       {children}
     </Box>

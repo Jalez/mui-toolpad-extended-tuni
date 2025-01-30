@@ -9,6 +9,8 @@ import { ResizeProvider } from '../../Common/Resizable/Context/ResizeContext';
 import { registerToolbar } from '../../Toolbars/PageToolbar/toolbarRegistry';
 import HomeToolbar from './HomeToolbar';
 import { CourseListVisibilityMenu } from '../../Courses/CourseListVisibilityMenu';
+import { Box } from '@mui/material';
+import FlexWrapper from './FlexWrapper';
 
 registerToolbar('/', HomeToolbar);
 
@@ -28,20 +30,36 @@ const Home = () => {
   const navigationType = user?.preferences?.navigationType || 'direct';
 
   return (
-    <ResizeProvider>
-      <ResizablePanel
-        id='home-course-selector'
-        tools={<CourseListVisibilityMenu />}
-        defaultWidth={800}
-        defaultHeight={500}
-        minWidth={280}
-        maxWidth={1200}
-        minHeight={200}
-        maxHeight={800}>
-        <CourseSelector courses={courses} navigationType={navigationType} />
-      </ResizablePanel>
-      {fetchState === 'loading' && <LoadingScreen />}
-    </ResizeProvider>
+    <FlexWrapper>
+      <ResizeProvider>
+        <ResizablePanel
+          id='home-course-selector'
+          tools={<CourseListVisibilityMenu />}
+          defaultWidth={800}
+          defaultHeight={500}
+          minWidth={280}
+          maxWidth={1200}
+          minHeight={200}
+          maxHeight={800}>
+          <CourseSelector courses={courses} navigationType={navigationType} />
+        </ResizablePanel>
+        {fetchState === 'loading' && <LoadingScreen />}
+      </ResizeProvider>
+      <ResizeProvider>
+        <ResizablePanel
+          id='home-course-selector-2'
+          tools={<CourseListVisibilityMenu />}
+          defaultWidth={800}
+          defaultHeight={500}
+          minWidth={280}
+          maxWidth={1200}
+          minHeight={200}
+          maxHeight={800}>
+          <CourseSelector courses={courses} navigationType={navigationType} />
+        </ResizablePanel>
+        {fetchState === 'loading' && <LoadingScreen />}
+      </ResizeProvider>
+    </FlexWrapper>
   );
 };
 
