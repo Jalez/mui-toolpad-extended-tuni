@@ -2,7 +2,7 @@
 
 import { Box, useTheme } from '@mui/material';
 import { useEffect, useRef } from 'react';
-import { usePlatformStore } from '../../store/usePlatformStore';
+import { usePanelStore } from './Resizable/store/usePanelStore';
 import BlurOverlay from './Resizable/BlurOverlay';
 import ResizeIndicator from './Resizable/ResizeIndicator';
 import InternalScrolling from './Resizable/InternalScrolling';
@@ -10,6 +10,7 @@ import ResizeHandlers from './Resizable/ResizeHandlers';
 import {
   useItemCounts,
   useResizeContext,
+  ResizeProvider,
 } from './Resizable/Context/ResizeContext';
 import { startDragging } from './Resizable/Hooks/useResizeHandlers';
 import { useResizablePanel } from './Resizable/Hooks/useResizablePanel';
@@ -17,6 +18,7 @@ import {
   loadDesiredWidth,
   saveDesiredWidth,
 } from './Resizable/Hooks/usePersistentDimensions';
+import { ToolsContainerWrapper } from './PanelTools/ToolsContainer';
 
 interface ResizablePanelProps {
   id: string; // New required prop
@@ -33,21 +35,23 @@ interface ResizablePanelProps {
   onResize?: (dimensions: { width: number; height: number }) => void;
 }
 
-const ResizablePanel = ({
-  id,
-  children,
-  tools,
-  minHeight = 200,
-  maxHeight = 800,
-  minWidth = 280,
-  maxWidth = 1200,
-  defaultHeight = 400,
-  defaultWidth = 800,
-  onResize,
-}: ResizablePanelProps) => {
+// Inner component that uses context
+const ResizablePanelContent = (props: ResizablePanelProps) => {
+  const {
+    id,
+    children,
+    tools,
+    minHeight = 200,
+    maxHeight = 800,
+    minWidth = 300,
+    maxWidth = 1200,
+    defaultHeight = 200,
+    defaultWidth = 900,
+    onResize,
+  } = props;
+
   const theme = useTheme();
-  const { platform } = usePlatformStore();
-  const resizeMode = platform.interface.resizeMode;
+  const { resizeMode } = usePanelStore();
   const { snapDimensions } = useResizeContext();
   const { setItemCounts } = useItemCounts();
   const panelRef = useRef<HTMLDivElement>(null);
@@ -338,17 +342,9 @@ const ResizablePanel = ({
         willChange: 'width, height',
       }}>
       {tools && (
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 8,
-            right: 8,
-            zIndex: 1,
-            display: 'flex',
-            gap: 1,
-          }}>
+        <ToolsContainerWrapper position='bottom-right'>
           {tools}
-        </Box>
+        </ToolsContainerWrapper>
       )}
       <InternalScrolling dimensions={dimensions}>
         {typeof children === 'function' ? children(dimensions) : children}
@@ -368,6 +364,15 @@ const ResizablePanel = ({
         />
       )}
     </Box>
+  );
+};
+
+// Main component that provides context
+const ResizablePanel = (props: ResizablePanelProps) => {
+  return (
+    <ResizeProvider>
+      <ResizablePanelContent {...props} />
+    </ResizeProvider>
   );
 };
 

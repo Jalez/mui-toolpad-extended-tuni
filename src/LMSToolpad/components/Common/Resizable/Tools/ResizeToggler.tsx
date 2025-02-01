@@ -1,13 +1,11 @@
 /** @format */
 
 import { IconButton, Tooltip } from '@mui/material';
-import { usePlatformStore } from '../../../../store/usePlatformStore';
-
+import { usePanelStore } from '../store/usePanelStore';
 import OpenWithIcon from '@mui/icons-material/OpenWith';
 
 const ResizeToggler = () => {
-  const { platform, toggleResizeMode } = usePlatformStore();
-  const resizeMode = platform.interface.resizeMode;
+  const { resizeMode, toggleResizeMode } = usePanelStore();
 
   return (
     <Tooltip title={resizeMode ? 'Exit Resize Mode' : 'Enter Resize Mode'}>

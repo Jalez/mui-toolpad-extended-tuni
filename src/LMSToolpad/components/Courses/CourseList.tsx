@@ -1,8 +1,8 @@
 /** @format */
 
-import { Course } from '../../store/useCourseStore';
+import useCourseStore, { Course } from '../../store/useCourseStore';
 import CourseItem from './CourseItem';
-import NoCoursesMessage from './NoCoursesMessage';
+// import NoCoursesMessage from './NoCoursesMessage';
 import { groupCoursesByEnrollment } from '../../utils/courseFilters';
 import { useUserStore } from '../../store/useUserStore';
 import { useSetSnapDimensions } from '../Common/Resizable/Context/ResizeContext';
@@ -13,9 +13,6 @@ import { useEffect } from 'react';
 import HorizontalScroller from '../Common/HorizontalScroller';
 
 type CourseListProps = {
-  courses: Course[];
-  selectedCourse?: Course | null;
-  onSelectCourse: (course: Course) => void;
   displayMode?: 'course' | 'instance' | 'instanceList';
   containerHeight?: string | number;
 };
@@ -35,12 +32,11 @@ type CourseListProps = {
  * @param {CourseListProps} props
  */
 const CourseList = ({
-  courses,
-  selectedCourse,
-  onSelectCourse,
-  displayMode = 'course',
+  displayMode = 'instance',
   containerHeight = '100%',
 }: CourseListProps) => {
+  const { courses, currentCourse } = useCourseStore();
+
   const { user } = useUserStore();
   const visibleLists = user?.preferences.visibleCourseLists;
   const { isStudent, isStudentOld, isTeacher, isTeacherOld, available } =
@@ -58,15 +54,18 @@ const CourseList = ({
       height: itemReelHeight,
     });
   }, [itemReelWidth, itemReelHeight, setSnapDimensions]);
-  if (courses.length === 0) return <NoCoursesMessage />;
+
+  // if (courses.length === 0) return <NoCoursesMessage />;
 
   const renderCourseSection = (
     title: string,
     courseList: Course[],
     priority: priority
   ) => {
+    console.log('courseList count', courseList.length, title);
     return (
       <HorizontalScroller
+        itemCount={courseList.length}
         height={itemReelHeight}
         title={title}
         priority={priority}
@@ -75,8 +74,7 @@ const CourseList = ({
           <CourseItem
             key={course.id}
             course={course}
-            isSelected={selectedCourse?.id === course.id}
-            onSelect={onSelectCourse}
+            isSelected={currentCourse?.id === course.id}
             displayMode={displayMode}
           />
         ))}
@@ -89,14 +87,19 @@ const CourseList = ({
       itemHeight={itemReelHeight}
       containerHeight={containerHeight}>
       {visibleLists?.isStudent &&
+        isStudent.length !== 0 &&
         renderCourseSection('My Enrolled Courses', isStudent, 'high')}
       {visibleLists?.isStudentOld &&
+        isStudentOld.length !== 0 &&
         renderCourseSection('My Completed Courses', isStudentOld, 'low')}
       {visibleLists?.isTeacher &&
+        isTeacher.length !== 0 &&
         renderCourseSection('My Teaching Courses', isTeacher, 'low')}
       {visibleLists?.isTeacherOld &&
+        isTeacherOld.length !== 0 &&
         renderCourseSection('My Past Teaching', isTeacherOld, 'low')}
       {visibleLists?.available &&
+        available.length !== 0 &&
         renderCourseSection('Available Courses', available, 'low')}
     </VerticalScroller>
   );

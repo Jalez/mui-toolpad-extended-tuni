@@ -1,6 +1,6 @@
 /** @format */
 import { Box, Typography } from '@mui/material';
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useScrollControls } from './Resizable/Hooks/useScrollControls';
 import PaginationDots from './PaginationDots';
 import { useItemCounts } from './Resizable/Context/ResizeContext';
@@ -12,6 +12,7 @@ type HorizontalScrollerProps = {
   priority: priority;
   height: number;
   itemWidth: number;
+  itemCount: number;
 };
 
 const HorizontalScroller = ({
@@ -20,6 +21,7 @@ const HorizontalScroller = ({
   priority,
   height,
   itemWidth,
+  itemCount,
 }: HorizontalScrollerProps) => {
   const { itemCounts } = useItemCounts();
 
@@ -44,7 +46,7 @@ const HorizontalScroller = ({
     direction: 'horizontal',
     itemSize: itemWidth,
     itemsPerPage: itemCounts.horizontal,
-    wrapAround: true,
+    itemCount, // Add this
   });
 
   const dragThreshold = 4; // Minimum pixels to consider as drag
@@ -56,8 +58,10 @@ const HorizontalScroller = ({
       e.stopPropagation();
     }
   };
-
-  // Only render dots if we have more than one item
+  useEffect(() => {
+    console.log('Triggered this for title:', title);
+  }, []);
+  // Add an effect to count children once this scroller becomes visible
 
   const reelRef = useRef<HTMLDivElement>(null);
 
@@ -85,8 +89,8 @@ const HorizontalScroller = ({
         // width: itemWidth,
       }}>
       {title && <ReelTitle title={title} priority={priority} />}
-
       <Box
+        data-testid='reel-container'
         ref={containerRef}
         sx={{
           width: '100%',
@@ -126,7 +130,6 @@ const HorizontalScroller = ({
           </Box>
         ))}
       </Box>
-
       <PaginationDots
         total={totalPages}
         current={currentPage}

@@ -2,15 +2,13 @@
 
 import useCourseStore from '../../../store/useCourseStore';
 import { useUserStore } from '../../../store/useUserStore';
-import CourseSelector from '../../Courses/CourseSelector';
-import LoadingScreen from '../../LoadingScreen';
 import ResizablePanel from '../../Common/ResizablePanel';
-import { ResizeProvider } from '../../Common/Resizable/Context/ResizeContext';
 import { registerToolbar } from '../../Toolbars/PageToolbar/toolbarRegistry';
 import HomeToolbar from './HomeToolbar';
 import { CourseListVisibilityMenu } from '../../Courses/CourseListVisibilityMenu';
-import { Box } from '@mui/material';
-import FlexWrapper from './FlexWrapper';
+import MovablePanel from '../../Common/MovablePanel/MovablePanel';
+import CourseList from '../../Courses/CourseList';
+import ToolsContainer from '../../Common/PanelTools/ToolsContainer';
 
 registerToolbar('/', HomeToolbar);
 
@@ -28,38 +26,40 @@ const Home = () => {
   const { courses, fetchState } = useCourseStore();
   const { user } = useUserStore();
   const navigationType = user?.preferences?.navigationType || 'direct';
+  console.log('Home', { courses, fetchState, navigationType });
+
+  const panelTools = (
+    <ToolsContainer>
+      <CourseListVisibilityMenu />
+    </ToolsContainer>
+  );
 
   return (
-    <FlexWrapper>
-      <ResizeProvider>
-        <ResizablePanel
-          id='home-course-selector'
-          tools={<CourseListVisibilityMenu />}
-          defaultWidth={800}
-          defaultHeight={500}
-          minWidth={280}
-          maxWidth={1200}
-          minHeight={200}
-          maxHeight={800}>
-          <CourseSelector courses={courses} navigationType={navigationType} />
-        </ResizablePanel>
-        {fetchState === 'loading' && <LoadingScreen />}
-      </ResizeProvider>
-      <ResizeProvider>
-        <ResizablePanel
-          id='home-course-selector-2'
-          tools={<CourseListVisibilityMenu />}
-          defaultWidth={800}
-          defaultHeight={500}
-          minWidth={280}
-          maxWidth={1200}
-          minHeight={200}
-          maxHeight={800}>
-          <CourseSelector courses={courses} navigationType={navigationType} />
-        </ResizablePanel>
-        {fetchState === 'loading' && <LoadingScreen />}
-      </ResizeProvider>
-    </FlexWrapper>
+    <MovablePanel id='home-panels'>
+      <ResizablePanel
+        id='home-course-selector'
+        tools={panelTools}
+        defaultWidth={600}
+        defaultHeight={400}
+        minWidth={300}
+        maxWidth={1200}
+        minHeight={200}
+        maxHeight={800}>
+        <CourseList displayMode={'instance'} containerHeight='100%' />
+      </ResizablePanel>
+      <div>Test</div>
+      {/* <ResizablePanel
+        id='home-course-selector-2'
+        tools={panelTools}
+        defaultWidth={900}
+        defaultHeight={200}
+        minWidth={300}
+        maxWidth={1200}
+        minHeight={200}
+        maxHeight={800}>
+        <CourseList displayMode={'instance'} containerHeight='100%' />
+      </ResizablePanel> */}
+    </MovablePanel>
   );
 };
 

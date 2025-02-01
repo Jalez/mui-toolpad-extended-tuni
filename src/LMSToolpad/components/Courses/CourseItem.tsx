@@ -4,29 +4,22 @@ import { Card, Box } from '@mui/material';
 import { Course } from '../../store/useCourseStore';
 import useDialogStore from '../../store/useDialogStore';
 import useCourseStore from '../../store/useCourseStore';
-import { useState } from 'react';
 import { subjectConfig } from '../../config/subjectConfig';
 import { CourseHeader } from './CourseHeader';
 import { CourseInfo } from './CourseInfo';
-import { CourseActions } from './CourseActions';
-import { CourseStats } from './CourseStats';
-import PaginationDots from '../Common/PaginationDots';
+import { CourseHeaderActions } from './CourseHeaderActions';
+import { useNavigate } from 'react-router-dom';
 
 type CourseItemProps = {
   course: Course;
   isSelected?: boolean;
-  onSelect: (course: Course) => void;
   displayMode?: 'course' | 'instance' | 'instanceList';
 };
 
-const CourseItem = ({
-  course,
-  onSelect,
-  displayMode = 'course',
-}: CourseItemProps) => {
+const CourseItem = ({ course, displayMode = 'course' }: CourseItemProps) => {
   const { setOpenDialog } = useDialogStore();
-  const { setCourseToUpdate } = useCourseStore();
-  const [side, setSide] = useState<'front' | 'back'>('front');
+  const { setCourseToUpdate, setCurrentCourse } = useCourseStore();
+  const navigate = useNavigate();
 
   const subject = course.code.split('.')[0];
   const config = subjectConfig[subject] || subjectConfig['COMP.CS'];
@@ -50,13 +43,14 @@ const CourseItem = ({
     setOpenDialog('CourseSettings');
   };
 
-  const handleFlip = (e: React.MouseEvent<HTMLElement>) => {
+  const handleTeacherEnroll = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
-    setSide(side === 'front' ? 'back' : 'front');
+    setOpenDialog('ManageEnrollments'); // Or whatever dialog you use for this
   };
 
-  const handleArrowClick = (direction: 'start' | 'end') => {
-    setSide(direction === 'start' ? 'front' : 'back');
+  const handleCourseSelect = () => {
+    setCurrentCourse(course);
+    navigate(`${course.code}/${course.instance}`);
   };
 
   return (
@@ -71,8 +65,7 @@ const CourseItem = ({
         borderLeft: `4px solid ${courseColor}`,
         transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
         overflow: 'hidden',
-        perspective: '2000px', // Increased perspective for better 3D effect
-        height: '100%', // Ensure card takes full height
+        height: '100%',
         '&:hover': {
           backgroundColor: `${courseColor}15`,
           '& .subject-icon': {
@@ -81,121 +74,66 @@ const CourseItem = ({
           },
         },
       }}
-      onClick={() => onSelect(course)}>
+      onClick={handleCourseSelect}>
+      <Box
+        component='img'
+        className='subject-icon'
+        src={config.icon}
+        alt={subject}
+        sx={{
+          position: 'absolute',
+          right: -10,
+          bottom: -10,
+          width: '80px',
+          height: '80px',
+          opacity: 0.08,
+          transition: 'all 0.3s ease-in-out',
+          filter: `drop-shadow(0 0 1px ${courseColor})`,
+        }}
+      />
       <Box
         sx={{
-          position: 'relative',
-          width: '100%',
+          p: 1,
           height: '100%',
-          transition: 'transform 0.8s',
-          transformStyle: 'preserve-3d',
-          transform: side === 'back' ? 'rotateY(180deg)' : 'rotateY(0)',
+          display: 'flex',
+          flexDirection: 'column',
         }}>
-        {/* Front Side */}
         <Box
           sx={{
-            position: 'absolute',
-            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
             height: '100%',
-            WebkitBackfaceVisibility: 'hidden',
-            backfaceVisibility: 'hidden',
-            visibility: side === 'front' ? 'visible' : 'hidden',
-            backgroundColor: `${courseColor}08`,
-            zIndex: side === 'front' ? 1 : 0,
           }}>
-          <Box
-            component='img'
-            className='subject-icon'
-            src={config.icon}
-            alt={subject}
-            sx={{
-              position: 'absolute',
-              right: -10,
-              bottom: -10,
-              width: '80px',
-              height: '80px',
-              opacity: 0.08,
-              transition: 'all 0.3s ease-in-out',
-              filter: `drop-shadow(0 0 1px ${courseColor})`,
-            }}
-          />
+          <CourseHeader course={course} />
           <Box
             sx={{
-              p: 2,
-              height: '100%',
+              width: '100%',
               display: 'flex',
-              flexDirection: 'column',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mt: 'auto',
             }}>
-            <CourseHeader
-              course={course}
-              side={side}
-              courseColor={courseColor}
-              isTeacher={isTeacher}
-              onFlip={handleFlip}
-              onSettingsClick={handleSettingsClick}
-            />
             <CourseInfo
               course={course}
               displayMode={displayMode}
-              showEnrollmentOpen={showEnrollmentOpen}
               hasUpcomingEvents={hasUpcomingEvents}
             />
-          </Box>
-        </Box>
-
-        {/* Back Side */}
-        <Box
-          sx={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            WebkitBackfaceVisibility: 'hidden',
-            backfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)',
-            visibility: side === 'back' ? 'visible' : 'hidden',
-            backgroundColor: `${courseColor}08`,
-            zIndex: side === 'back' ? 1 : 0,
-          }}>
-          <Box
-            sx={{
-              p: 2,
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-            <CourseHeader
+            <CourseHeaderActions
               course={course}
-              side={side}
               courseColor={courseColor}
               isTeacher={isTeacher}
-              onFlip={handleFlip}
+              showEnrollmentOpen={showEnrollmentOpen}
               onSettingsClick={handleSettingsClick}
+              onEnroll={(e) => {
+                e.stopPropagation();
+                setOpenDialog('EnrollInCourse');
+              }}
+              onTeacherEnroll={handleTeacherEnroll}
             />
-            <Box
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                mt: 'auto',
-              }}>
-              <CourseStats course={course} />
-              <CourseActions showEnrollmentOpen={showEnrollmentOpen} />
-            </Box>
           </Box>
         </Box>
       </Box>
-
-      {/* Pagination Dots */}
-
-      <PaginationDots
-        total={2}
-        current={side === 'front' ? 0 : 1}
-        onDotClick={(index) => setSide(index === 0 ? 'front' : 'back')}
-        onArrowClick={handleArrowClick}
-        showArrows={true}
-        disableStart={side === 'front'}
-        disableEnd={side === 'back'}
-      />
     </Card>
   );
 };

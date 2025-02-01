@@ -2,24 +2,24 @@
 
 import { Box } from '@mui/material';
 import { PageContainerToolbar } from '@toolpad/core';
-import LayoutToggle from '../../Courses/LayoutToggle';
-import { useUserStore } from '../../../store/useUserStore';
+
 import ResizeToggler from '../../Common/Resizable/Tools/ResizeToggler';
+import MoveToggler from '../../Common/MovablePanel/MoveToggler';
 
 const HomeToolbar = () => {
-  const { user, updateUser } = useUserStore();
-  const navigationType = user?.preferences?.navigationType || 'direct';
+  // const { user, updateUser } = useUserStore();
+  // // const navigationType = user?.preferences?.navigationType || 'direct';
 
-  const handleLayoutChange = (value: 'direct' | 'instances') => {
-    if (!user) return;
-    updateUser({
-      ...user,
-      preferences: {
-        ...user.preferences,
-        navigationType: value,
-      },
-    });
-  };
+  // // const handleLayoutChange = (value: 'direct' | 'instances') => {
+  // //   if (!user) return;
+  // //   updateUser({
+  // //     ...user,
+  // //     preferences: {
+  // //       ...user.preferences,
+  // //       navigationType: value,
+  // //     },
+  // //   });
+  // // };
 
   return (
     <PageContainerToolbar>
@@ -31,8 +31,10 @@ const HomeToolbar = () => {
           gap: 1,
           width: '100%',
         }}>
+        <MoveToggler />
+
         <ResizeToggler />
-        <LayoutToggle value={navigationType} onChange={handleLayoutChange} />
+        {/* <LayoutToggle value={navigationType} onChange={handleLayoutChange} /> */}
       </Box>
     </PageContainerToolbar>
   );

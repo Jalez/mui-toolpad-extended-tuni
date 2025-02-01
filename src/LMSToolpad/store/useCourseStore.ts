@@ -268,6 +268,7 @@ const useCourseStore = create<CourseStore>((set, get) => ({
   getCourses: async () => {
     try {
       set({ fetchState: 'loading' });
+      console.log('Fetching courses...');
       const response = await getCourses();
       const courses = response;
       set({ fetchState: 'idle' });

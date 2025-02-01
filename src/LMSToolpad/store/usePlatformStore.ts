@@ -151,7 +151,7 @@ export interface Platform {
     };
   };
   interface: {
-    resizeMode: boolean;
+    // Remove resizeMode
     // Add other interface settings here
   };
 }
@@ -162,7 +162,7 @@ interface PlatformSettingsStore {
   updatePlatform: (newPlatform: Platform) => void;
   updateAISettings: (newAISettings: Partial<AISettings>) => void;
   resetToDefaults: () => void;
-  toggleResizeMode: () => void;
+  // Remove toggleResizeMode
 }
 
 const DEFAULT_SETTINGS: Platform = {
@@ -276,7 +276,7 @@ const DEFAULT_SETTINGS: Platform = {
     },
   },
   interface: {
-    resizeMode: false,
+    // Remove resizeMode: false,
   },
 };
 
@@ -297,16 +297,7 @@ export const usePlatformStore = create<PlatformSettingsStore>()(
           },
         })),
       resetToDefaults: () => set({ platform: DEFAULT_SETTINGS }),
-      toggleResizeMode: () =>
-        set((state) => ({
-          platform: {
-            ...state.platform,
-            interface: {
-              ...state.platform.interface,
-              resizeMode: !state.platform.interface.resizeMode,
-            },
-          },
-        })),
+      // Remove toggleResizeMode
     }),
     {
       name: 'platform-settings',

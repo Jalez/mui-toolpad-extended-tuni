@@ -6,20 +6,25 @@
  * Returns refs and handlers to enable snapping, arrow button controls, and more.
  */
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 
 interface ScrollControlsOptions {
   direction: 'horizontal' | 'vertical';
   itemSize: number;
   itemsPerPage?: number; // New prop
-  wrapAround?: boolean;
+  itemCount?: number; // Add this
 }
+
+// Add at the top of the file
+let lastHorizontalScrollTime = 0;
+let lastVerticalScrollTime = 0;
+const SCROLL_COOLDOWN = 500; // ms
 
 export const useScrollControls = ({
   direction: scrollAxis, // rename for clarity
   itemSize,
   itemsPerPage = 1,
-  // wrapAround = false,
+  itemCount, // Add this parameter
 }: ScrollControlsOptions) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showStartButton, setShowStartButton] = useState(false);
@@ -27,72 +32,15 @@ export const useScrollControls = ({
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ pos: 0, scroll: 0 });
   const [hasDragged, setHasDragged] = useState(false);
-  const [canScroll, setCanScroll] = useState(false);
-  const lastDragDirection = useRef<'start' | 'end' | null>(null);
-  const dragTimer = useRef<NodeJS.Timeout>();
-  const hasMovedRef = useRef(false); // Add this to track any movement
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const activeScrollAxis = useRef<'horizontal' | 'vertical' | null>(null);
-
-  // Add last logged values for debouncing
-  const lastLoggedValues = useRef({
-    progress: 0,
-    direction: '',
-    timestamp: 0,
-    page: 0,
-  });
-
-  // Add debounce timer for scroll actions
-  const scrollTimer = useRef<NodeJS.Timeout>();
-  const lastScrollTime = useRef(0);
-
-  const debugLog = (type: 'scroll' | 'drag' | 'action', data: any) => {
-    if (process.env.NODE_ENV !== 'development') return;
-
-    const now = Date.now();
-    const minInterval = 250; // Only log every 250ms
-
-    switch (type) {
-      case 'drag':
-        // Only log if direction changed or progress changed by more than 10%
-        const currentProgress = parseInt(data.progress);
-        if (
-          now - lastLoggedValues.current.timestamp > minInterval &&
-          (data.direction !== lastLoggedValues.current.direction ||
-            Math.abs(currentProgress - lastLoggedValues.current.progress) >= 10)
-        ) {
-          console.log(`[${scrollAxis}] drag:`, data);
-          lastLoggedValues.current = {
-            ...lastLoggedValues.current,
-            progress: currentProgress,
-            direction: data.direction,
-            timestamp: now,
-          };
-        }
-        break;
-
-      case 'scroll':
-        // Only log if page changed
-        if (data.page !== lastLoggedValues.current.page) {
-          console.log(`[${scrollAxis}] scroll:`, data);
-          lastLoggedValues.current.page = data.page;
-        }
-        break;
-
-      case 'action':
-        // Always log actions but with throttling
-        if (now - lastLoggedValues.current.timestamp > minInterval) {
-          console.log(`[${scrollAxis}] action:`, data);
-          lastLoggedValues.current.timestamp = now;
-        }
-        break;
-    }
-  };
+  const lastDragDirection = useRef<'start' | 'end' | null>(null);
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+
+    let throttleTimeout: NodeJS.Timeout | null = null;
 
     const checkScroll = () => {
       const isHorizontal = scrollAxis === 'horizontal';
@@ -100,16 +48,36 @@ export const useScrollControls = ({
         ? container.scrollLeft
         : container.scrollTop;
 
-      const itemCount = container.children.length;
+      // Use itemCount prop if provided, fallback to DOM children count
+      const actualItemCount = itemCount ?? container.children.length;
+
+      console.log('CheckScroll called:', {
+        direction: scrollAxis,
+        currentScroll,
+        itemCount: actualItemCount,
+        containerChildrenCount: container.children.length,
+        itemsPerPage,
+      });
 
       // Calculate total pages based on items and items per page
-      const totalPagesCalc = Math.max(1, Math.ceil(itemCount / itemsPerPage));
+      const totalPagesCalc = Math.max(
+        1,
+        Math.ceil(actualItemCount / itemsPerPage)
+      );
+
+      console.log(`totalPagesCalc ${totalPagesCalc} ${scrollAxis}`, {
+        actualItemCount,
+        itemsPerPage,
+        containerWidth: container.clientWidth,
+        containerScroll: container.scrollLeft,
+      });
 
       // Calculate current page
       const currentPageCalc = Math.min(
         Math.floor(currentScroll / itemSize),
         totalPagesCalc - 1
       );
+      console.log('totalPagesCalc', totalPagesCalc, scrollAxis);
 
       setTotalPages(totalPagesCalc);
       setCurrentPage(currentPageCalc);
@@ -117,36 +85,105 @@ export const useScrollControls = ({
       // Simple button state based on current page and total pages
       setShowStartButton(currentPageCalc > 0);
       setShowEndButton(currentPageCalc < totalPagesCalc - 1);
-      setCanScroll(totalPagesCalc > 1);
     };
+
+    const throttledCheckScroll = () => {
+      if (throttleTimeout === null) {
+        throttleTimeout = setTimeout(() => {
+          throttleTimeout = null;
+          checkScroll();
+        }, 100); // Adjust delay as needed
+      }
+    };
+
+    // Replace raw scroll logger with one that logs only when near a snap point
 
     const resizeObserver = new ResizeObserver(checkScroll);
     resizeObserver.observe(container);
-    container.addEventListener('scroll', checkScroll);
-    checkScroll();
+    container.addEventListener('scroll', throttledCheckScroll);
+    // Use new snapped logger
+    // Add MutationObserver to capture changes in container children
+    const mutationObserver = new MutationObserver(checkScroll);
+    mutationObserver.observe(container, { childList: true, subtree: true });
+    // Defer initial check until layout is settled
+    requestAnimationFrame(() => {
+      requestAnimationFrame(checkScroll);
+    });
 
     return () => {
-      container.removeEventListener('scroll', checkScroll);
+      container.removeEventListener('scroll', throttledCheckScroll);
       resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      if (throttleTimeout) clearTimeout(throttleTimeout);
     };
-  }, [scrollAxis, itemSize, itemsPerPage]);
+  }, [scrollAxis, itemSize, itemsPerPage, itemCount]); // Add itemCount to dependencies
 
-  const handleScrollAction = (forward: boolean) => {
-    const now = Date.now();
-    if (now - lastScrollTime.current < 500) return; // Prevent rapid scrolls
-    lastScrollTime.current = now;
+  // Add new effect specifically for itemCount changes
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container || !itemCount) return;
 
+    console.log(
+      'ItemCount changed for direction:',
+      scrollAxis,
+      'new count:',
+      itemCount
+    );
+
+    const currentScroll =
+      scrollAxis === 'horizontal' ? container.scrollLeft : container.scrollTop;
+    const totalPagesCalc = Math.max(1, Math.ceil(itemCount / itemsPerPage));
+    const currentPageCalc = Math.min(
+      Math.floor(currentScroll / itemSize),
+      totalPagesCalc - 1
+    );
+
+    setTotalPages(totalPagesCalc);
+    setCurrentPage(currentPageCalc);
+    setShowStartButton(currentPageCalc > 0);
+    setShowEndButton(currentPageCalc < totalPagesCalc - 1);
+  }, [itemCount, itemsPerPage, itemSize, scrollAxis]);
+
+  // Common function to snap to nearest item
+  const snapToClosest = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
-
     const isHorizontal = scrollAxis === 'horizontal';
     const currentScroll = isHorizontal
       ? container.scrollLeft
       : container.scrollTop;
-    const targetScroll = currentScroll + (forward ? itemSize : -itemSize);
-
+    const snapPoint = Math.round(currentScroll / itemSize) * itemSize;
     container.style.scrollBehavior = 'smooth';
     if (isHorizontal) {
+      container.scrollLeft = snapPoint;
+    } else {
+      container.scrollTop = snapPoint;
+    }
+  }, [scrollAxis, itemSize]);
+
+  // Add global mouseup listener to clear dragging state
+  useEffect(() => {
+    const handleGlobalMouseUp = (e: MouseEvent) => {
+      if (isDragging) {
+        setIsDragging(false);
+        snapToClosest();
+      }
+    };
+    window.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
+  }, [isDragging, snapToClosest]);
+
+  const handleScrollAction = (forward: boolean) => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Log scrolling action with direction and current scroll value.
+    const currentScroll =
+      scrollAxis === 'horizontal' ? container.scrollLeft : container.scrollTop;
+
+    const targetScroll = currentScroll + (forward ? itemSize : -itemSize);
+    container.style.scrollBehavior = 'smooth';
+    if (scrollAxis === 'horizontal') {
       container.scrollLeft = targetScroll;
     } else {
       container.scrollTop = targetScroll;
@@ -154,13 +191,7 @@ export const useScrollControls = ({
   };
 
   const scroll = (scrollDirection: 'start' | 'end') => {
-    if (scrollTimer.current) {
-      clearTimeout(scrollTimer.current);
-    }
-
-    scrollTimer.current = setTimeout(() => {
-      handleScrollAction(scrollDirection === 'end');
-    }, 50);
+    handleScrollAction(scrollDirection === 'end');
   };
 
   const scrollToPage = (page: number) => {
@@ -180,12 +211,12 @@ export const useScrollControls = ({
     }
   };
 
+  const DRAG_THRESHOLD = itemSize * 0.01;
+
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
     setHasDragged(false);
-    hasMovedRef.current = false;
-
     const pos = scrollAxis === 'horizontal' ? e.pageX : e.pageY;
     const scrollPos =
       scrollAxis === 'horizontal'
@@ -194,7 +225,6 @@ export const useScrollControls = ({
 
     setDragStart({ pos, scroll: scrollPos });
     lastDragDirection.current = null;
-    activeScrollAxis.current = scrollAxis;
 
     if (containerRef.current) {
       containerRef.current.style.scrollBehavior = 'auto';
@@ -202,105 +232,44 @@ export const useScrollControls = ({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (
-      !isDragging ||
-      !containerRef.current ||
-      activeScrollAxis.current !== scrollAxis
-    )
-      return;
+    if (!isDragging || !containerRef.current) return;
     e.preventDefault();
 
     const currentPos = scrollAxis === 'horizontal' ? e.pageX : e.pageY;
     const delta = dragStart.pos - currentPos;
-    const progress = Math.round((delta / itemSize) * 100);
 
-    // Only trigger scroll when crossing a threshold
-    if (Math.abs(delta) > itemSize * 0.5) {
-      // Increased threshold
+    if (Math.abs(delta) > DRAG_THRESHOLD) {
+      const now = performance.now();
+      // Prevent triggering the other axis if it has fired recently.
+      if (scrollAxis === 'horizontal') {
+        if (now - lastVerticalScrollTime < SCROLL_COOLDOWN) return;
+        lastHorizontalScrollTime = now;
+      } else {
+        if (now - lastHorizontalScrollTime < SCROLL_COOLDOWN) return;
+        lastVerticalScrollTime = now;
+      }
+
       const direction = delta > 0 ? 'end' : 'start';
-
       if (direction !== lastDragDirection.current) {
         lastDragDirection.current = direction;
         scroll(direction);
       }
-    }
-
-    // Only log significant changes in drag
-    if (Math.abs(progress) % 10 === 0) {
-      debugLog('drag', {
-        direction: delta > 0 ? 'forward' : 'backward',
-        progress: `${progress}%`,
-      });
-    }
-
-    if (Math.abs(delta) > 2) {
-      hasMovedRef.current = true;
       setHasDragged(true);
-    }
-
-    if (Math.abs(delta) > itemSize * 0.2) {
-      const direction = delta > 0 ? 'end' : 'start';
-
-      if (direction !== lastDragDirection.current) {
-        lastDragDirection.current = direction;
-        if (dragTimer.current) {
-          clearTimeout(dragTimer.current);
-        }
-        dragTimer.current = setTimeout(() => {
-          scroll(direction);
-        }, 50);
-      }
     }
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
-    if (activeScrollAxis.current !== scrollAxis) return;
+    if (!containerRef.current) return;
 
     e.preventDefault();
     setIsDragging(false);
     lastDragDirection.current = null;
-    activeScrollAxis.current = null;
-
-    if (dragTimer.current) {
-      clearTimeout(dragTimer.current);
-    }
-
-    // If there was any movement, prevent click
-    if (hasMovedRef.current) {
-      e.stopPropagation();
-      // Prevent the next click event too
-      const preventNextClick = (e: Event) => {
-        e.stopPropagation();
-        document.removeEventListener('click', preventNextClick, true);
-      };
-      document.addEventListener('click', preventNextClick, true);
-    }
 
     if (hasDragged) {
       e.stopPropagation();
     }
 
-    // Ensure we're properly snapped to an item
-    if (containerRef.current) {
-      const container = containerRef.current;
-      const isHorizontal = scrollAxis === 'horizontal';
-      const currentScroll = isHorizontal
-        ? container.scrollLeft
-        : container.scrollTop;
-      // Snap directly to nearest item
-      let snapPoint = Math.round(currentScroll / itemSize) * itemSize;
-
-      // Clamp snap point
-      snapPoint = Math.max(0, snapPoint);
-      snapPoint = Math.min(snapPoint, (totalPages - 1) * itemSize);
-
-      container.style.scrollBehavior = 'smooth';
-      if (isHorizontal) {
-        container.scrollLeft = snapPoint;
-      } else {
-        container.scrollTop = snapPoint;
-      }
-    }
+    snapToClosest();
   };
 
   // Add touch handling
@@ -314,7 +283,6 @@ export const useScrollControls = ({
 
     setIsDragging(true);
     setHasDragged(false);
-    hasMovedRef.current = false;
     setDragStart({ pos, scroll: scrollPos });
   };
 
@@ -326,7 +294,6 @@ export const useScrollControls = ({
     const delta = dragStart.pos - currentPos;
 
     if (Math.abs(delta) > 5) {
-      hasMovedRef.current = true;
       setHasDragged(true);
 
       // Prevent page scrolling while swiping
@@ -344,35 +311,12 @@ export const useScrollControls = ({
     setIsDragging(false);
 
     // Snap to nearest item
-    if (containerRef.current && hasMovedRef.current) {
-      const container = containerRef.current;
-      const currentScroll =
-        scrollAxis === 'horizontal'
-          ? container.scrollLeft
-          : container.scrollTop;
-
-      const snapPoint = Math.round(currentScroll / itemSize) * itemSize;
-
-      container.style.scrollBehavior = 'smooth';
-      if (scrollAxis === 'horizontal') {
-        container.scrollLeft = snapPoint;
-      } else {
-        container.scrollTop = snapPoint;
-      }
+    if (containerRef.current && hasDragged) {
+      snapToClosest();
     }
   };
 
-  // Clean up timer on unmount
-  useEffect(() => {
-    return () => {
-      if (dragTimer.current) {
-        clearTimeout(dragTimer.current);
-      }
-      if (scrollTimer.current) {
-        clearTimeout(scrollTimer.current);
-      }
-    };
-  }, []);
+  const canScroll = totalPages > 1;
 
   return {
     containerRef,
@@ -380,12 +324,10 @@ export const useScrollControls = ({
     showEndButton,
     isDragging,
     hasDragged,
-    canScroll,
     scroll,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
-    hasMovedRef, // Optional: expose this if needed for custom handling
     currentPage,
     totalPages,
     scrollToPage,
@@ -394,5 +336,6 @@ export const useScrollControls = ({
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
+    canScroll, // Added canScroll property
   };
 };

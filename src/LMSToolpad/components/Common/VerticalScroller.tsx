@@ -49,6 +49,9 @@ const VerticalScroller = ({
     itemsPerPage: itemCounts.vertical,
   });
 
+  console.log('ITEM COUNTS', itemCounts);
+  console.log('totalPages', totalPages);
+
   return (
     <Box
       sx={{
@@ -92,7 +95,6 @@ const VerticalScroller = ({
         onTouchEnd={handleTouchEnd}>
         {children}
       </Box>
-      {/* <Box sx={{ width: PAGINATION_WIDTH, flexShrink: 0 }}> */}
       <PaginationDots
         total={totalPages}
         current={currentPage}
@@ -103,7 +105,6 @@ const VerticalScroller = ({
         disableStart={disableStartButton}
         disableEnd={disableEndButton}
       />
-      {/* </Box> */}
     </Box>
   );
 };

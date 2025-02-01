@@ -1,65 +1,56 @@
 /** @format */
 
-import { Box, Typography, Chip } from '@mui/material';
+import { Box, Typography, IconButton, Tooltip } from '@mui/material';
 import { Course } from '../../store/useCourseStore';
+import EventIcon from '@mui/icons-material/Event';
 
 type CourseInfoProps = {
   course: Course;
   displayMode: 'course' | 'instance' | 'instanceList';
-  showEnrollmentOpen: boolean;
   hasUpcomingEvents: boolean;
 };
 
 export const CourseInfo = ({
   course,
   displayMode,
-  showEnrollmentOpen,
   hasUpcomingEvents,
-}: CourseInfoProps) => (
-  <Box
-    sx={{
-      display: 'flex',
-      flexDirection: 'column',
-      mb: 'auto',
-    }}>
-    <Typography variant='caption' color='text.secondary'>
-      {course.code}
-    </Typography>
-    {displayMode !== 'course' && (
-      <Typography variant='caption' color='text.secondary'>
-        • {course.instance}
-      </Typography>
-    )}
-
+}: CourseInfoProps) => {
+  return (
     <Box
       sx={{
         display: 'flex',
-        gap: 0,
-        flexWrap: 'wrap',
-        mt: 'auto',
+        flexDirection: 'row',
+        alignItems: 'center',
+        mb: 'auto',
+        width: '100%',
       }}>
-      {showEnrollmentOpen && (
-        <Chip
-          size='small'
-          label='Enrollment Open'
+      {displayMode !== 'course' && (
+        <Typography
+          variant='caption'
+          color='text.secondary'
           sx={{
-            backgroundColor: 'success.light',
-            color: 'success.contrastText',
-            height: 20,
-          }}
-        />
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            mr: 1,
+          }}>
+          {course.instance}
+        </Typography>
       )}
       {hasUpcomingEvents && (
-        <Chip
-          size='small'
-          label='Upcoming Events'
-          sx={{
-            backgroundColor: 'info.light',
-            color: 'info.contrastText',
-            height: 20,
-          }}
-        />
+        <Tooltip title='Upcoming Events'>
+          <IconButton
+            size='small'
+            color='info'
+            sx={{
+              width: 28,
+              height: 28,
+              padding: 0,
+            }}>
+            <EventIcon sx={{ fontSize: 18 }} />
+          </IconButton>
+        </Tooltip>
       )}
     </Box>
-  </Box>
-);
+  );
+};
