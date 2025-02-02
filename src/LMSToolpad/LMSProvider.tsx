@@ -13,6 +13,8 @@ import { addActions } from './components/tools/addActions';
 import Notifications from './components/Notifications';
 import { useNotificationStore } from './store/useNotificationsStore';
 import { SnackbarProvider } from 'notistack';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
 
 import { SizableContentHeader } from './layout/breadcrumbs/SizableContentHeader';
 import SidebarFooter from './components/sidebar/Footer';
@@ -182,48 +184,50 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
   };
 
   return (
-    <SnackbarProvider maxSnack={6} autoHideDuration={10000}>
-      <AppProvider
-        branding={{
-          logo: <Logo />,
-          title: '',
-        }}
-        navigation={(currentCourse && currentNavigation) || []}
-        theme={lmsTheme}
-        router={router as Router}
-        session={session}
-        authentication={{
-          signIn: handleLogin,
-          signOut: handleLogout,
-        }}>
-        <DashboardLayout
-          //No borders for dashboard layout
-          border={false}
-          sx={{
-            bgcolor: 'background.paper',
-            '& .MuiDrawer-paper': {
-              border: 0,
-            },
-            //Navbar no border
-            '& .MuiAppBar-root': {
-              borderBottom: 0,
-            },
+    <LocalizationProvider dateAdapter={AdapterLuxon}>
+      <SnackbarProvider maxSnack={6} autoHideDuration={10000}>
+        <AppProvider
+          branding={{
+            logo: <Logo />,
+            title: '',
           }}
-          defaultSidebarCollapsed={true}
-          maxWidth={true}
-          slots={{
-            toolbarAccount: ToolbarAccount,
-            toolbarActions: CustomActions,
-            sidebarFooter: SidebarFooter,
+          navigation={(currentCourse && currentNavigation) || []}
+          theme={lmsTheme}
+          router={router as Router}
+          session={session}
+          authentication={{
+            signIn: handleLogin,
+            signOut: handleLogout,
           }}>
-          <SizableContentHeader />
+          <DashboardLayout
+            //No borders for dashboard layout
+            border={false}
+            sx={{
+              bgcolor: 'background.paper',
+              '& .MuiDrawer-paper': {
+                border: 0,
+              },
+              //Navbar no border
+              '& .MuiAppBar-root': {
+                borderBottom: 0,
+              },
+            }}
+            defaultSidebarCollapsed={true}
+            maxWidth={true}
+            slots={{
+              toolbarAccount: ToolbarAccount,
+              toolbarActions: CustomActions,
+              sidebarFooter: SidebarFooter,
+            }}>
+            <SizableContentHeader />
 
-          {children}
-          <Dialogs />
-          <Notifications />
-        </DashboardLayout>
-      </AppProvider>
-    </SnackbarProvider>
+            {children}
+            <Dialogs />
+            <Notifications />
+          </DashboardLayout>
+        </AppProvider>
+      </SnackbarProvider>
+    </LocalizationProvider>
   );
 };
 

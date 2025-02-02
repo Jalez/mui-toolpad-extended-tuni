@@ -44,7 +44,7 @@ const ResizeHandlers = ({
         onTouchStart={handleTouchStart('vertical')} // Add touch handler
         sx={{
           position: 'absolute',
-          bottom: 0,
+          bottom: -1,
           left: 0,
           height: '4px',
           width: '100%',

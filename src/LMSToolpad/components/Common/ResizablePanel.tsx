@@ -322,6 +322,9 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
       sx={{
         m: 1,
         position: 'relative',
+        // padding: 1,
+        // border box
+        boxSizing: 'border-box',
         width: dimensions.width + 25,
         maxWidth: '100%', // Constrain width
         height: dimensions.height,
