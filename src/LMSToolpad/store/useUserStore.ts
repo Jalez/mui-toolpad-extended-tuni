@@ -56,9 +56,7 @@ export interface UserData {
       isTeacherOld: boolean;
       available: boolean;
     };
-    visibleNavigation: {
-      [key: string]: boolean;
-    };
+    visibleNavigation: string[];
   };
 }
 
@@ -96,13 +94,7 @@ const defaultTestUsers = [
         isTeacherOld: true,
         available: true,
       },
-      visibleNavigation: {
-        "Current courses": true,
-        "Past courses": true,
-        Teaching: true,
-        "Teaching history": true,
-        "Available courses": true,
-      },
+      visibleNavigation: ["Courses"],
     },
     platformRoles: ["creator", "moderator"] as PlatformRole[],
   },
@@ -139,13 +131,7 @@ const defaultTestUsers = [
         isTeacherOld: true,
         available: true,
       },
-      visibleNavigation: {
-        "Current courses": true,
-        "Past courses": true,
-        Teaching: true,
-        "Teaching history": true,
-        "Available courses": true,
-      },
+      visibleNavigation: ["Courses"],
     },
     platformRoles: ["user"] as PlatformRole[],
   },
@@ -182,13 +168,7 @@ const defaultTestUsers = [
         isTeacherOld: true,
         available: true,
       },
-      visibleNavigation: {
-        "Current courses": true,
-        "Past courses": true,
-        Teaching: true,
-        "Teaching history": true,
-        "Available courses": true,
-      },
+      visibleNavigation: ["Courses"],
     },
     platformRoles: ["user"] as PlatformRole[],
   },
@@ -225,13 +205,7 @@ const defaultTestUsers = [
         isTeacherOld: true,
         available: true,
       },
-      visibleNavigation: {
-        "Current courses": true,
-        "Past courses": true,
-        Teaching: true,
-        "Teaching history": true,
-        "Available courses": true,
-      },
+      visibleNavigation: ["Courses"],
     },
     platformRoles: ["creator", "moderator"] as PlatformRole[],
   },

@@ -25,6 +25,7 @@ import { useThemeStore } from "./store/useThemeStore";
 import { createTheme, Theme } from "@mui/material";
 import RegisteredAppTools from "./layout/Toolbars/AppToolbar/RegisteredAppTools";
 import PageContent from "./layout/Content/PageContent";
+import { UserManager } from "./components/UserManager";
 
 export interface EduMLProviderProps {
   children?: ReactNode;
@@ -116,6 +117,7 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
           authentication={authentication}
         >
           <AuthenticationManager />
+          <UserManager />
           <CourseManager />
           <DashboardLayout
             data-testid="dashboard-layout"

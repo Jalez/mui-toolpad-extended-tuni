@@ -1,19 +1,19 @@
 /** @format */
 
-import ResizablePanel from '../../Common/Panel/ResizablePanel';
-import { registerPageToolbarAction } from '../../../layout/Toolbars/toolbarRegistry';
-import { CourseListVisibilityMenu } from '../../Courses/CourseListVisibilityMenu';
-import MovablePanel from '../../Common/Panel/MovablePanel/MovablePanel';
-import CourseList from '../../Courses/CourseList';
-import ToolsContainer from '../../Common/Panel/PanelTools/ToolsContainer';
-import Calendar from './Calendar';
-import ResizeToggler from '../../Common/Panel/Resizable/Tools/ResizeToggler';
-import MoveToggler from '../../Common/Panel/MovablePanel/MoveToggler';
-import { useTheme } from '@mui/material';
-
-// Register individual actions for the home page
-registerPageToolbarAction('/', MoveToggler);
-registerPageToolbarAction('/', ResizeToggler);
+import { useEffect } from "react";
+import ResizablePanel from "../../Common/Panel/ResizablePanel";
+import {
+  registerPageToolbarAction,
+  unregisterPageToolbarAction,
+} from "../../../layout/Toolbars/toolbarRegistry";
+import { CourseListVisibilityMenu } from "../../Courses/CourseListVisibilityMenu";
+import MovablePanel from "../../Common/Panel/MovablePanel/MovablePanel";
+import CourseList from "../../Courses/CourseList";
+import ToolsContainer from "../../Common/Panel/PanelTools/ToolsContainer";
+import Calendar from "./Calendar";
+import ResizeToggler from "../../Common/Panel/Resizable/Tools/ResizeToggler";
+import MoveToggler from "../../Common/Panel/MovablePanel/MoveToggler";
+import { useTheme } from "@mui/material";
 
 /**
  * Home component with enhanced layout options.
@@ -27,6 +27,17 @@ registerPageToolbarAction('/', ResizeToggler);
  */
 const Home = () => {
   const theme = useTheme();
+
+  useEffect(() => {
+    // Unregister actions when component unmounts
+    // Register individual actions for the home page
+    registerPageToolbarAction("/", MoveToggler);
+    registerPageToolbarAction("/", ResizeToggler);
+    return () => {
+      unregisterPageToolbarAction("/", MoveToggler);
+      unregisterPageToolbarAction("/", ResizeToggler);
+    };
+  }, []);
 
   const panelTools = (
     <ToolsContainer>
@@ -52,46 +63,48 @@ const Home = () => {
   // Fallback dummy events for testing (remove “!important”)
   const dummyEvents = [
     {
-      title: 'Test Event 1',
+      title: "Test Event 1",
       start: new Date().toISOString(),
       end: new Date(Date.now() + 3600000).toISOString(), // +1 hour
-      backgroundColor: 'white',
+      backgroundColor: "white",
       borderColor: theme.palette.info.dark,
-      textColor: 'black',
+      textColor: "black",
     },
     {
-      title: 'Test Event 2',
+      title: "Test Event 2",
       start: new Date(Date.now() + 86400000).toISOString(), // +1 day
       end: new Date(Date.now() + 90000000).toISOString(),
-      backgroundColor: 'green',
+      backgroundColor: "green",
       borderColor: theme.palette.info.dark,
-      textColor: 'white',
+      textColor: "white",
     },
   ];
   const events = dummyEvents;
 
   return (
-    <MovablePanel id='home-panels'>
+    <MovablePanel id="home-panels">
       <ResizablePanel
-        id='home-course-selector'
+        id="home-course-selector"
         tools={panelTools}
         defaultWidth={600}
         defaultHeight={400}
         minWidth={300}
         maxWidth={1200}
         minHeight={200}
-        maxHeight={800}>
-        <CourseList displayMode={'instance'} containerHeight='100%' />
+        maxHeight={800}
+      >
+        <CourseList displayMode={"instance"} containerHeight="100%" />
       </ResizablePanel>
       {/* New calendar panel using Calendar component */}
       <ResizablePanel
-        id='home-calendar'
+        id="home-calendar"
         defaultWidth={600}
         defaultHeight={400}
         minWidth={300}
         maxWidth={1200}
         minHeight={200}
-        maxHeight={800}>
+        maxHeight={800}
+      >
         <Calendar events={events} />
       </ResizablePanel>
       {/* <ResizablePanel

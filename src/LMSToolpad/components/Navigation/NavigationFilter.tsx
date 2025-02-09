@@ -11,6 +11,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import { useState, useEffect, useCallback } from "react";
 import { useTheme } from "@mui/material/styles";
 import { useNavigationStore } from "./store/useNavigationStore";
+import { useNavigationFilterStore } from "./store/useNavigationFilterStore";
 
 export const NavigationFilter = () => {
   const theme = useTheme();
@@ -20,23 +21,35 @@ export const NavigationFilter = () => {
   const { sectionOrder, setVisibleSections, recalculateNavigation } =
     useNavigationStore();
 
-  // Local state for filter options: { [sectionHeader]: boolean }
-  const [filterOptions, setFilterOptions] = useState<Record<string, boolean>>(
-    {}
-  );
+  // Get filter options from the shared filter store
+  const { filterOptions, setFilterOptions } = useNavigationFilterStore();
+  const [localFilterOptions, setLocalFilterOptions] = useState(filterOptions);
 
-  // When sectionOrder changes, initialize each section to visible (true)
+  // When sectionOrder changes, initialize missing sections to visible (true)
   useEffect(() => {
-    const initialFilters: Record<string, boolean> = {};
+    const newFilters = { ...filterOptions };
+    let hasChanges = false;
+
     sectionOrder.forEach((header) => {
-      initialFilters[header] = true;
+      if (filterOptions[header] === undefined) {
+        newFilters[header] = false;
+        hasChanges = true;
+      }
     });
-    setFilterOptions(initialFilters);
-    // Also update the store with initial visible sections.
-    setVisibleSections(initialFilters);
-    // Recalculate navigation based on these filters.
-    recalculateNavigation();
-  }, [sectionOrder, setVisibleSections, recalculateNavigation]);
+
+    setLocalFilterOptions(newFilters);
+    if (hasChanges) {
+      setVisibleSections(newFilters);
+    }
+  }, [sectionOrder, filterOptions, setLocalFilterOptions, setVisibleSections]);
+
+  // Update navigation when filter options change
+  useEffect(() => {
+    if (Object.keys(localFilterOptions).length > 0) {
+      setVisibleSections(localFilterOptions);
+      recalculateNavigation();
+    }
+  }, [localFilterOptions]);
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
@@ -49,36 +62,41 @@ export const NavigationFilter = () => {
   }, []);
 
   // Toggle the visibility for a given section header
-  const handleToggle = (
-    event: React.MouseEvent<HTMLElement>,
-    option: string
-  ) => {
-    event.preventDefault();
-    event.stopPropagation();
-    const newOptions = {
-      ...filterOptions,
-      [option]: !filterOptions[option],
-    };
-    setFilterOptions(newOptions);
-    // Update the navigation store so that recalcNavigation will filter sections.
-    setVisibleSections(newOptions);
-    recalculateNavigation();
-  };
+  const handleToggle = useCallback(
+    (event: React.MouseEvent<HTMLElement>, option: string) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const newOptions = {
+        ...localFilterOptions,
+        [option]: !localFilterOptions[option],
+      };
+      setFilterOptions(newOptions);
+      // Update the navigation store so that recalcNavigation will filter sections.
+      setVisibleSections(newOptions);
+      recalculateNavigation();
+    },
+    [
+      localFilterOptions,
+      setFilterOptions,
+      setVisibleSections,
+      recalculateNavigation,
+    ]
+  );
 
-  if (Object.keys(filterOptions).length === 0) {
+  if (Object.keys(localFilterOptions).length === 0) {
     return null;
   }
 
   return (
     <Box>
       <IconButton
-        disabled={Object.keys(filterOptions).length === 0}
+        disabled={Object.keys(localFilterOptions).length === 0}
         onClick={handleClick}
         size="small"
       >
         <FilterListIcon
           htmlColor={
-            Object.keys(filterOptions).length === 0
+            Object.keys(localFilterOptions).length === 0
               ? theme.palette.text.disabled
               : theme.palette.text.primary
           }
@@ -97,12 +115,12 @@ export const NavigationFilter = () => {
           horizontal: "right",
         }}
       >
-        {Object.keys(filterOptions).map((option) => (
+        {Object.keys(localFilterOptions).map((option) => (
           <MenuItem
             key={option}
             onClick={(event) => handleToggle(event, option)}
           >
-            <Checkbox checked={filterOptions[option]} />
+            <Checkbox checked={localFilterOptions[option]} />
             <ListItemText primary={option} />
           </MenuItem>
         ))}

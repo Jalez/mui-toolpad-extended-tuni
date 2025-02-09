@@ -3,7 +3,7 @@
 import { http, HttpResponse } from "msw";
 import { baseUrl } from "../../../constants";
 import { UserBackendData } from "./types";
-import { dataStore } from "../../store";
+import { dataStore, saveDataStore } from "../../store";
 
 // Type for response data
 type JsonResponse = {
@@ -67,8 +67,10 @@ const handleUpdateUser = async (
       ...dataStore.users[userIndex],
       ...requestData,
     } as UserBackendData;
+    console.log("updatedUser", updatedUser);
 
     dataStore.users[userIndex] = updatedUser;
+    saveDataStore(dataStore);
     return HttpResponse.json(updatedUser);
   } catch (error) {
     return createErrorResponse("Failed to update user");

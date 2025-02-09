@@ -185,8 +185,8 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
     // Compute the navigation built from sections
     let sectionNavigation: NavigationStoreItem[] = [];
     state.sectionOrder.forEach((sectionKey) => {
-      // Only include sections that are visible
-      if (visibleSections[sectionKey] === false) return;
+      // Only include sections that are visible; treat undefined as not visible.
+      if (!visibleSections[sectionKey]) return;
       const section = state.sections[sectionKey];
       if (section) {
         if (sectionNavigation.length > 0) {

@@ -2,7 +2,7 @@
 import React from "react";
 import useCourseStore, { courseLevel } from "./store/useCourseStore";
 import { NavigationSectionBuilder } from "../Navigation/NavigationBuilder";
-import SchoolIcon from "@mui/icons-material/School";
+// import SchoolIcon from "@mui/icons-material/School";
 import type { addSectionProps } from "../Navigation/store/useNavigationStore";
 import { subjectConfig } from "../../config/subjectConfig";
 import { createCourseIcon } from "../Courses/CourseIcon";
@@ -36,8 +36,8 @@ export const CourseNavigationBuilder: React.FC = () => {
 
   const sections = useMemo<addSectionProps[]>(() => {
     const courseSections = [
-      { courses: learningCourses, header: "Learning Courses" },
-      { courses: learningCoursesOld, header: "Learning Courses (Old)" },
+      { courses: learningCourses, header: "Courses" },
+      { courses: learningCoursesOld, header: "Courses (Old)" },
       { courses: teachingCourses, header: "Teaching Courses" },
       { courses: teachingCoursesOld, header: "Teaching Courses (Old)" },
       { courses: availableCourses, header: "Available Courses" },
