@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 diff.txt
+Todo.txt
 node_modules
 # DON'T ignore dist folder if you're publishing from GitHub
 # dist
@@ -15,6 +16,7 @@ dist-ssr
 *.local
 
 dist
+
 
 # Editor directories and files
 .vscode/*
