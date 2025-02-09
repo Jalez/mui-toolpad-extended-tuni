@@ -1,49 +1,49 @@
 /** @format */
 
-import { Route, Routes } from 'react-router-dom';
-import CourseCodeLoader from '../Courses/CourseCodeLoader';
-import CourseInstanceSelector from '../Courses/CourseInstanceSelector';
-import CourseInstanceLoader from '../Courses/CourseInstanceLoader';
-import CourseTools from '../Courses/CourseTools';
+import { Route, Routes } from "react-router-dom";
+import CourseCodeLoader from "../Courses/CourseCodeLoader";
+import CourseInstanceSelector from "../Courses/CourseInstanceSelector";
+import CourseInstanceLoader from "../Courses/CourseInstanceLoader";
+import CourseTools from "../Courses/CourseTools";
 import {
   NavigationPageStoreItem,
   useNavigationStore,
-} from '../../store/useNavigationStore';
-import { useEffect } from 'react';
-import ToolDisplayer from '../Tool/ToolDisplayer';
-import useCourseStore from '../../store/useCourseStore';
-import Home from '../Routes/Home/Home';
+} from "../Navigation/store/useNavigationStore";
+import ToolDisplayer from "../Tool/ToolDisplayer";
+import Home from "../Routes/Home/Home";
+import { useEffect } from "react";
 
 type MicroservicesProps = {
   children: React.ReactNode;
 };
 
 const Microservices = ({ children }: MicroservicesProps) => {
-  const { allMicroserviceNavigation, updateCourseInstanceSection } =
-    useNavigationStore();
-  const { currentCourse, currentCourseCode, courses } = useCourseStore();
+  const {
+    allMicroserviceNavigation,
+    updateMicroserviceNavigationForSections,
+    sections,
+  } = useNavigationStore();
 
+  // Call the store function to update sections with merged microservices
   useEffect(() => {
-    // If we have a current course, use that for microservice navigation
-    if (currentCourse?.id) {
-      allMicroserviceNavigation.forEach((ms) => {
-        if (currentCourse.services?.includes(ms.segment)) {
-          updateCourseInstanceSection(currentCourse, allMicroserviceNavigation);
-        }
-      });
-    }
-  }, [currentCourse, currentCourseCode, courses, updateCourseInstanceSection]);
+    console.log("allMicroserviceNavigation", allMicroserviceNavigation);
+    updateMicroserviceNavigationForSections();
+  }, [
+    allMicroserviceNavigation,
+    updateMicroserviceNavigationForSections,
+    sections,
+  ]);
 
   return (
     <>
       {children}
       <Routes>
-        <Route path='' element={<Home />} index />
-        <Route path='help' element={<div>Help</div>} />
-        <Route path='contact' element={<div>Contact</div>} />
-        <Route path=':code' element={<CourseCodeLoader />}>
+        <Route path="" element={<Home />} index />
+        <Route path="help" element={<div>Help</div>} />
+        <Route path="contact" element={<div>Contact</div>} />
+        <Route path=":code" element={<CourseCodeLoader />}>
           <Route index element={<CourseInstanceSelector />} />
-          <Route path=':instance' element={<CourseInstanceLoader />}>
+          <Route path=":instance" element={<CourseInstanceLoader />}>
             <Route
               index
               element={
@@ -57,7 +57,7 @@ const Microservices = ({ children }: MicroservicesProps) => {
                   element={
                     (nav.view && <nav.view />) || (
                       <ToolDisplayer
-                        title={nav.title}
+                        title={nav.title as string}
                         show={true}
                         navItems={nav.children as NavigationPageStoreItem[]}
                       />
@@ -71,7 +71,7 @@ const Microservices = ({ children }: MicroservicesProps) => {
                       element={
                         (child.view && <child.view />) || (
                           <ToolDisplayer
-                            title={child.title}
+                            title={child.title as string}
                             show={true}
                             navItems={
                               child.children as NavigationPageStoreItem[]

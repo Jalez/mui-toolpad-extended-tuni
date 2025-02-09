@@ -1,12 +1,10 @@
 /** @format */
 
-import { useEffect } from 'react';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import useCourseStore, { Course } from '../../store/useCourseStore';
-import { useNotificationStore } from '../../store/useNotificationsStore';
-import LoadingScreen from '../LoadingScreen';
-import { useNavigationStore } from '../../store/useNavigationStore';
-import SchoolIcon from '@mui/icons-material/School';
+import { useEffect } from "react";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
+import useCourseStore, { Course } from "./store/useCourseStore";
+import { useNotificationStore } from "../Notifications/store/useNotificationsStore";
+import LoadingScreen from "../LoadingScreen";
 
 /**
  * Component for loading and managing course code level data.
@@ -25,7 +23,6 @@ const CourseCodeLoader = () => {
   const { fetchState, courses, setCurrentCourseCode } = useCourseStore();
   const { addNotificationData } = useNotificationStore();
   const navigate = useNavigate();
-  const { addSection } = useNavigationStore();
 
   useEffect(() => {
     if (!code) return;
@@ -34,22 +31,12 @@ const CourseCodeLoader = () => {
     const matchingCourses = courses.filter(
       (course: Course) => course.code === code
     );
-
-    if (matchingCourses.length > 0) {
-      const firstCourse = matchingCourses[0];
-      addSection({
-        segment: firstCourse.code,
-        title: firstCourse.code.toUpperCase(),
-        description: firstCourse.description,
-        Icon: SchoolIcon,
-        instances: matchingCourses.map((c) => c.instance),
-      });
-    } else if (fetchState !== 'loading') {
+    if (matchingCourses.length === 0 && fetchState === "success") {
       addNotificationData({
-        type: 'error',
-        message: 'Course not found',
+        type: "error",
+        message: "Course not found",
       });
-      navigate('/');
+      navigate("/");
     }
   }, [
     code,
@@ -60,7 +47,7 @@ const CourseCodeLoader = () => {
     setCurrentCourseCode,
   ]);
 
-  if (fetchState === 'loading') return <LoadingScreen />;
+  if (fetchState === "loading") return <LoadingScreen />;
   return <Outlet />;
 };
 

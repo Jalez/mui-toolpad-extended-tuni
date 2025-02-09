@@ -1,187 +1,105 @@
 /** @format */
 
-import { ReactNode, useEffect, useState } from 'react';
-import { DashboardLayout, Navigation, Router, Session } from '@toolpad/core';
-import { AppProvider } from '@toolpad/core/react-router-dom';
-import { useNavigationStore } from './store/useNavigationStore';
-import { useUserStore } from './store/useUserStore';
-import useCourseStore from './store/useCourseStore';
-import useCustomRouter from './hooks/useCustomRouter';
-import { Logo } from './components/Logo';
-import { addIcons } from './components/tools/addIcons';
-import { addActions } from './components/tools/addActions';
-import Notifications from './components/Notifications';
-import { useNotificationStore } from './store/useNotificationsStore';
-import { SnackbarProvider } from 'notistack';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
+import { ReactNode, useEffect, useState, useMemo } from "react";
+import { DashboardLayout, Router, Session } from "@toolpad/core";
+import { AppProvider } from "@toolpad/core/react-router-dom";
+import { useNavigationStore } from "./components/Navigation/store/useNavigationStore";
+import { useUserStore } from "./store/useUserStore";
+import useCustomRouter from "./hooks/useCustomRouter";
+import { addIcons } from "./components/tools/addIcons";
+import { addActions } from "./components/tools/addActions";
+import Notifications from "./components/Notifications/Notifications";
+import { SnackbarProvider } from "notistack";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 
-import { SizableContentHeader } from './layout/breadcrumbs/SizableContentHeader';
-import SidebarFooter from './components/sidebar/Footer';
-import { ToolbarAccount } from './components/Toolbars/AppToolbar/Account';
-import { CustomActions } from './components/Toolbars/AppToolbar/Actions';
-import Dialogs from './components/Dialogs/Dialogs';
-import { useThemeStore } from './store/useThemeStore';
-import { createTheme, Theme } from '@mui/material';
+import { Logo } from "./layout/Toolbars/AppToolbar/Logo";
+import { ToolbarAccount } from "./layout/Toolbars/AppToolbar/Account";
+import { PageToolbar } from "./layout/Toolbars/PageToolbar/PageToolbar";
+import SidebarFooter from "./layout/sidebar/Footer";
+import AuthenticationManager from "./components/AuthenticationManager";
+import CourseManager from "./components/Courses/CourseManager";
+
+import Dialogs from "./components/Dialogs/Dialogs";
+import { useThemeStore } from "./store/useThemeStore";
+import { createTheme, Theme } from "@mui/material";
+import RegisteredAppTools from "./layout/Toolbars/AppToolbar/RegisteredAppTools";
+import PageContent from "./layout/Content/PageContent";
 
 export interface EduMLProviderProps {
   children?: ReactNode;
-  // Add other props here
 }
 
 /**
- * Main provider component for the LMS system.
+ * LMSProvider Component
  *
- * @version 2.1.0
+ * @version 3.0.0
  * @breaking-changes
- * - Renamed from EduMLProvider to LMSProvider
- * - Updated authentication handling for course instances
- * - Added support for course code level navigation
- * - Improved context sharing between microservices
+ * - Complete architectural restructuring for better separation of concerns
+ * - Removed direct course management (now handled by CourseManager)
+ * - Simplified authentication handling (now handled by AuthenticationManager)
+ * - Improved theme management with consistent application
+ * - Enhanced layout structure with PageContent and PageToolbar components
+ * - Removed direct message handling (now managed by respective components)
+ *
+ * Main application provider that sets up:
+ * - Authentication context
+ * - Theme provider
+ * - Navigation structure
+ * - Basic app layout
+ * - Router integration
  *
  * @example
  * ```tsx
  * <BrowserRouter>
  *   <LMSProvider>
- *     {children}
+ *     <YourApp />
  *   </LMSProvider>
  * </BrowserRouter>
  * ```
  */
 const LMSProvider = ({ children }: EduMLProviderProps) => {
-  // const createdTheme = createTheme(ThemeTemplate);
-  const [loggingIn, setLoggingIn] = useState(false);
   const { user, getUser, logout } = useUserStore();
-  const { currentCourse, getCourses, setCurrentCourseUrl, getCourseByUrl } =
-    useCourseStore();
   const { navigation } = useNavigationStore();
   const router = useCustomRouter();
-  const [currentNavigation, setCurrentNavigation] = useState<Navigation | null>(
-    null
-  );
-  const [parentUrl, setParentUrl] = useState<string | null>(null);
-  const { addNotificationData } = useNotificationStore();
   const { theme } = useThemeStore();
-  const [lmsTheme, setLmsTheme] = useState<Theme>(createTheme(theme));
+  const [lmsTheme, setLmsTheme] = useState<Theme>(createTheme(theme as any));
 
-  // Fetch the user on mount and whenever loggingIn or currentCourse.id changes
+  // Update theme when it changes
   useEffect(() => {
-    getUser(currentCourse?.id);
-  }, [loggingIn, currentCourse?.id, getUser]);
-
-  useEffect(() => {
-    setLmsTheme(createTheme(theme));
+    setLmsTheme(createTheme(theme as any));
   }, [theme]);
 
-  // If user is known, fetch courses
-  useEffect(() => {
-    // if (user?.id) {
-    getCourses();
-    // }
-  }, [getCourses]);
-
-  // Update navigation once we have user and navigation data
-  useEffect(() => {
-    if (currentCourse?.id) {
-      setCurrentNavigation(
-        addActions(
-          addIcons(navigation),
-          currentCourse?.data?.myData?.role || ''
-        )
-      );
-    }
-  }, [navigation, user, currentCourse]);
-
-  useEffect(() => {
-    const messageHandler = async (event: MessageEvent) => {
-      const { url } = event.data;
-      if (url) {
-        setParentUrl(url);
-        setCurrentCourseUrl(url);
-
-        if (!user?.id) {
-          try {
-            await getCourseByUrl(url);
-          } catch (error) {
-            console.error('Failed to fetch course by URL:', error);
-          }
-        }
+  // Create session data for Toolpad
+  const userSessionData = user?.id
+    ? {
+        id: user.id,
+        name: user.name,
+        image:
+          user.image?.thumbnail ||
+          user.image?.medium ||
+          user.image?.large ||
+          "",
+        email: user.email,
       }
-    };
-
-    window.addEventListener('message', messageHandler);
-    return () => window.removeEventListener('message', messageHandler);
-  }, [user, getCourseByUrl, setCurrentCourseUrl]);
-
-  // After user returns from authentication and we have a user logged in, restore their location
-  useEffect(() => {
-    if (user?.id) {
-      const returnLocation = localStorage.getItem('returnLocation');
-      if (returnLocation) {
-        localStorage.removeItem('returnLocation');
-        window.location.href = returnLocation;
-      }
-    }
-  }, [user, router]);
-
-  const handleLogin = () => {
-    const current = window?.top || window;
-    setLoggingIn(true);
-    // Store current location before leaving
-    localStorage.setItem('returnLocation', parentUrl || window.location.href);
-
-    // Check if the current course has an LTI login URL
-    const loginUrl = currentCourse?.ltiLoginUrl;
-
-    if (loginUrl) {
-      current.location.href = loginUrl;
-    } else {
-      if (!currentCourse?.id) {
-        addNotificationData({
-          type: 'error',
-          message:
-            'Failed to login. Please select a course first so that the login URL can be retrieved.',
-        });
-      } else {
-        // Inform the user that the login URL is not available
-        addNotificationData({
-          type: 'error',
-          message: 'Login is not available. Please contact the course staff.',
-        });
-      }
-      setLoggingIn(false);
-    }
-  };
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error('Failed to logout:', error);
-      addNotificationData({
-        type: 'error',
-        message: 'Failed to logout. Please try again.',
-      });
-    }
-  };
-
-  let userSessionData = undefined;
-  if (user?.id) {
-    userSessionData = {
-      id: user?.id,
-      name: user?.name,
-      image:
-        user?.image?.thumbnail ||
-        user?.image?.medium ||
-        user?.image?.large ||
-        '',
-      email: user?.email,
-    };
-  }
+    : undefined;
 
   const session: Session = {
     user: userSessionData,
   };
+
+  // Add authentication handlers
+  const authentication = useMemo(
+    () => ({
+      signIn: async () => {
+        await getUser();
+      },
+      signOut: async () => {
+        await logout();
+      },
+    }),
+    [getUser, logout]
+  );
 
   return (
     <LocalizationProvider dateAdapter={AdapterLuxon}>
@@ -189,39 +107,55 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
         <AppProvider
           branding={{
             logo: <Logo />,
-            title: '',
+            title: "",
           }}
-          navigation={(currentCourse && currentNavigation) || []}
+          navigation={addActions(addIcons(navigation))}
           theme={lmsTheme}
           router={router as Router}
           session={session}
-          authentication={{
-            signIn: handleLogin,
-            signOut: handleLogout,
-          }}>
+          authentication={authentication}
+        >
+          <AuthenticationManager />
+          <CourseManager />
           <DashboardLayout
-            //No borders for dashboard layout
+            data-testid="dashboard-layout"
             border={false}
             sx={{
-              bgcolor: 'background.paper',
-              '& .MuiDrawer-paper': {
+              "& .MuiListItemIcon-root": {
+                paddingRight: "20px" + "!important",
+              },
+              bgcolor: "background.paper",
+              "& .MuiDrawer-paper": {
                 border: 0,
               },
-              //Navbar no border
-              '& .MuiAppBar-root': {
+              "& .MuiAppBar-root": {
                 borderBottom: 0,
+              },
+              "& .MuiContainer-root": {
+                display: "flex",
+                flexDirection: "column",
+                padding: 0,
+                margin: 0,
+                width: "100%",
+                maxWidth: "100%",
+              },
+              "& .MuiContainer-maxWidthLg": {
+                padding: 0,
+                margin: 0,
+                width: "100%",
+                paddingLeft: 1,
               },
             }}
             defaultSidebarCollapsed={true}
             maxWidth={true}
             slots={{
               toolbarAccount: ToolbarAccount,
-              toolbarActions: CustomActions,
+              toolbarActions: RegisteredAppTools,
               sidebarFooter: SidebarFooter,
-            }}>
-            <SizableContentHeader />
-
-            {children}
+            }}
+          >
+            <PageToolbar />
+            <PageContent>{children}</PageContent>
             <Dialogs />
             <Notifications />
           </DashboardLayout>

@@ -1,18 +1,15 @@
 /** @format */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { Route, Routes } from 'react-router-dom';
-import CourseInstanceLoader from '../Courses/CourseInstanceLoader';
-import CourseTools from '../Courses/CourseTools';
-import useCourseStore from '../../store/useCourseStore';
-import { useUserStore } from '../../store/useUserStore';
-import {
-  NavigationPageStoreItem,
-  useNavigationStore,
-} from '../../store/useNavigationStore';
-import CourseInstanceSelector from '../Courses/CourseInstanceSelector';
-import CourseCodeLoader from '../Courses/CourseCodeLoader';
+import { Route, Routes } from "react-router-dom";
+import CourseInstanceLoader from "../Courses/CourseInstanceLoader";
+import CourseTools from "../Courses/CourseTools";
+import useCourseStore from "../Courses/store/useCourseStore";
+import { useUserStore } from "../../store/useUserStore";
+import { NavigationPageStoreItem } from "../Navigation/store/useNavigationStore";
+import CourseInstanceSelector from "../Courses/CourseInstanceSelector";
+import CourseCodeLoader from "../Courses/CourseCodeLoader";
 
 export interface MicroserviceConfig {
   path: string;
@@ -61,7 +58,6 @@ const MicroserviceRoutes: React.FC<MicroserviceRoutesProps> = ({
 }) => {
   const { currentCourse, currentCourseCode, courses } = useCourseStore();
   const { user } = useUserStore();
-  const { updateCourseInstanceSection } = useNavigationStore();
   const [allMicroservicesNavigation, setAllMicroservicesNavigation] = useState<
     NavigationPageStoreItem[]
   >([]);
@@ -76,17 +72,17 @@ const MicroserviceRoutes: React.FC<MicroserviceRoutesProps> = ({
   useEffect(() => {
     // If we have a current course, use that for microservice navigation
     if (currentCourse?.id && user) {
-      const isTeacher = currentCourse.data?.myData?.role === 'teacher';
+      const isTeacher = currentCourse.data?.myData?.role === "teacher";
       const buildMicroServiceNavigation: NavigationPageStoreItem[] = [];
       microservices.forEach((ms) => {
-        if (ms.buildNavigation && typeof ms.buildNavigation === 'function') {
+        if (ms.buildNavigation && typeof ms.buildNavigation === "function") {
           const microserviceNavigation = ms.buildNavigation(
             currentCourse.id,
             isTeacher
           );
           buildMicroServiceNavigation.push(...microserviceNavigation);
           if (currentCourse.services?.includes(ms.path)) {
-            updateCourseInstanceSection(currentCourse, microserviceNavigation);
+            // updateCourseInstanceSection(currentCourse, microserviceNavigation);
           }
         }
       });
@@ -94,18 +90,18 @@ const MicroserviceRoutes: React.FC<MicroserviceRoutesProps> = ({
     }
     // If we only have a course code, build basic navigation
     else if (currentCourseCode && user) {
-      console.log('Building navigation for course code:', currentCourseCode);
+      console.log("Building navigation for course code:", currentCourseCode);
       const matchingCourses = courses.filter(
         (course) => course.code === currentCourseCode
       );
-      console.log('Matching courses:', matchingCourses);
+      console.log("Matching courses:", matchingCourses);
 
       if (matchingCourses.length > 0) {
-        const isTeacher = currentCourse?.data?.myData?.role === 'teacher';
+        const isTeacher = currentCourse?.data?.myData?.role === "teacher";
         const buildMicroServiceNavigation: NavigationPageStoreItem[] = [];
 
         microservices.forEach((ms) => {
-          if (ms.buildNavigation && typeof ms.buildNavigation === 'function') {
+          if (ms.buildNavigation && typeof ms.buildNavigation === "function") {
             matchingCourses.forEach((course) => {
               if (course.services?.includes(ms.path)) {
                 const microserviceNavigation = ms.buildNavigation(
@@ -114,7 +110,7 @@ const MicroserviceRoutes: React.FC<MicroserviceRoutesProps> = ({
                 );
                 buildMicroServiceNavigation.push(...microserviceNavigation);
                 // Also update the course instance section
-                updateCourseInstanceSection(course, microserviceNavigation);
+                // updateCourseInstanceSection(course, microserviceNavigation);
               }
             });
           }
@@ -129,14 +125,14 @@ const MicroserviceRoutes: React.FC<MicroserviceRoutesProps> = ({
     courses,
     user,
     microservices,
-    updateCourseInstanceSection,
+    // updateCourseInstanceSection,
   ]);
 
   return (
     <Routes>
-      <Route path=':code' element={<CourseCodeLoader />}>
+      <Route path=":code" element={<CourseCodeLoader />}>
         <Route index element={<CourseInstanceSelector />} />
-        <Route path=':instance' element={<CourseInstanceLoader />}>
+        <Route path=":instance" element={<CourseInstanceLoader />}>
           <Route
             index
             element={<CourseTools microservices={allMicroservicesNavigation} />}

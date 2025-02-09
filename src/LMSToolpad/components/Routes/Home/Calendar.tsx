@@ -5,15 +5,13 @@ import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { usePanelStore } from '../../Common/Resizable/store/usePanelStore'; // added import
+import { usePanelStore } from '../../Common/Panel/Resizable/store/usePanelStore'; // added import
 import {
   useTheme,
   GlobalStyles,
   Box,
   Typography,
   IconButton,
-  ToggleButton,
-  ToggleButtonGroup,
   Tooltip,
 } from '@mui/material';
 import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
@@ -23,15 +21,29 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import TodayIcon from '@mui/icons-material/Today';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import { DateTime } from 'luxon';
+import { useSetSnapDimensions } from '../../Common/Panel/Resizable/Context/ResizeContext';
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import ViewWeekIcon from '@mui/icons-material/ViewWeek';
+import ViewDayIcon from '@mui/icons-material/ViewDay';
+import { SpeedDialButton } from '../../Common/SpeedDialButton';
 
 interface CalendarProps {
-  events: any[];
+  events: Array<{
+    title: string;
+    start: string;
+    end?: string; // Make end optional
+    backgroundColor?: string;
+    borderColor?: string;
+    textColor?: string;
+  }>;
 }
+
+type ViewMode = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
 
 const Calendar: React.FC<CalendarProps> = ({ events }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<any>(null);
-  const [calendarView, setCalendarView] = useState('dayGridMonth');
+  const [calendarView, setCalendarView] = useState<ViewMode>('dayGridMonth');
   const [manualSelection, setManualSelection] = useState(false);
   const [currentTitle, setCurrentTitle] = useState('');
   const { resizeMode } = usePanelStore(); // get resize mode state
@@ -40,6 +52,21 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
   const dragStartPos = useRef({ x: 0, scrollLeft: 0 });
   const scrollableRef = useRef<HTMLElement | null>(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  // const [dialOpen, setDialOpen] = useState(false);
+  const [showAllDaySlot, _] = useState(false);
+
+  const itemReelHeight = 200;
+  const itemReelWidth = 300; // Width of the course item
+
+  // Set snap dimensions for parent ResizablePanel
+  const setSnapDimensions = useSetSnapDimensions();
+
+  useEffect(() => {
+    setSnapDimensions({
+      width: itemReelWidth, // Account for padding
+      height: itemReelHeight,
+    });
+  }, [itemReelWidth, itemReelHeight, setSnapDimensions]);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -56,7 +83,7 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
           } else {
             view = 'timeGridDay';
           }
-          setCalendarView(view);
+          setCalendarView(view as ViewMode);
         }
       }
     });
@@ -103,7 +130,7 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
   };
 
   const changeView = (view: string) => {
-    setCalendarView(view);
+    setCalendarView(view as ViewMode);
     setManualSelection(true); // Mark that user manually changed view
     if (calendarRef.current) {
       calendarRef.current.getApi().changeView(view);
@@ -113,16 +140,6 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
   // Callback for FullCalendar datesSet event
   const handleDatesSet = (arg: any) => {
     setCurrentTitle(arg.view.title);
-  };
-
-  // Update changeView to handle ToggleButtonGroup changes if needed
-  const handleViewChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newView: string | null
-  ) => {
-    if (newView) {
-      changeView(newView);
-    }
   };
 
   const handleMouseDown = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -161,143 +178,209 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
     setAnchorEl(null);
   };
 
+  // Define view actions for SpeedDial
+  const viewActions = [
+    { icon: <CalendarMonthIcon />, name: 'Month', value: 'dayGridMonth' },
+    { icon: <ViewWeekIcon />, name: 'Week', value: 'timeGridWeek' },
+    { icon: <ViewDayIcon />, name: 'Day', value: 'timeGridDay' },
+  ];
+
+  const viewIcons = {
+    dayGridMonth: <CalendarMonthIcon />,
+    timeGridWeek: <ViewWeekIcon />,
+    timeGridDay: <ViewDayIcon />,
+  };
+
+  const handleEventDidMount = useCallback((info: any) => {
+    // Check both top-level and extendedProps for color values
+    const bg =
+      info.event.backgroundColor || info.event.extendedProps.backgroundColor;
+    const bd = info.event.borderColor || info.event.extendedProps.borderColor;
+    const txt = info.event.textColor || info.event.extendedProps.textColor;
+    if (bg) info.el.style.backgroundColor = bg;
+    if (bd) info.el.style.borderColor = bd;
+    if (txt) info.el.style.color = txt;
+  }, []);
+
   return (
-    <>
+    <Box
+      sx={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        pointerEvents: resizeMode ? 'none' : 'auto',
+        backgroundColor: theme.palette.background.paper,
+        color: theme.palette.text.primary,
+        // borderRadius: theme.shape.borderRadius,
+        padding: theme.spacing(2),
+        boxShadow: theme.shadows[2],
+      }}
+      ref={containerRef}>
       <GlobalStyles
         styles={{
-          '.fc': {
-            height: '100% !important',
+          '.fc .fc-day-today': {
+            backgroundColor: theme.palette.background.default + ' !important',
+            // color:
+            //   theme.palette.getContrastText(theme.palette.action.hover) +
+            //   ' !important',
           },
-          '.fc-view': {
-            height: '100% !important',
+          '.fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link, .fc-timegrid-slot-lane, .fc-timegrid-slot-lane-frame':
+            {
+              border: 'none !important',
+              boxShadow: 'none !important',
+              font: theme.typography.body2.fontFamily,
+            },
+          'fc-event-main-frame': {
+            backgroundColor: 'white' + ' !important',
+            // bgcolor: 'white',
           },
-          '.fc-scroller': {
-            height: '100% !important',
+          '.fc-theme-standard td, .fc-theme-standard th': {
+            border: 'none !important',
           },
-          '.fc-daygrid-body': {
-            height: '100% !important',
+          '.fc .fc-col-header-cell .fc-day .fc-day-mon .fc-day-past .fc-daygrid-day-frame, .fc .fc-daygrid-day-top, .fc .fc-daygrid-day-bg, .fc .fc-scrollgrid-liquid':
+            {
+              border: 'none !important',
+            },
+          td: {
+            border: 'none !important',
+            padding: 0,
+            //make the cells stylish
+            // '&:hover': {
+            //   backgroundColor: theme.palette.action.hover,
+            // },
+            //Make only that row change background color
           },
-          // Add styles for better appearance in small containers
-          '.fc-col-header-cell': {
-            padding: '4px',
+          // '.fc .fc-daygrid-body tr:hover': {
+          //   backgroundColor: theme.palette.action.hover + ' !important',
+          // },
+          '.fc .fc-daygrid-body tbody tr:hover > td': {
+            backgroundColor: theme.palette.action.hover + ' !important',
           },
-          '.fc-daygrid-day': {
-            padding: '2px',
+          '.fc-daygrid-row:hover': {
+            '& .fc-daygrid-day': {
+              backgroundColor: theme.palette.action.hover + ' !important',
+            },
           },
+          '.fc-timegrid-slot-lane:hover': {
+            backgroundColor: theme.palette.action.hover + ' !important',
+          },
+          '.fc-daygrid-day:hover': {
+            backgroundColor: theme.palette.action.hover + ' !important',
+          },
+          // Remove or comment out these styles that might override individual event colors
+          // '.fc-timegrid-event': {
+          //   backgroundColor: `${theme.palette.primary.dark} !important`,
+          //   borderColor: `${theme.palette.primary.main} !important`,
+          //   '& .fc-event-main': {
+          //     backgroundColor: 'transparent !important',
+          //     color: `${theme.palette.primary.contrastText} !important`,
+          //   },
+          // },
         }}
       />
+      {/* Custom header styled similar to CourseHeaderActions */}
       <Box
         sx={{
-          width: '100%',
-          height: '100%',
           display: 'flex',
-          flexDirection: 'column',
-          pointerEvents: resizeMode ? 'none' : 'auto',
-        }}
-        ref={containerRef}>
-        {/* Custom header styled similar to CourseHeaderActions */}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mb: 1,
-            px: 1,
-          }}>
-          {/* Left controls with IconButtons */}
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Tooltip title='Previous'>
-              <IconButton size='small' onClick={handlePrev}>
-                <ChevronLeftIcon fontSize='small' />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Go to today'>
-              <IconButton size='small' onClick={handleToday}>
-                <TodayIcon fontSize='small' />
-              </IconButton>
-            </Tooltip>
-            <Tooltip title='Select date'>
-              <IconButton
-                size='small'
-                onClick={(e) => setAnchorEl(e.currentTarget)}>
-                <CalendarMonthIcon fontSize='small' />
-              </IconButton>
-            </Tooltip>
-            {anchorEl && (
-              <Popover
-                open={Boolean(anchorEl)}
-                anchorEl={anchorEl}
-                onClose={() => setAnchorEl(null)}
-                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
-                <StaticDatePicker
-                  displayStaticWrapperAs='desktop'
-                  value={null}
-                  onChange={handleDateSelect}
-                />
-              </Popover>
-            )}
-            <Tooltip title='Next'>
-              <IconButton size='small' onClick={handleNext}>
-                <ChevronRightIcon fontSize='small' />
-              </IconButton>
-            </Tooltip>
-          </Box>
-          {/* Center title */}
-          <Typography variant='subtitle1' component='div'>
-            {currentTitle}
-          </Typography>
-          {/* Right controls as a ToggleButtonGroup */}
-          <ToggleButtonGroup
-            value={calendarView}
-            exclusive
-            onChange={handleViewChange}
-            size='small'
-            color='primary'>
-            <ToggleButton value='dayGridMonth'>Month</ToggleButton>
-            <ToggleButton value='timeGridWeek'>Week</ToggleButton>
-            <ToggleButton value='timeGridDay'>Day</ToggleButton>
-          </ToggleButtonGroup>
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          mb: 1,
+          px: 1,
+        }}>
+        {/* Left controls with IconButtons */}
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Tooltip title='Previous'>
+            <IconButton size='small' onClick={handlePrev}>
+              <ChevronLeftIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Go to today'>
+            <IconButton size='small' onClick={handleToday}>
+              <TodayIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title='Select date'>
+            <IconButton
+              size='small'
+              onClick={(e) => setAnchorEl(e.currentTarget)}>
+              <CalendarMonthIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
+          {/* <Tooltip title='Toggle all-day slot'>
+            <IconButton
+              size='small'
+              onClick={() => setShowAllDaySlot((v) => !v)}>
+              <CalendarMonthIcon fontSize='small' />
+            </IconButton>
+          </Tooltip> */}
+          {anchorEl && (
+            <Popover
+              open={Boolean(anchorEl)}
+              anchorEl={anchorEl}
+              onClose={() => setAnchorEl(null)}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
+              <StaticDatePicker
+                displayStaticWrapperAs='desktop'
+                value={null}
+                onChange={handleDateSelect}
+              />
+            </Popover>
+          )}
+          <Tooltip title='Next'>
+            <IconButton size='small' onClick={handleNext}>
+              <ChevronRightIcon fontSize='small' />
+            </IconButton>
+          </Tooltip>
         </Box>
-        <Box
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseLeave}
-          sx={{
-            flex: 1,
-            minHeight: 0,
-            overflow: 'hidden',
-            '& .fc-scroller-liquid-absolute': {
-              cursor: 'grab',
-              '&:active': {
-                cursor: 'grabbing',
-              },
-            },
-          }}>
-          <FullCalendar
-            ref={calendarRef}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-            initialView={calendarView}
-            events={events}
-            height='100%'
-            headerToolbar={false}
-            eventBackgroundColor={theme.palette.primary.light}
-            eventBorderColor={theme.palette.primary.dark}
-            eventTextColor={theme.palette.getContrastText(
-              theme.palette.primary.light
-            )}
-            datesSet={handleDatesSet}
-            editable={false}
-            selectable={false}
-            slotMinTime='00:00:00'
-            slotMaxTime='24:00:00'
-            expandRows={true}
-            handleWindowResize={true}
-          />
-        </Box>
+        {/* Center title */}
+        <Typography variant='subtitle1' component='div'>
+          {currentTitle}
+        </Typography>
+        <SpeedDialButton
+          actions={viewActions}
+          value={calendarView}
+          onChange={changeView}
+          icons={viewIcons}
+          openIcon={<MoreHorizIcon />}
+        />
       </Box>
-    </>
+      <Box
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        sx={{
+          flex: 1,
+          minHeight: 0,
+          overflow: 'hidden',
+          '& .fc-scroller-liquid-absolute': {
+            cursor: 'grab',
+            '&:active': {
+              cursor: 'grabbing',
+            },
+          },
+        }}>
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          initialView={calendarView}
+          events={events}
+          eventDidMount={handleEventDidMount} // <-- New callback added
+          height='100%'
+          headerToolbar={false}
+          datesSet={handleDatesSet}
+          editable={false}
+          selectable={false}
+          slotMinTime='00:00:00'
+          slotMaxTime='24:00:00'
+          expandRows={true}
+          handleWindowResize={true}
+          allDaySlot={showAllDaySlot}
+        />
+      </Box>
+    </Box>
   );
 };
 

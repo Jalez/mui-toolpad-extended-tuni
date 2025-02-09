@@ -9,19 +9,17 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Button,
-} from '@mui/material';
-import SettingsIcon from '@mui/icons-material/Settings';
-import InfoIcon from '@mui/icons-material/Info';
-import PersonAddIcon from '@mui/icons-material/PersonAdd';
-import SchoolIcon from '@mui/icons-material/School';
-import TranslateIcon from '@mui/icons-material/Translate';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import GroupIcon from '@mui/icons-material/Group';
-import StarsIcon from '@mui/icons-material/Stars';
-import GroupAddIcon from '@mui/icons-material/GroupAdd'; // Add this import
-import { useState, MouseEvent } from 'react';
-import { Course } from '../../store/useCourseStore';
+} from "@mui/material";
+import SettingsIcon from "@mui/icons-material/Settings";
+import InfoIcon from "@mui/icons-material/Info";
+import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import SchoolIcon from "@mui/icons-material/School";
+import TranslateIcon from "@mui/icons-material/Translate";
+import GroupIcon from "@mui/icons-material/Group";
+import StarsIcon from "@mui/icons-material/Stars";
+import GroupAddIcon from "@mui/icons-material/GroupAdd"; // Add this import
+import { useState, MouseEvent } from "react";
+import { Course } from "./store/useCourseStore";
 
 type CourseHeaderActionsProps = {
   course: Course;
@@ -56,19 +54,21 @@ export const CourseHeaderActions = ({
   };
 
   return (
-    <Box sx={{ display: 'flex', gap: 1 }}>
+    <Box sx={{ display: "flex", gap: 1 }}>
       {showEnrollmentOpen && (
         <>
           <Tooltip
-            title={isTeacher ? 'Manage enrollments' : 'Enroll in course'}>
+            title={isTeacher ? "Manage enrollments" : "Enroll in course"}
+          >
             <IconButton
-              size='small'
-              color='success'
+              size="small"
+              color="success"
               onClick={(e) => {
                 e.stopPropagation();
                 setEnrollAnchor(e.currentTarget);
               }}
-              sx={{ width: 28, height: 28, padding: 0 }}>
+              sx={{ width: 28, height: 28, padding: 0 }}
+            >
               {isTeacher ? (
                 <GroupAddIcon sx={{ fontSize: 18 }} />
               ) : (
@@ -83,43 +83,46 @@ export const CourseHeaderActions = ({
               event.stopPropagation();
               setEnrollAnchor(null);
             }}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            transformOrigin={{ vertical: "bottom", horizontal: "center" }}
+          >
             <MenuItem dense disabled>
               <ListItemIcon>
-                <GroupIcon fontSize='small' />
+                <GroupIcon fontSize="small" />
               </ListItemIcon>
               <ListItemText
                 primary={`${course.data?.enrollmentData?.length || 0}/${course.enrollment?.status.maxStudents} enrolled`}
-                primaryTypographyProps={{ variant: 'body2' }}
+                primaryTypographyProps={{ variant: "body2" }}
               />
             </MenuItem>
             <Divider />
             <MenuItem dense onClick={handleEnrollClick}>
-              {isTeacher ? 'Manage Student Enrollments' : 'Enroll Now'}
+              {isTeacher ? "Manage Student Enrollments" : "Enroll Now"}
             </MenuItem>
           </Menu>
         </>
       )}
       {isTeacher && (
-        <Tooltip title='Course settings'>
+        <Tooltip title="Course settings">
           <IconButton
-            size='small'
+            size="small"
             onClick={onSettingsClick}
-            sx={{ color: courseColor, width: 28, height: 28, padding: 0 }}>
+            sx={{ color: courseColor, width: 28, height: 28, padding: 0 }}
+          >
             <SettingsIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
       )}
       <>
-        <Tooltip title='Course details'>
+        <Tooltip title="Course details">
           <IconButton
-            size='small'
+            size="small"
             onClick={(e) => {
               e.stopPropagation();
               setInfoAnchor(e.currentTarget);
             }}
-            sx={{ color: courseColor, width: 28, height: 28, padding: 0 }}>
+            sx={{ color: courseColor, width: 28, height: 28, padding: 0 }}
+          >
             <InfoIcon sx={{ fontSize: 18 }} />
           </IconButton>
         </Tooltip>
@@ -130,33 +133,34 @@ export const CourseHeaderActions = ({
             event.stopPropagation();
             setInfoAnchor(null);
           }}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          transformOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          transformOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
           <MenuItem dense disabled>
             <ListItemIcon>
-              <SchoolIcon fontSize='small' />
+              <SchoolIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText
               primary={course.studyModule?.level}
-              primaryTypographyProps={{ variant: 'body2' }}
+              primaryTypographyProps={{ variant: "body2" }}
             />
           </MenuItem>
           <MenuItem dense disabled>
             <ListItemIcon>
-              <StarsIcon fontSize='small' />
+              <StarsIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText
               primary={`${course.studyModule?.credits} credits`}
-              primaryTypographyProps={{ variant: 'body2' }}
+              primaryTypographyProps={{ variant: "body2" }}
             />
           </MenuItem>
           <MenuItem dense disabled>
             <ListItemIcon>
-              <TranslateIcon fontSize='small' />
+              <TranslateIcon fontSize="small" />
             </ListItemIcon>
             <ListItemText
               primary={course.language}
-              primaryTypographyProps={{ variant: 'body2' }}
+              primaryTypographyProps={{ variant: "body2" }}
             />
           </MenuItem>
         </Menu>

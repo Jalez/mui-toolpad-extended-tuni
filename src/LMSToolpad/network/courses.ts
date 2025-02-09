@@ -1,23 +1,44 @@
 /** @format */
 
-import { Course, CourseRaw } from '../store/useCourseStore';
-import axios from './axiosConfig';
+import { Course, CourseRaw } from "../components/Courses/store/useCourseStore";
+import axios from "./axiosConfig";
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from '../utils/caseConverter';
+} from "../utils/caseConverter";
+
+const cache = new Map<string, { timestamp: number; data: any }>();
+const CACHE_TTL = 300000; // 5 minutes TTL
+
+/**
+ * Helper to fetch with caching
+ */
+async function fetchWithCache<T>(
+  key: string,
+  fetchFn: () => Promise<T>
+): Promise<T> {
+  const cached = cache.get(key);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data as T;
+  }
+  const data = await fetchFn();
+  cache.set(key, { timestamp: Date.now(), data });
+  return data;
+}
 
 /**
  * @description Helper function to make a GET request to retrieve the current course
  * @returns Promise<Course> - The current course object
  */
 export async function getCurrentCourse(): Promise<Course> {
-  try {
-    const response = await axios.get('api/courses/current/');
-    return convertObjectKeysToCamelCase(response.data);
-  } catch (error) {
-    throw new Error('Failed to retrieve current course: ' + error);
-  }
+  return fetchWithCache("getCurrentCourse", async () => {
+    try {
+      const response = await axios.get("api/courses/current/");
+      return convertObjectKeysToCamelCase(response.data) as Course;
+    } catch (error) {
+      throw new Error("Failed to retrieve current course: " + error);
+    }
+  });
 }
 
 /**
@@ -26,12 +47,14 @@ export async function getCurrentCourse(): Promise<Course> {
  * @returns Promise<Course[]> - The list of courses
  */
 export async function getCourses(): Promise<Course[]> {
-  try {
-    const response = await axios.get('api/courses/');
-    return convertObjectKeysToCamelCase(response.data);
-  } catch (error) {
-    throw new Error('Failed to retrieve courses: ' + error);
-  }
+  return fetchWithCache("getCourses", async () => {
+    try {
+      const response = await axios.get("api/courses/");
+      return convertObjectKeysToCamelCase(response.data) as Course[];
+    } catch (error) {
+      throw new Error("Failed to retrieve courses: " + error);
+    }
+  });
 }
 
 /**
@@ -40,12 +63,15 @@ export async function getCourses(): Promise<Course[]> {
  * @returns Promise<Course> - The course object
  */
 export async function getCourseById(courseId: string): Promise<Course> {
-  try {
-    const response = await axios.get(`api/courses/${courseId}`);
-    return convertObjectKeysToCamelCase(response.data);
-  } catch (error) {
-    throw new Error('Failed to retrieve course: ' + error);
-  }
+  const cacheKey = `getCourseById_${courseId}`;
+  return fetchWithCache(cacheKey, async () => {
+    try {
+      const response = await axios.get(`api/courses/${courseId}`);
+      return convertObjectKeysToCamelCase(response.data) as Course;
+    } catch (error) {
+      throw new Error("Failed to retrieve course: " + error);
+    }
+  });
 }
 
 /**
@@ -54,16 +80,21 @@ export async function getCourseById(courseId: string): Promise<Course> {
  * @returns Promise<Course> - The course object
  */
 export async function getCourseByUrl(url: string): Promise<Course> {
-  try {
-    //use base64 encoding to encode the url
-    const encodedUrl = btoa(url);
-    const response = await axios.get(`api/courses/?encoded_url=${encodedUrl}`);
-    // ?url=${encodeURIComponent(url)}
-    //THIS IS EVIL: WE SHOULD NOT TAKE THE FIRST ELEMENT OF THE ARRAY
-    return convertObjectKeysToCamelCase(response.data[0]);
-  } catch (error) {
-    throw new Error('Failed to retrieve course by URL: ' + error);
-  }
+  const encodedUrl = btoa(url);
+  const cacheKey = `getCourseByUrl_${encodedUrl}`;
+  return fetchWithCache(cacheKey, async () => {
+    try {
+      const response = await axios.get(
+        `api/courses/?encoded_url=${encodedUrl}`
+      );
+      if (!Array.isArray(response.data) || response.data.length === 0) {
+        throw new Error("Course not found");
+      }
+      return convertObjectKeysToCamelCase(response.data[0] as Course);
+    } catch (error) {
+      throw new Error("Failed to retrieve course by URL: " + error);
+    }
+  });
 }
 
 /**
@@ -74,10 +105,10 @@ export async function getCourseByUrl(url: string): Promise<Course> {
  */
 export async function addCourse(courseData: CourseRaw): Promise<Course> {
   try {
-    const response = await axios.post('api/courses/', courseData);
-    return convertObjectKeysToCamelCase(response.data);
+    const response = await axios.post("api/courses/", courseData);
+    return convertObjectKeysToCamelCase(response.data) as Course;
   } catch (error) {
-    throw new Error('Failed to add a new course: ' + error);
+    throw new Error("Failed to add a new course: " + error);
   }
 }
 
@@ -91,11 +122,11 @@ export const updateCourse = async (course: Course): Promise<Course> => {
   const courseWithDataProcessing = {
     ...course,
     dataProcessing: course.dataProcessing || {
-      purposes: ['course_delivery', 'assessment'],
+      purposes: ["course_delivery", "assessment"],
       retention: 365,
       thirdPartyProcessors: [],
       specialCategories: false,
-      legalBasis: 'consent',
+      legalBasis: "consent",
     },
   };
 
@@ -108,7 +139,7 @@ export const updateCourse = async (course: Course): Promise<Course> => {
 
     const updatedCourse = convertObjectKeysToCamelCase(response.data);
 
-    return updatedCourse;
+    return updatedCourse as Course;
   } catch (error) {
     throw new Error(`Failed to update the course: ${error}`);
   }
@@ -122,8 +153,8 @@ export const updateCourse = async (course: Course): Promise<Course> => {
 export async function deleteCourse(courseId: string): Promise<Course> {
   try {
     const response = await axios.delete(`api/chat/courses/${courseId}`);
-    return convertObjectKeysToCamelCase(response.data);
+    return convertObjectKeysToCamelCase(response.data) as Course;
   } catch (error) {
-    throw new Error('Failed to delete the course: ' + error);
+    throw new Error("Failed to delete the course: " + error);
   }
 }

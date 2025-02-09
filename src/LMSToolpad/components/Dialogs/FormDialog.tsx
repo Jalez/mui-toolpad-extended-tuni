@@ -94,11 +94,8 @@ const FormDialog: React.FC<FormDialogProps> = ({
             </Box>
             <DialogActions
               sx={{
-                px: 0,
                 borderTop: 1,
                 borderColor: 'divider',
-                m: 0,
-                p: 0,
               }}>
               <Button onClick={handleClose}>Cancel</Button>
               <Button

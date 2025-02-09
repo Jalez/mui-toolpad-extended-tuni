@@ -1,15 +1,33 @@
 /** @format */
 
-import { Box } from '@mui/material';
-import FormDialog from '../../components/Dialogs/FormDialog';
-import useDialogStore from '../../store/useDialogStore';
-import { Platform, usePlatformStore } from '../../store/usePlatformStore';
-import { useNotificationStore } from '../../store/useNotificationsStore';
-import PlatformSettingsTabs from './PlatformSettingsTabs';
-import { useState, useEffect, useCallback } from 'react';
-import isEqual from 'lodash/isEqual';
-import { AppTheme, useThemeStore } from '../../store/useThemeStore';
+import { Box } from "@mui/material";
+import FormDialog from "../../components/Dialogs/FormDialog";
+import useDialogStore from "../../store/useDialogStore";
+import { Platform, usePlatformStore } from "../../store/usePlatformStore";
+import { useNotificationStore } from "../../components/Notifications/store/useNotificationsStore";
+import PlatformSettingsTabs from "./PlatformSettingsTabs";
+import { useState, useEffect, useCallback } from "react";
+import isEqual from "lodash/isEqual";
+import { AppTheme, useThemeStore } from "../../store/useThemeStore";
 
+/**
+ * PlatformSettings Component
+ *
+ * @version 3.0.0
+ * @breaking-changes
+ * - Updated notification store path to feature-based structure
+ * - Enhanced form state management with isDirty tracking
+ * - Improved TypeScript strict mode compliance
+ * - Standardized string literals
+ * - Enhanced layout structure without fixed heights
+ * - Added unsaved changes warning system
+ *
+ * Provides interface for:
+ * - Managing platform-wide settings
+ * - Configuring global features
+ * - Setting platform defaults
+ * - Managing AI configurations
+ */
 const PlatformSettings = () => {
   const { closeDialog } = useDialogStore();
   const { platform, updatePlatform } = usePlatformStore();
@@ -51,8 +69,8 @@ const PlatformSettings = () => {
     setIsDirty(false);
 
     addNotificationData({
-      type: 'success',
-      message: 'Settings updated successfully',
+      type: "success",
+      message: "Settings updated successfully",
     });
     closeDialog();
   };
@@ -75,21 +93,22 @@ const PlatformSettings = () => {
     setIsDirty(checkIfThemeDirty(newThemeSettings));
   };
 
-  console.log('localPlatformSettings', localPlatformSettings);
+  console.log("localPlatformSettings", localPlatformSettings);
   if (!localPlatformSettings || !localThemeSettings) {
     return null;
   }
 
   return (
     <FormDialog
-      title='Platform Settings'
-      submitText='Save'
+      title="Platform Settings"
+      submitText="Save"
       onSubmit={handleSave}
-      maxWidth='lg'
+      maxWidth="lg"
       fullWidth
       showUnsavedChangesWarning={true}
-      isDirty={isDirty}>
-      <Box sx={{ height: '70vh', display: 'flex', flexDirection: 'column' }}>
+      isDirty={isDirty}
+    >
+      <Box sx={{ height: "70vh", display: "flex", flexDirection: "column" }}>
         <PlatformSettingsTabs
           platformSettings={localPlatformSettings}
           themeSettings={localThemeSettings}

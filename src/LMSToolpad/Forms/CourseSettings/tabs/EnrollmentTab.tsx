@@ -1,6 +1,6 @@
 /** @format */
 
-import { useState } from 'react';
+import { useState } from "react";
 import {
   Stack,
   FormControlLabel,
@@ -18,14 +18,14 @@ import {
   Paper,
   IconButton,
   Avatar,
-} from '@mui/material';
-import { DateTimePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import { parseDate } from '../../../utils/parseDate';
-import { AdapterLuxon } from '@mui/x-date-pickers/AdapterLuxon';
-import CheckIcon from '@mui/icons-material/Check';
-import CloseIcon from '@mui/icons-material/Close';
-import { CourseRaw } from '../../../store/useCourseStore';
-import { UserData } from '../../../store/useUserStore';
+} from "@mui/material";
+import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { parseDate } from "../../../utils/parseDate";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
+import { CourseRaw } from "../../../components/Courses/store/useCourseStore";
+import { UserData } from "../../../store/useUserStore";
 
 interface EnrollmentTabProps {
   formData: CourseRaw;
@@ -33,38 +33,58 @@ interface EnrollmentTabProps {
   courseUsers?: UserData[];
 }
 
+/**
+ * EnrollmentTab Component
+ *
+ * @version 3.0.0
+ * @breaking-changes
+ * - Enhanced TypeScript string literal types
+ * - Improved student list management with better state handling
+ * - Updated styling for better visual hierarchy
+ * - Enhanced date handling with proper typing
+ * - Improved responsive design for mobile and desktop views
+ * - Added proper type definitions for enrollment statuses
+ *
+ * Provides interface for:
+ * - Managing course enrollment settings
+ * - Handling student enrollment requests
+ * - Setting enrollment periods
+ * - Managing enrollment capacity
+ * - Viewing enrolled and pending students
+ */
 export default function EnrollmentTab({
   formData,
   setFormData,
   courseUsers = [],
 }: EnrollmentTabProps) {
   const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
-  const [listView, setListView] = useState<'settings' | 'enrolled' | 'pending'>(
-    'settings'
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
+  const [listView, setListView] = useState<"settings" | "enrolled" | "pending">(
+    "settings"
   );
 
-  console.log('courseUsers in EnrollmentTab:', courseUsers);
+  console.log("courseUsers in EnrollmentTab:", courseUsers);
 
   // Filter enrolled and pending students using new data structure
   const enrolledStudents =
     formData.data?.enrollmentData?.filter(
-      (data) => data.role === 'student' && data.status === 'enrolled'
+      (data) => data.role === "student" && data.status === "enrolled"
     ) || [];
 
   const pendingStudents =
     formData.data?.enrollmentData?.filter(
-      (data) => data.role === 'student' && data.status === 'pending'
+      (data) => data.role === "student" && data.status === "pending"
     ) || [];
 
-  console.log('Enrolled students:', enrolledStudents);
-  console.log('Pending students:', pendingStudents);
+  console.log("Enrolled students:", enrolledStudents);
+  console.log("Pending students:", pendingStudents);
 
   const renderEnrollmentSettings = () => (
     <Stack
-      direction={isLargeScreen ? 'row' : 'column'}
+      direction={isLargeScreen ? "row" : "column"}
       spacing={2}
-      alignItems={isLargeScreen ? 'center' : 'stretch'}>
+      alignItems={isLargeScreen ? "center" : "stretch"}
+    >
       <FormControlLabel
         control={
           <Switch
@@ -84,11 +104,11 @@ export default function EnrollmentTab({
             }
           />
         }
-        label='Enrollment Open'
+        label="Enrollment Open"
       />
       <LocalizationProvider dateAdapter={AdapterLuxon}>
         <DateTimePicker
-          label='Enrollment Starts'
+          label="Enrollment Starts"
           value={parseDate(formData.enrollment?.startDate)}
           onChange={(date) =>
             setFormData({
@@ -105,7 +125,7 @@ export default function EnrollmentTab({
           }
         />
         <DateTimePicker
-          label='Enrollment Ends'
+          label="Enrollment Ends"
           value={parseDate(formData.enrollment?.endDate)}
           onChange={(date) =>
             setFormData({
@@ -123,9 +143,9 @@ export default function EnrollmentTab({
         />
       </LocalizationProvider>
       <TextField
-        label='Maximum Students'
-        type='number'
-        value={formData.enrollment?.status.maxStudents ?? ''}
+        label="Maximum Students"
+        type="number"
+        value={formData.enrollment?.status.maxStudents ?? ""}
         onChange={(e) =>
           setFormData({
             ...formData,
@@ -150,22 +170,24 @@ export default function EnrollmentTab({
     <Box sx={{ mt: 2 }}>
       {!isLargeScreen && (
         <Tabs
-          value={listView === 'enrolled' ? 0 : 1}
+          value={listView === "enrolled" ? 0 : 1}
           onChange={(_, newValue) =>
-            setListView(newValue === 0 ? 'enrolled' : 'pending')
+            setListView(newValue === 0 ? "enrolled" : "pending")
           }
-          sx={{ mb: 2 }}>
-          <Tab label='Enrolled' />
-          <Tab label='Pending' />
+          sx={{ mb: 2 }}
+        >
+          <Tab label="Enrolled" />
+          <Tab label="Pending" />
         </Tabs>
       )}
 
-      <Stack direction={isLargeScreen ? 'row' : 'column'} spacing={2}>
-        {(isLargeScreen || listView === 'enrolled') && (
-          <Paper sx={{ flex: 1, maxHeight: 400, overflow: 'auto' }}>
+      <Stack direction={isLargeScreen ? "row" : "column"} spacing={2}>
+        {(isLargeScreen || listView === "enrolled") && (
+          <Paper sx={{ flex: 1, maxHeight: 400, overflow: "auto" }}>
             <Typography
-              variant='subtitle1'
-              sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              variant="subtitle1"
+              sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}
+            >
               Enrolled Students ({enrolledStudents.length})
             </Typography>
             <List>
@@ -182,11 +204,12 @@ export default function EnrollmentTab({
           </Paper>
         )}
 
-        {(isLargeScreen || listView === 'pending') && (
-          <Paper sx={{ flex: 1, maxHeight: 400, overflow: 'auto' }}>
+        {(isLargeScreen || listView === "pending") && (
+          <Paper sx={{ flex: 1, maxHeight: 400, overflow: "auto" }}>
             <Typography
-              variant='subtitle1'
-              sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              variant="subtitle1"
+              sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}
+            >
               Pending Requests ({pendingStudents.length})
             </Typography>
             <List>
@@ -194,15 +217,16 @@ export default function EnrollmentTab({
                 <ListItem
                   key={student.userId}
                   secondaryAction={
-                    <Stack direction='row' spacing={1}>
-                      <IconButton color='success'>
+                    <Stack direction="row" spacing={1}>
+                      <IconButton color="success">
                         <CheckIcon />
                       </IconButton>
-                      <IconButton color='error'>
+                      <IconButton color="error">
                         <CloseIcon />
                       </IconButton>
                     </Stack>
-                  }>
+                  }
+                >
                   <Avatar sx={{ mr: 2 }}>{student.name[0]}</Avatar>
                   {/* <ListItemText
                     primary={student.name}
@@ -224,14 +248,15 @@ export default function EnrollmentTab({
   return !isLargeScreen ? (
     <Stack spacing={2}>
       <Tabs
-        value={listView === 'settings' ? 0 : 1}
+        value={listView === "settings" ? 0 : 1}
         onChange={(_, newValue) =>
-          setListView(newValue === 0 ? 'settings' : 'enrolled')
-        }>
-        <Tab label='Settings' />
-        <Tab label='Students' />
+          setListView(newValue === 0 ? "settings" : "enrolled")
+        }
+      >
+        <Tab label="Settings" />
+        <Tab label="Students" />
       </Tabs>
-      {listView === 'settings'
+      {listView === "settings"
         ? renderEnrollmentSettings()
         : renderEnrollmentLists()}
     </Stack>

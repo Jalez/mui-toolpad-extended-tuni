@@ -1,19 +1,19 @@
-import { NavigationStoreItem, NavigationPageStoreItem } from "../../store/useNavigationStore";
+import {
+  NavigationStoreItem,
+  NavigationPageStoreItem,
+} from "../Navigation/store/useNavigationStore";
 import ActionFCWrapper from "./utils/ActionFCWrapper";
 
 /**
  * Processes a single navigation item
  */
-const processNavItem = (
-  item: NavigationStoreItem,
-  role: string,
-): NavigationStoreItem => {
+const processNavItem = (item: NavigationStoreItem): NavigationStoreItem => {
   if (item.kind !== "page") return item;
 
   // Process children recursively, ensuring only page items are included
-  const children = item.children?.map((child) =>
-    processNavItem(child, role)
-  ).filter((child): child is NavigationPageStoreItem => child.kind === "page");
+  const children = item.children
+    ?.map((child) => processNavItem(child))
+    .filter((child): child is NavigationPageStoreItem => child.kind === "page");
 
   // Create action from actionFC if present
   if (item?.actionFC) {
@@ -32,6 +32,5 @@ const processNavItem = (
  * Adds actions to navigation items based on their actionHandlers
  */
 export const addActions = (
-  navItems: NavigationStoreItem[],
-  role: string,
-): NavigationStoreItem[] => navItems.map((item) => processNavItem(item, role));
+  navItems: NavigationStoreItem[]
+): NavigationStoreItem[] => navItems.map((item) => processNavItem(item));

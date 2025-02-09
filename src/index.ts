@@ -3,11 +3,12 @@
 /**
  * @deprecated Use LMSProvider instead of EduMLProvider. Will be removed in version 2.0.0
  */
-export { default as EduMLProvider } from './LMSToolpad/EduMLProvider';
+export { default as EduMLProvider } from "./LMSToolpad/EduMLProvider";
 
-export { default as LMSProvider } from './LMSToolpad/LMSProvider';
+export { default as LMSProvider } from "./LMSToolpad/LMSProvider";
 
-export type { EduMLProviderProps } from './LMSToolpad/EduMLProvider';
+//as of v3, No longer exists
+// export type { EduMLProviderProps } from './LMSToolpad/EduMLProvider';
 
 // Re-export router dependencies that consumers might need
 export {
@@ -22,76 +23,76 @@ export {
   Navigate,
   Link,
   Outlet,
-} from 'react-router-dom';
-export * from './LMSToolpad/interfaces';
+} from "react-router-dom";
+export * from "./LMSToolpad/interfaces";
 
 /**
  * **STORES**
  */
-export * from './LMSToolpad/store/useCourseStore';
+export * from "./LMSToolpad/components/Courses/store/useCourseStore";
 
-export { default as useCourseStore } from './LMSToolpad/store/useCourseStore';
+export { default as useCourseStore } from "./LMSToolpad/components/Courses/store/useCourseStore";
 
-export { default as useDialogStore } from './LMSToolpad/store/useDialogStore';
+export { default as useDialogStore } from "./LMSToolpad/store/useDialogStore";
 
-export * from './LMSToolpad/store/useUserStore';
+export * from "./LMSToolpad/store/useUserStore";
 
-export * from './LMSToolpad/store/useNavigationStore';
+export * from "./LMSToolpad/components/Navigation/store/useNavigationStore";
 
-export * from './LMSToolpad/store/useNotificationsStore';
+export * from "./LMSToolpad/components/Notifications/store/useNotificationsStore";
 
 /**
  * **COMPONENTS**
  */
 
-export { default as Home } from './LMSToolpad/components/Routes/Home/Home';
+export { default as Home } from "./LMSToolpad/components/Routes/Home/Home";
 
-export { default as CourseTools } from './LMSToolpad/components/Courses/CourseTools';
+export { default as CourseTools } from "./LMSToolpad/components/Courses/CourseTools";
 
-export { default as LoadingScreen } from './LMSToolpad/components/LoadingScreen';
+export { default as LoadingScreen } from "./LMSToolpad/components/LoadingScreen";
 
-export { default as ToolSelector } from './LMSToolpad/components/Tool/ToolSelector';
-export type { ToolSelectorItem } from './LMSToolpad/components/Tool/ToolSelector';
+export { default as ToolSelector } from "./LMSToolpad/components/Tool/ToolSelector";
+export type { ToolSelectorItem } from "./LMSToolpad/components/Tool/ToolSelector";
 
-export { default as DialogOpener } from './LMSToolpad/components/Dialogs/DialogOpener';
+export { default as DialogOpener } from "./LMSToolpad/components/Dialogs/DialogOpener";
 
-export { default as FormDialog } from './LMSToolpad/components/Dialogs/FormDialog';
+export { default as FormDialog } from "./LMSToolpad/components/Dialogs/FormDialog";
 
-export { default as IconWithBadge } from './LMSToolpad/components/IconWithBadge';
+export { default as IconWithBadge } from "./LMSToolpad/components/IconWithBadge";
 
-export { default as ExtendedDialog } from './LMSToolpad/components/EduMLDialog';
+export { default as ExtendedDialog } from "./LMSToolpad/components/EduMLDialog";
 
-export { default as CenteredHeading } from './LMSToolpad/components/CenteredHeading';
+export { default as CenteredHeading } from "./LMSToolpad/components/CenteredHeading";
 
 /**
  * **TOOLS**
  */
 
-export { default as ErrorBoundary } from './LMSToolpad/tools/ErrorBoundary';
+export { default as ErrorBoundary } from "./LMSToolpad/tools/ErrorBoundary";
 
-export { default as NullStateWarning } from './LMSToolpad/tools/NullStateWarning';
+export { default as NullStateWarning } from "./LMSToolpad/tools/NullStateWarning";
 
 export {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from './LMSToolpad/utils/caseConverter';
+} from "./LMSToolpad/utils/caseConverter";
 
-export { default as MicroserviceRoutes } from './LMSToolpad/components/Microservices/MicroserviceRoutes';
-export type { MicroserviceConfig } from './LMSToolpad/components/Microservices/MicroserviceRoutes';
+export { default as MicroserviceRoutes } from "./LMSToolpad/components/Microservices/MicroserviceRoutes";
+export type { MicroserviceConfig } from "./LMSToolpad/components/Microservices/MicroserviceRoutes";
 
-export { buildMicroServiceNavigation } from './LMSToolpad/components/Microservices/MicroserviceNavigationBuilder';
-export type { BuildMicroServiceNavigationProps } from './LMSToolpad/components/Microservices/MicroserviceNavigationBuilder';
+export { buildMicroServiceNavigation } from "./LMSToolpad/components/Microservices/MicroserviceNavigationBuilder";
+export type { BuildMicroServiceNavigationProps } from "./LMSToolpad/components/Microservices/MicroserviceNavigationBuilder";
 
 /**
  * **NETWORK**
  */
 
-export { default as axios } from './LMSToolpad/network/axiosConfig';
+export { default as axios } from "./LMSToolpad/network/axiosConfig";
 
 /**
  * **CONSTANTS**
  */
 
-export { baseUrl } from './LMSToolpad/constants';
+export { baseUrl } from "./LMSToolpad/constants";
 
-export * from './LMSToolpad/interfaces';
+export * from "./LMSToolpad/interfaces";

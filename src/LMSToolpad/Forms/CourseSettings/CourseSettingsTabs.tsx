@@ -7,16 +7,16 @@ import {
   useMediaQuery,
   useTheme,
   Tooltip,
-} from '@mui/material';
-import { useState, useEffect } from 'react';
-import BasicInfoTab from './tabs/BasicInfoTab';
-import StaffTab from './tabs/StaffTab';
-import EnrollmentTab from './tabs/EnrollmentTab';
-import VisibilityTab from './tabs/VisibilityTab';
-import { CourseRaw } from '../../store/useCourseStore';
-import { UserData } from '../../store/useUserStore';
-import DataProcessingTab from './tabs/DataProcessingTab';
-import RelationshipsTab from './tabs/RelationshipsTab';
+} from "@mui/material";
+import { useState, useEffect } from "react";
+import BasicInfoTab from "./tabs/BasicInfoTab";
+import StaffTab from "./tabs/StaffTab";
+import EnrollmentTab from "./tabs/EnrollmentTab";
+import VisibilityTab from "./tabs/VisibilityTab";
+import { CourseRaw } from "../../components/Courses/store/useCourseStore";
+import { UserData } from "../../store/useUserStore";
+import DataProcessingTab from "./tabs/DataProcessingTab";
+import RelationshipsTab from "./tabs/RelationshipsTab";
 
 type CourseSettingsProps = {
   formData: CourseRaw;
@@ -31,7 +31,7 @@ export default function CourseSettingsTabs({
 }: CourseSettingsProps) {
   const theme = useTheme();
   const [tab, setTab] = useState(0);
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
 
   // Ensure dataProcessing is initialized when the form is first loaded
   useEffect(() => {
@@ -39,11 +39,11 @@ export default function CourseSettingsTabs({
       handleUpdateFormData({
         ...formData,
         dataProcessing: {
-          purposes: ['course_delivery', 'assessment'],
+          purposes: ["course_delivery", "assessment"],
           retention: 365,
           thirdPartyProcessors: [],
           specialCategories: false,
-          legalBasis: 'consent',
+          legalBasis: "consent",
         },
       });
     }
@@ -54,54 +54,61 @@ export default function CourseSettingsTabs({
       <Tabs
         value={tab}
         onChange={(_, newTab) => setTab(newTab)}
-        sx={{ borderBottom: 1, borderColor: 'divider' }}>
+        sx={{ borderBottom: 1, borderColor: "divider" }}
+      >
         {!isLargeScreen && (
           <Tooltip
-            title='Set the core details of your course. Add a title, description, course image, and tags.'
+            title="Set the core details of your course. Add a title, description, course image, and tags."
             arrow
             enterDelay={500}
-            enterNextDelay={100}>
-            <Tab label='Basic Info' />
+            enterNextDelay={100}
+          >
+            <Tab label="Basic Info" />
           </Tooltip>
         )}
         <Tooltip
-          title='Control who can see your course. Set visibility to public, enrolled users only, or private.'
+          title="Control who can see your course. Set visibility to public, enrolled users only, or private."
           arrow
           enterDelay={500}
-          enterNextDelay={100}>
-          <Tab label='Visibility' />
+          enterNextDelay={100}
+        >
+          <Tab label="Visibility" />
         </Tooltip>
         <Tooltip
-          title='Manage how students can join your course. Set enrollment periods and limits.'
+          title="Manage how students can join your course. Set enrollment periods and limits."
           arrow
           enterDelay={500}
-          enterNextDelay={100}>
-          <Tab label='Enrollment' />
+          enterNextDelay={100}
+        >
+          <Tab label="Enrollment" />
         </Tooltip>
         <Tooltip
-          title='Add or remove staff members who will help manage this course.'
+          title="Add or remove staff members who will help manage this course."
           arrow
           enterDelay={500}
-          enterNextDelay={100}>
-          <Tab label='Staff' />
+          enterNextDelay={100}
+        >
+          <Tab label="Staff" />
         </Tooltip>
         <Tooltip
-          title='Set data processing details. Define purposes, retention period, and legal basis.'
+          title="Set data processing details. Define purposes, retention period, and legal basis."
           arrow
           enterDelay={500}
-          enterNextDelay={100}>
-          <Tab label='Data Processing' />
+          enterNextDelay={100}
+        >
+          <Tab label="Data Processing" />
         </Tooltip>
         <Tooltip
-          title='Manage course relationships, prerequisites, and related courses'
+          title="Manage course relationships, prerequisites, and related courses"
           arrow
           enterDelay={500}
-          enterNextDelay={100}>
-          <Tab label='Relationships' />
+          enterNextDelay={100}
+        >
+          <Tab label="Relationships" />
         </Tooltip>
       </Tabs>
 
-      <Box sx={{ overflowY: 'auto', flex: 1, p: 1 }}>
+      <Box sx={{ overflowY: "auto", flex: 1, p: 1 }}>
         {/* Remove the Typography that was showing the description */}
         {!isLargeScreen && tab === 0 && (
           <BasicInfoTab

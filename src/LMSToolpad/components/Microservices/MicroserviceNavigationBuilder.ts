@@ -1,6 +1,6 @@
 /** @format */
 
-import { NavigationPageStoreItem } from '../../store/useNavigationStore';
+import { NavigationPageStoreItem } from "../Navigation/store/useNavigationStore";
 
 export type BuildMicroServiceNavigationProps = {
   segment: string;
@@ -56,7 +56,7 @@ export const buildMicroServiceNavigation = ({
   children,
 }: BuildMicroServiceNavigationProps): NavigationPageStoreItem[] => {
   const eduTestSegment: NavigationPageStoreItem = {
-    kind: 'page',
+    kind: "page",
     segment: segment,
     title: title,
     iconFC: icon,

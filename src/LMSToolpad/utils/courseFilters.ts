@@ -1,6 +1,6 @@
 /** @format */
 
-import { Course } from '../store/useCourseStore';
+import { Course } from "../components/Courses/store/useCourseStore";
 
 export type CourseGroups = {
   isStudent: Course[];
@@ -113,30 +113,45 @@ export const groupCoursesByActivity = (
 
 export const groupCoursesByEnrollment = (courses: Course[]): CourseGroups => {
   const now = new Date();
-
   return courses.reduce(
     (acc: CourseGroups, course) => {
       const hasEnded = course.endDate ? new Date(course.endDate) < now : false;
       const role = course.data?.myData?.role;
-      const isEnrolled = course.data?.myData?.status === 'enrolled';
+      const status = course.data?.myData?.status;
+      const isEnrolled = status === "enrolled";
+      let isHandled = false;
 
-      if (role === 'student' && isEnrolled) {
+      // Handle enrolled student courses
+      if (role === "student" && isEnrolled) {
         if (hasEnded) {
           acc.isStudentOld.push(course);
         } else {
           acc.isStudent.push(course);
         }
-      } else if (role === 'teacher') {
+        isHandled = true;
+      }
+
+      // Handle teacher courses
+      if (role === "teacher" && isEnrolled) {
         if (hasEnded) {
           acc.isTeacherOld.push(course);
         } else {
           acc.isTeacher.push(course);
         }
-      } else if (!hasEnded && course.visibility.mode === 'public') {
-        // Only add to available if the course:
-        // - hasn't ended
-        // - is public
-        // - user is not enrolled or teaching
+        isHandled = true;
+      }
+
+      // A course is available if:
+      // - It hasn't been handled as an enrolled course AND
+      // - It hasn't ended AND
+      // - It's public OR user has a pending/rejected enrollment
+      if (
+        !isHandled &&
+        !hasEnded &&
+        (course.visibility.mode === "public" ||
+          (role === "student" &&
+            (status === "pending" || status === "rejected")))
+      ) {
         acc.available.push(course);
       }
 

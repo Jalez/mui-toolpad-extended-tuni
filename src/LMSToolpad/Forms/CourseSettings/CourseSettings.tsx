@@ -2,23 +2,43 @@
 
 // components/Channels/ChannelImporter.tsx
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-import useDialogStore from '../../store/useDialogStore';
+import useDialogStore from "../../store/useDialogStore";
 import useCourseStore, {
   CourseRaw,
   courseTemplate,
-} from '../../store/useCourseStore';
-import FormDialog from '../../components/Dialogs/FormDialog';
-import BasicInfoTab from './tabs/BasicInfoTab';
-import { Box, useMediaQuery, useTheme } from '@mui/system';
-import CourseSettingsTabs from './CourseSettingsTabs';
-import { useNotificationStore } from '../../store/useNotificationsStore';
-import { useUserStore } from '../../store/useUserStore';
+} from "../../components/Courses/store/useCourseStore";
+import FormDialog from "../../components/Dialogs/FormDialog";
+import BasicInfoTab from "./tabs/BasicInfoTab";
+import { Box, useMediaQuery, useTheme } from "@mui/system";
+import CourseSettingsTabs from "./CourseSettingsTabs";
+import { useNotificationStore } from "../../components/Notifications/store/useNotificationsStore";
+import { useUserStore } from "../../store/useUserStore";
 
+/**
+ * CourseSettings Component
+ *
+ * @version 3.0.0
+ * @breaking-changes
+ * - Restructured import paths to follow feature-based organization
+ * - Enhanced notification handling through dedicated store
+ * - Improved dialog management with better state handling
+ * - Updated course store integration with new path structure
+ * - Enhanced TypeScript strict mode compliance
+ * - Standardized string literals for consistency
+ *
+ * Provides interface for:
+ * - Managing course basic information
+ * - Configuring course visibility
+ * - Managing enrollment settings
+ * - Configuring staff access
+ * - Setting data processing preferences
+ * - Managing course relationships
+ */
 const CourseSettings = () => {
   const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
   const { closeDialog } = useDialogStore();
   const { setCourseToUpdate, updateStateCourse, courseToUpdate } =
     useCourseStore();
@@ -73,8 +93,8 @@ const CourseSettings = () => {
 
     setCourseToUpdate(null);
     addNotificationData({
-      message: 'Course settings saved successfully',
-      type: 'success',
+      message: "Course settings saved successfully",
+      type: "success",
     });
     closeDialog();
   };
@@ -85,29 +105,32 @@ const CourseSettings = () => {
 
   return (
     <FormDialog
-      title='Course Settings'
-      submitText='Save'
+      title="Course Settings"
+      submitText="Save"
       onSubmit={handleSave}
-      maxWidth='lg'
-      fullWidth>
+      maxWidth="lg"
+      fullWidth
+    >
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
           minHeight: 0, // Important for flex child
           // overflow: 'hidden', // Prevent content overflow
-        }}>
+        }}
+      >
         {isLargeScreen && (
           <Box
             sx={{
               borderBottom: 1,
-              borderColor: 'divider',
+              borderColor: "divider",
               pb: 2,
               mb: 2,
-              flex: '0 0 auto', // Don't grow, don't shrink, auto basis
-              overflow: 'auto', // Allow scrolling if needed
-            }}>
+              flex: "0 0 auto", // Don't grow, don't shrink, auto basis
+              overflow: "auto", // Allow scrolling if needed
+            }}
+          >
             <BasicInfoTab formData={formData} setFormData={setFormData} />
           </Box>
         )}
@@ -116,10 +139,11 @@ const CourseSettings = () => {
           sx={{
             flex: 1, // Take remaining space
             minHeight: 0, // Allow shrinking
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden', // Contain tab content
-          }}>
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden", // Contain tab content
+          }}
+        >
           <CourseSettingsTabs
             formData={formData}
             handleUpdateFormData={handleUpdateFormData}

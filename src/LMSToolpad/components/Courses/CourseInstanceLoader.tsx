@@ -1,10 +1,10 @@
 /** @format */
 
-import { useEffect } from 'react';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import useCourseStore, { Course } from '../../store/useCourseStore';
-import { useNotificationStore } from '../../store/useNotificationsStore';
-import LoadingScreen from '../LoadingScreen';
+import { useEffect } from "react";
+import { Outlet, useNavigate, useParams } from "react-router-dom";
+import useCourseStore, { Course } from "./store/useCourseStore";
+import { useNotificationStore } from "../Notifications/store/useNotificationsStore";
+import LoadingScreen from "../LoadingScreen";
 
 /**
  * Component for loading specific course instance data.
@@ -31,12 +31,12 @@ const CourseInstanceLoader = () => {
     );
     if (foundCourse) {
       setCurrentCourse(foundCourse);
-    } else if (fetchState !== 'loading') {
+    } else if (fetchState !== "loading") {
       addNotificationData({
-        type: 'error',
-        message: 'Course Instance not found',
+        type: "error",
+        message: "Course Instance not found",
       });
-      navigate('/' + code);
+      navigate("/" + code);
     }
   }, [
     instance,
@@ -47,7 +47,7 @@ const CourseInstanceLoader = () => {
     navigate,
   ]);
 
-  if (fetchState === 'loading') return <LoadingScreen />;
+  if (fetchState === "loading") return <LoadingScreen />;
   return <Outlet />;
 };
 

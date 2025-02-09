@@ -1,12 +1,12 @@
 /** @format */
 
-import { Stack, Box, Divider, Typography } from '@mui/material';
-import { CourseRaw } from '../../../store/useCourseStore';
-import EditableText from '../../Components/Editables/EditableText';
-import EditableAutocomplete from '../../Components/Editables/EditableAutoComplete';
-import EditableImage from '../../Components/Editables/EditableImage';
-import EditableSelect from '../../Components/Editables/EditableSelect';
-import EditableNumber from '../../Components/Editables/EditableNumber';
+import { Stack, Box, Divider, Typography } from "@mui/material";
+import { CourseRaw } from "../../../components/Courses/store/useCourseStore";
+import EditableText from "../../Components/Editables/EditableText";
+import EditableAutocomplete from "../../Components/Editables/EditableAutoComplete";
+import EditableImage from "../../Components/Editables/EditableImage";
+import EditableSelect from "../../Components/Editables/EditableSelect";
+import EditableNumber from "../../Components/Editables/EditableNumber";
 
 interface BasicInfoTabProps {
   formData: CourseRaw;
@@ -18,28 +18,28 @@ export default function BasicInfoTab({
   setFormData,
 }: BasicInfoTabProps) {
   return (
-    <Box sx={{ minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ minHeight: 0, display: "flex", flexDirection: "column" }}>
       <Stack spacing={2} sx={{ minHeight: 0 }}>
-        <Stack direction='row' spacing={2} alignItems='flex-start'>
+        <Stack direction="row" spacing={2} alignItems="flex-start">
           <EditableImage
             value={formData.image?.large}
             onChange={(value) =>
               setFormData({
                 ...formData,
-                image: { large: value, medium: '', thumbnail: '' },
+                image: { large: value, medium: "", thumbnail: "" },
               })
             }
           />
 
           <Stack spacing={2} sx={{ flex: 1 }}>
             <EditableText
-              label='Course Code'
+              label="Course Code"
               value={formData.code}
               onChange={(value) => setFormData({ ...formData, code: value })}
             />
 
             <EditableText
-              label='Instance'
+              label="Instance"
               value={formData.instance}
               onChange={(value) =>
                 setFormData({ ...formData, instance: value })
@@ -47,13 +47,13 @@ export default function BasicInfoTab({
             />
 
             <EditableText
-              label='Title'
+              label="Title"
               value={formData.title}
               onChange={(value) => setFormData({ ...formData, title: value })}
             />
 
             <EditableText
-              label='Description'
+              label="Description"
               value={formData.description}
               onChange={(value) =>
                 setFormData({ ...formData, description: value })
@@ -62,7 +62,7 @@ export default function BasicInfoTab({
             />
 
             <EditableAutocomplete
-              label='Tags'
+              label="Tags"
               value={formData.tags || []}
               onChange={(newTags) =>
                 setFormData({ ...formData, tags: newTags })
@@ -70,8 +70,8 @@ export default function BasicInfoTab({
             />
 
             <EditableText
-              label='Language'
-              value={formData.language || ''}
+              label="Language"
+              value={formData.language || ""}
               onChange={(value) =>
                 setFormData({ ...formData, language: value })
               }
@@ -83,13 +83,13 @@ export default function BasicInfoTab({
 
       <Divider sx={{ my: 2 }} />
 
-      <Typography variant='h6' sx={{ mb: 2 }}>
+      <Typography variant="h6" sx={{ mb: 2 }}>
         Study Module Information
       </Typography>
       <Stack spacing={2}>
         <EditableText
-          label='Module Name'
-          value={formData.studyModule?.name || ''}
+          label="Module Name"
+          value={formData.studyModule?.name || ""}
           onChange={(value) =>
             setFormData({
               ...formData,
@@ -97,15 +97,15 @@ export default function BasicInfoTab({
                 ...formData.studyModule,
                 name: value,
                 credits: formData.studyModule?.credits || 5,
-                level: formData.studyModule?.level || 'basic',
+                level: formData.studyModule?.level || "basic",
               },
             })
           }
-          helperText='Name of the study module this course belongs to'
+          helperText="Name of the study module this course belongs to"
         />
 
         <EditableNumber
-          label='Credits'
+          label="Credits"
           value={formData.studyModule?.credits || 5}
           onChange={(value) =>
             setFormData({
@@ -113,34 +113,34 @@ export default function BasicInfoTab({
               studyModule: {
                 ...formData.studyModule,
                 credits: value,
-                name: formData.studyModule?.name || '',
-                level: formData.studyModule?.level || 'basic',
+                name: formData.studyModule?.name || "",
+                level: formData.studyModule?.level || "basic",
               },
             })
           }
-          helperText='Number of credits awarded for completing this course'
+          helperText="Number of credits awarded for completing this course"
         />
 
         <EditableSelect
-          label='Course Level'
-          value={formData.studyModule?.level || 'basic'}
+          label="Course Level"
+          value={formData.studyModule?.level || "basic"}
           onChange={(value) =>
             setFormData({
               ...formData,
               studyModule: {
                 ...formData.studyModule,
-                level: value as 'basic' | 'intermediate' | 'advanced',
+                level: value as "basic" | "intermediate" | "advanced",
                 credits: formData.studyModule?.credits || 5,
-                name: formData.studyModule?.name || '',
+                name: formData.studyModule?.name || "",
               },
             })
           }
           options={[
-            { value: 'basic', label: 'Basic' },
-            { value: 'intermediate', label: 'Intermediate' },
-            { value: 'advanced', label: 'Advanced' },
+            { value: "basic", label: "Basic" },
+            { value: "intermediate", label: "Intermediate" },
+            { value: "advanced", label: "Advanced" },
           ]}
-          helperText='The difficulty level of this course'
+          helperText="The difficulty level of this course"
         />
       </Stack>
     </Box>

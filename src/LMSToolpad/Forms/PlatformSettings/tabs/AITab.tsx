@@ -1,15 +1,48 @@
 /** @format */
-
-import { Stack } from '@mui/material';
-import { Platform } from '../../../store/usePlatformStore';
-import EditableText from '../../Components/Editables/EditableText';
-import EditableSwitch from '../../Components/Editables/EditableSwitch';
-import EditableNumber from '../../Components/Editables/EditableNumber';
-import { Box } from '@mui/system';
+import React, { useState } from "react";
+import { Stack, Button, Typography, Chip, Box, TextField } from "@mui/material";
+import { Platform } from "../../../store/usePlatformStore";
+import {
+  DndContext,
+  DragOverlay,
+  useDraggable,
+  useDroppable,
+  DragEndEvent,
+  DragStartEvent,
+} from "@dnd-kit/core";
+import EditableSwitch from "../../Components/Editables/EditableSwitch";
+import DraggableItem from "../../../components/Common/Panel/MovablePanel/DraggableItem";
 
 interface AITabProps {
   settings: Platform;
   onUpdate: (settings: Platform) => void;
+}
+
+// Droppable container component
+function DroppableArea({
+  id,
+  children,
+}: {
+  id: string;
+  children: React.ReactNode;
+}) {
+  const { setNodeRef } = useDroppable({ id });
+  return (
+    <Box
+      ref={setNodeRef}
+      sx={{
+        minHeight: 80,
+        p: 1,
+        border: "1px dashed",
+        borderColor: "divider",
+        borderRadius: 1,
+        display: "flex",
+        flexWrap: "wrap",
+      }}
+    >
+      {children}
+    </Box>
+  );
 }
 
 export default function AITab({ settings, onUpdate }: AITabProps) {
@@ -23,112 +56,244 @@ export default function AITab({ settings, onUpdate }: AITabProps) {
     onUpdate({ ...settings, ai: newAISettings });
   };
 
+  // Add Agent Configuration with empty assigned chips
+  const handleAddAgentConfig = () => {
+    const newConfigs = [
+      ...settings.ai.agentConfigurations,
+      { agent: "openai", assigned: [] },
+    ];
+    handleAIUpdate(["agentConfigurations"], newConfigs);
+  };
+
+  // List of assignable feature/moderation items remains
+  const assignableItems = [
+    { key: "autoGrading", label: "Auto Grading" },
+    { key: "plagiarismDetection", label: "Plagiarism Detection" },
+    { key: "contentGeneration", label: "Content Generation" },
+    { key: "studentAssistant", label: "Student Assistant" },
+    { key: "teacherAssistant", label: "Teacher Assistant" },
+    { key: "contentModeration", label: "Content Moderation" },
+    { key: "filterProfanity", label: "Filter Profanity" },
+  ];
+
+  // Compute available items: those not assigned to any agent config.
+  const assignedKeys = settings.ai.agentConfigurations.flatMap(
+    (c) => c.assigned
+  );
+  const availableItems = assignableItems.filter(
+    (item) => !assignedKeys.includes(item.key)
+  );
+
+  const [activeChip, setActiveChip] = useState<{
+    id: string;
+    label: string;
+  } | null>(null);
+
+  // onDragStart: set active chip from its id.
+  const handleDragStart = (event: DragStartEvent) => {
+    const { active } = event;
+    const activeId = active.id.toString();
+    // find chip label from assignableItems
+    const item = assignableItems.find((i) => `chip-${i.key}` === activeId);
+    if (item) setActiveChip({ id: activeId, label: item.label });
+    else {
+      // if chip comes from an agent droppable, its id will be "chip-{key}-agent-{index}"
+      const parts = activeId.split("-");
+      const key = parts[1];
+      const label = assignableItems.find((i) => i.key === key)?.label || key;
+      setActiveChip({ id: activeId, label });
+    }
+  };
+
+  // onDragEnd: determine drop target and update assignments.
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    const activeId = active.id.toString();
+    if (!over || !activeChip) {
+      setActiveChip(null);
+      return;
+    }
+    const overId = over.id.toString();
+    // Check if dropped into available items container.
+    if (overId === "available-items") {
+      // Remove chip from any agent it belongs to.
+      const newConfigs = settings.ai.agentConfigurations.map((config) => {
+        if (
+          config.assigned.includes(
+            activeChip!.id.replace("chip-", "").split("-")[0]
+          )
+        ) {
+          return {
+            ...config,
+            assigned: config.assigned.filter(
+              (k) => k !== activeChip!.id.replace("chip-", "").split("-")[0]
+            ),
+          };
+        }
+        return config;
+      });
+      handleAIUpdate(["agentConfigurations"], newConfigs);
+    } else if (overId.startsWith("agent-")) {
+      const agentIndex = parseInt(overId.replace("agent-", ""), 10);
+      if (isNaN(agentIndex)) return;
+      // Remove chip from any agent to avoid duplicates.
+      let newConfigs = settings.ai.agentConfigurations.map((config) => ({
+        ...config,
+        assigned: config.assigned.filter(
+          (k) => k !== activeChip!.id.replace("chip-", "").split("-")[0]
+        ),
+      }));
+      // Add chip to target agent if not already added.
+      const chipKey = activeChip.id.replace("chip-", "").split("-")[0];
+      if (!newConfigs[agentIndex].assigned.includes(chipKey)) {
+        newConfigs[agentIndex].assigned.push(chipKey);
+      }
+      handleAIUpdate(["agentConfigurations"], newConfigs);
+    }
+    setActiveChip(null);
+  };
+
+  // New agent form state
+  const [newAgent, setNewAgent] = useState({
+    agent: "",
+    modelName: "",
+    apiKey: "",
+    apiUrl: "",
+  });
+
+  const handleNewAgentChange = (
+    field: keyof typeof newAgent,
+    value: string
+  ) => {
+    setNewAgent((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveNewAgent = () => {
+    if (!newAgent.agent) return;
+    const newConfig = {
+      agent: newAgent.agent,
+      modelName: newAgent.modelName,
+      apiKey: newAgent.apiKey,
+      apiUrl: newAgent.apiUrl,
+      assigned: [],
+    };
+    const newConfigs = [...settings.ai.agentConfigurations, newConfig];
+    handleAIUpdate(["agentConfigurations"], newConfigs);
+    setNewAgent({ agent: "", modelName: "", apiKey: "", apiUrl: "" });
+  };
+
   return (
-    <Stack spacing={3}>
-      <Box
-        sx={{
-          borderBottom: 1,
-          borderColor: 'divider',
-          display: 'flex',
-          justifyContent: 'center',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 4,
-        }}>
-        <EditableSwitch
-          label='AI Features Enabled'
-          value={settings.ai.enabled}
-          onChange={(value) => handleAIUpdate(['enabled'], value)}
-        />
-        <Stack spacing={2}>
-          <h3>OpenAI Settings</h3>
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <Stack spacing={3}>
+        <Box
+          sx={{
+            borderBottom: 1,
+            borderColor: "divider",
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 4,
+          }}
+        >
           <EditableSwitch
-            label='OpenAI Enabled'
-            value={settings.ai.providers.openai.enabled}
-            onChange={(value) =>
-              handleAIUpdate(['providers', 'openai', 'enabled'], value)
-            }
+            label="AI Features Enabled"
+            value={settings.ai.enabled}
+            onChange={(value) => handleAIUpdate(["enabled"], value)}
           />
-          <EditableText
-            label='API Key'
-            value={settings.ai.providers.openai.apiKey || ''}
-            onChange={(value) =>
-              handleAIUpdate(['providers', 'openai', 'apiKey'], value)
-            }
-          />
-          <EditableText
-            label='Model Name'
-            value={settings.ai.providers.openai.modelName}
-            onChange={(value) =>
-              handleAIUpdate(['providers', 'openai', 'modelName'], value)
-            }
-          />
-          <EditableNumber
-            label='Max Tokens'
-            value={settings.ai.providers.openai.maxTokens}
-            onChange={(value) =>
-              handleAIUpdate(['providers', 'openai', 'maxTokens'], value)
-            }
-          />
-        </Stack>
+          {/* ...existing code... */}
+        </Box>
 
+        {/* Agent Assignment Section */}
         <Stack spacing={2}>
-          <h3>Feature Settings</h3>
-          <EditableSwitch
-            label='Auto Grading'
-            value={settings.ai.features.autoGrading}
-            onChange={(value) =>
-              handleAIUpdate(['features', 'autoGrading'], value)
-            }
-          />
-          <EditableSwitch
-            label='Plagiarism Detection'
-            value={settings.ai.features.plagiarismDetection}
-            onChange={(value) =>
-              handleAIUpdate(['features', 'plagiarismDetection'], value)
-            }
-          />
-          <EditableSwitch
-            label='Content Generation'
-            value={settings.ai.features.contentGeneration}
-            onChange={(value) =>
-              handleAIUpdate(['features', 'contentGeneration'], value)
-            }
-          />
-          <EditableSwitch
-            label='Student Assistant'
-            value={settings.ai.features.studentAssistant}
-            onChange={(value) =>
-              handleAIUpdate(['features', 'studentAssistant'], value)
-            }
-          />
-        </Stack>
+          <Typography variant="h6">Agent Assignment</Typography>
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle1">Unassigned Items</Typography>
+            <DroppableArea id="available-items">
+              {availableItems.map((item) => (
+                <DraggableItem key={item.key} id={`chip-${item.key}`}>
+                  <Chip label={item.label} />
+                </DraggableItem>
+              ))}
+            </DroppableArea>
+          </Box>
 
-        <Stack spacing={2}>
-          <h3>Moderation Settings</h3>
-          <EditableSwitch
-            label='Content Moderation'
-            value={settings.ai.moderationSettings.enabled}
-            onChange={(value) =>
-              handleAIUpdate(['moderationSettings', 'enabled'], value)
-            }
-          />
-          <EditableSwitch
-            label='Filter Profanity'
-            value={settings.ai.moderationSettings.filterProfanity}
-            onChange={(value) =>
-              handleAIUpdate(['moderationSettings', 'filterProfanity'], value)
-            }
-          />
-          <EditableNumber
-            label='Max Queries Per Hour'
-            value={settings.ai.moderationSettings.maxQueriesPerHour}
-            onChange={(value) =>
-              handleAIUpdate(['moderationSettings', 'maxQueriesPerHour'], value)
-            }
-          />
+          {settings.ai.agentConfigurations.map((config, index) => (
+            <Box key={index}>
+              <Typography variant="subtitle1">Agent: {config.agent}</Typography>
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                Assigned Items:
+              </Typography>
+              <DroppableArea id={`agent-${index}`}>
+                {config.assigned.map((key: string) => {
+                  const label =
+                    assignableItems.find((item) => item.key === key)?.label ||
+                    key;
+                  return (
+                    <DraggableItem key={key} id={`chip-${key}-agent-${index}`}>
+                      <Chip label={label} />
+                    </DraggableItem>
+                  );
+                })}
+              </DroppableArea>
+            </Box>
+          ))}
+          <Button variant="outlined" onClick={handleAddAgentConfig}>
+            Add Default Agent Configuration
+          </Button>
+          {/* New: Custom Agent Form */}
+          <Box
+            sx={{
+              p: 2,
+              border: "1px solid",
+              borderColor: "divider",
+              borderRadius: 1,
+            }}
+          >
+            <Typography variant="subtitle1">Add New Agent</Typography>
+            <Stack spacing={1} direction="row">
+              <TextField
+                label="Agent Name"
+                value={newAgent.agent}
+                onChange={(e) => handleNewAgentChange("agent", e.target.value)}
+                size="small"
+              />
+              <TextField
+                label="Model Name"
+                value={newAgent.modelName}
+                onChange={(e) =>
+                  handleNewAgentChange("modelName", e.target.value)
+                }
+                size="small"
+              />
+            </Stack>
+            <Stack spacing={1} direction="row" sx={{ mt: 1 }}>
+              <TextField
+                label="API Key"
+                value={newAgent.apiKey}
+                onChange={(e) => handleNewAgentChange("apiKey", e.target.value)}
+                size="small"
+              />
+              <TextField
+                label="API URL"
+                value={newAgent.apiUrl}
+                onChange={(e) => handleNewAgentChange("apiUrl", e.target.value)}
+                size="small"
+              />
+            </Stack>
+            <Button
+              variant="contained"
+              sx={{ mt: 1 }}
+              onClick={handleSaveNewAgent}
+            >
+              Save New Agent
+            </Button>
+          </Box>
         </Stack>
-      </Box>
-    </Stack>
+      </Stack>
+      <DragOverlay>
+        {activeChip ? <Chip label={activeChip.label} /> : null}
+      </DragOverlay>
+    </DndContext>
   );
 }

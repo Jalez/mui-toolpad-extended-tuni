@@ -2,17 +2,17 @@
 
 // components/CourseSettingsDialog.tsx
 
-import { useState, useEffect } from 'react';
-import { TextField } from '@mui/material';
-import useCourseStore from '../../../store/useCourseStore';
-import FormDialog from '../FormDialog';
-import useDialogStore from '../../../store/useDialogStore';
+import { useState, useEffect } from "react";
+import { TextField } from "@mui/material";
+import useCourseStore from "../../Courses/store/useCourseStore";
+import FormDialog from "../FormDialog";
+import useDialogStore from "../../../store/useDialogStore";
 
 const CourseSettings = () => {
   const { closeDialog } = useDialogStore();
   const { currentCourse, updateStateCourse } = useCourseStore();
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   useEffect(() => {
     if (currentCourse) {
@@ -38,22 +38,23 @@ const CourseSettings = () => {
   return (
     <FormDialog
       onSubmit={handleSubmit}
-      title='Edit Course'
-      submitText='Save Changes'>
+      title="Edit Course"
+      submitText="Save Changes"
+    >
       <TextField
-        label='Title'
+        label="Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         fullWidth
-        margin='normal'
+        margin="normal"
       />
 
       <TextField
-        label='Description'
+        label="Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         fullWidth
-        margin='normal'
+        margin="normal"
       />
     </FormDialog>
   );

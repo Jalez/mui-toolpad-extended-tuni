@@ -1,19 +1,36 @@
 /** @format */
 
-import { Grid, Stack, Typography } from '@mui/material';
-import { Platform } from '../../../store/usePlatformStore';
-import EditableSwitch from '../../Components/Editables/EditableSwitch';
-import EditableText from '../../Components/Editables/EditableText';
-import EditableSelect from '../../Components/Editables/EditableSelect';
+import { Box, Stack, Typography } from "@mui/material";
+import { Platform } from "../../../store/usePlatformStore";
+import EditableSwitch from "../../Components/Editables/EditableSwitch";
+import EditableText from "../../Components/Editables/EditableText";
+import EditableSelect from "../../Components/Editables/EditableSelect";
 
 interface FeaturesTabProps {
   settings: Platform;
   onUpdate: (settings: Platform) => void;
 }
 
+/**
+ * FeaturesTab Component
+ *
+ * @version 3.0.0
+ * @breaking-changes
+ * - Replaced Grid system with more flexible Box layout
+ * - Enhanced responsive design with flex-based layouts
+ * - Improved spacing consistency
+ * - Optimized component structure for better performance
+ * - Standardized style properties
+ *
+ * Provides interface for:
+ * - Managing platform-wide feature settings
+ * - Configuring feature availability
+ * - Setting feature-specific parameters
+ * - Managing feature dependencies
+ */
 export default function FeaturesTab({ settings, onUpdate }: FeaturesTabProps) {
   const handleFeatureUpdate = (
-    key: keyof Platform['features'],
+    key: keyof Platform["features"],
     value: boolean
   ) => {
     onUpdate({
@@ -31,89 +48,89 @@ export default function FeaturesTab({ settings, onUpdate }: FeaturesTabProps) {
 
   return (
     <Stack spacing={4}>
-      <Typography variant='h6' gutterBottom>
+      <Typography variant="h6" gutterBottom>
         Platform Features
       </Typography>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+        <Box sx={{ flex: "1 1 45%" }}>
           <EditableSwitch
-            label='Forums'
+            label="Forums"
             value={settings.features.forums}
-            onChange={(value) => handleFeatureUpdate('forums', value)}
+            onChange={(value) => handleFeatureUpdate("forums", value)}
           />
-        </Grid>
-        <Grid item xs={12} md={6}>
+        </Box>
+        <Box sx={{ flex: "1 1 45%" }}>
           <EditableSwitch
-            label='Wiki'
+            label="Wiki"
             value={settings.features.wiki}
-            onChange={(value) => handleFeatureUpdate('wiki', value)}
+            onChange={(value) => handleFeatureUpdate("wiki", value)}
           />
-        </Grid>
-        <Grid item xs={12} md={6}>
+        </Box>
+        <Box sx={{ flex: "1 1 45%" }}>
           <EditableSwitch
-            label='Chat'
+            label="Chat"
             value={settings.features.chat}
-            onChange={(value) => handleFeatureUpdate('chat', value)}
+            onChange={(value) => handleFeatureUpdate("chat", value)}
           />
-        </Grid>
-        <Grid item xs={12} md={6}>
+        </Box>
+        <Box sx={{ flex: "1 1 45%" }}>
           <EditableSwitch
-            label='Video Conference'
+            label="Video Conference"
             value={settings.features.videoConference}
-            onChange={(value) => handleFeatureUpdate('videoConference', value)}
+            onChange={(value) => handleFeatureUpdate("videoConference", value)}
           />
-        </Grid>
-        <Grid item xs={12} md={6}>
+        </Box>
+        <Box sx={{ flex: "1 1 45%" }}>
           <EditableSwitch
-            label='Peer Review'
+            label="Peer Review"
             value={settings.features.peerReview}
-            onChange={(value) => handleFeatureUpdate('peerReview', value)}
+            onChange={(value) => handleFeatureUpdate("peerReview", value)}
           />
-        </Grid>
-        <Grid item xs={12} md={6}>
+        </Box>
+        <Box sx={{ flex: "1 1 45%" }}>
           <EditableSwitch
-            label='Gamification'
+            label="Gamification"
             value={settings.features.gamification}
-            onChange={(value) => handleFeatureUpdate('gamification', value)}
+            onChange={(value) => handleFeatureUpdate("gamification", value)}
           />
-        </Grid>
-      </Grid>
+        </Box>
+      </Box>
 
-      <Typography variant='h6' gutterBottom>
+      <Typography variant="h6" gutterBottom>
         Analytics Settings
       </Typography>
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+      <Box sx={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
+        <Box sx={{ flex: "1 1 45%" }}>
           <EditableSwitch
-            label='Enable Analytics'
+            label="Enable Analytics"
             value={settings.analytics.enabled}
-            onChange={(value) => handleAnalyticsUpdate('enabled', value)}
+            onChange={(value) => handleAnalyticsUpdate("enabled", value)}
           />
-        </Grid>
+        </Box>
         {settings.analytics.enabled && (
           <>
-            <Grid item xs={12} md={6}>
+            <Box sx={{ flex: "1 1 45%" }}>
               <EditableSelect
-                label='Analytics Provider'
-                value={settings.analytics.provider || ''}
-                onChange={(value) => handleAnalyticsUpdate('provider', value)}
+                label="Analytics Provider"
+                value={settings.analytics.provider || ""}
+                onChange={(value) => handleAnalyticsUpdate("provider", value)}
                 options={[
-                  { value: 'google', label: 'Google Analytics' },
-                  { value: 'matomo', label: 'Matomo' },
-                  { value: 'custom', label: 'Custom' },
+                  { value: "google", label: "Google Analytics" },
+                  { value: "matomo", label: "Matomo" },
+                  { value: "custom", label: "Custom" },
                 ]}
               />
-            </Grid>
-            <Grid item xs={12} md={6}>
+            </Box>
+            <Box sx={{ flex: "1 1 45%" }}>
               <EditableText
-                label='Tracking ID'
-                value={settings.analytics.trackingId || ''}
-                onChange={(value) => handleAnalyticsUpdate('trackingId', value)}
+                label="Tracking ID"
+                value={settings.analytics.trackingId || ""}
+                onChange={(value) => handleAnalyticsUpdate("trackingId", value)}
               />
-            </Grid>
+            </Box>
           </>
         )}
-      </Grid>
+      </Box>
     </Stack>
   );
 }

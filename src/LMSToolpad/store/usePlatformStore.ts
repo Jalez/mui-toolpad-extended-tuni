@@ -65,6 +65,14 @@ export interface AISettings {
     filterSensitiveContent: boolean;
     maxQueriesPerHour: number;
   };
+  // Updated: agentConfigurations now has an 'assigned' property.
+  agentConfigurations: {
+    agent: 'openai' | 'anthropic' | 'local' | string;
+    assigned: string[];
+    apiKey?: string;
+    modelName?: string;
+    apiUrl?: string; // new: endpoint for requests
+  }[];
 }
 
 export interface NotificationSettings {
@@ -221,6 +229,7 @@ const DEFAULT_SETTINGS: Platform = {
       filterSensitiveContent: true,
       maxQueriesPerHour: 100,
     },
+    agentConfigurations: [], // default empty array for multiple agent setups
   },
   notifications: {
     emailNotifications: true,

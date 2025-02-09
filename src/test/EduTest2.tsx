@@ -1,11 +1,11 @@
 /** @format */
 
-import { useEffect } from 'react';
-import ScienceIcon from '@mui/icons-material/Science';
+import { useEffect } from "react";
+import ScienceIcon from "@mui/icons-material/Science";
 import {
   NavigationPageStoreItem,
   useNavigationStore,
-} from '../LMSToolpad/store/useNavigationStore';
+} from "../LMSToolpad/components/Navigation/store/useNavigationStore";
 
 const EduTest2 = () => {
   const { addMicroserviceNavigation } = useNavigationStore();
@@ -13,31 +13,31 @@ const EduTest2 = () => {
     addMicroserviceNavigation(eduTest2Navigation);
   }, []);
   const eduTest2Navigation: NavigationPageStoreItem = {
-    kind: 'page',
-    segment: 'eduteest',
-    title: 'EduTest2',
+    kind: "page",
+    segment: "eduteest",
+    title: "EduTest2",
     iconFC: ScienceIcon,
     view: EduTestView,
     metadata: {
-      description: 'EduTest is a microservice for testing',
-      forRoles: ['teacher', 'student'],
+      description: "EduTest is a microservice for testing",
+      forRoles: ["teacher", "student"],
       isRootTool: true,
     },
     children: [
       {
-        kind: 'page',
-        segment: 'dashboard',
-        title: 'Dashboard',
+        kind: "page",
+        segment: "dashboard",
+        title: "Dashboard",
         view: DashboardView,
         metadata: {
-          description: 'Dashboard for EduTest2',
-          forRoles: ['teacher', 'student'],
+          description: "Dashboard for EduTest2",
+          forRoles: ["teacher", "student"],
         },
       },
       {
-        kind: 'page',
-        segment: 'assignments',
-        title: 'Assignments',
+        kind: "page",
+        segment: "assignments",
+        title: "Assignments",
         view: AssignmentsView,
       },
     ],

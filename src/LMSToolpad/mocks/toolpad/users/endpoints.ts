@@ -1,9 +1,9 @@
 /** @format */
 
-import { http, HttpResponse } from 'msw';
-import { baseUrl } from '../../../constants';
-import { UserBackendData } from './types';
-import { dataStore } from '../../store';
+import { http, HttpResponse } from "msw";
+import { baseUrl } from "../../../constants";
+import { UserBackendData } from "./types";
+import { dataStore } from "../../store";
 
 // Type for response data
 type JsonResponse = {
@@ -24,6 +24,7 @@ const createErrorResponse = (
 const handleCreateUser = async (request: Request): Promise<HttpResponse> => {
   try {
     const requestData = (await request.json()) as Record<string, unknown>;
+    console.log("requestData", requestData);
     const newUser: UserBackendData = {
       id: (dataStore.users.length + 1).toString(),
       name: requestData.name as string,
@@ -31,21 +32,21 @@ const handleCreateUser = async (request: Request): Promise<HttpResponse> => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       platform_roles:
-        (requestData.platform_roles as UserBackendData['platform_roles']) || [
-          'user',
+        (requestData.platform_roles as UserBackendData["platform_roles"]) || [
+          "user",
         ],
       privacy_settings:
-        requestData.privacy_settings as UserBackendData['privacy_settings'],
-      gdpr_consent: requestData.gdpr_consent as UserBackendData['gdpr_consent'],
+        requestData.privacy_settings as UserBackendData["privacy_settings"],
+      gdpr_consent: requestData.gdpr_consent as UserBackendData["gdpr_consent"],
       data_retention:
-        requestData.data_retention as UserBackendData['data_retention'],
-      preferences: requestData.preferences as UserBackendData['preferences'],
+        requestData.data_retention as UserBackendData["data_retention"],
+      preferences: requestData.preferences as UserBackendData["preferences"],
     };
 
     dataStore.users.push(newUser);
     return HttpResponse.json(newUser);
   } catch (error) {
-    return createErrorResponse('Failed to create user');
+    return createErrorResponse("Failed to create user");
   }
 };
 
@@ -55,10 +56,11 @@ const handleUpdateUser = async (
 ): Promise<HttpResponse> => {
   try {
     const requestData = (await request.json()) as Record<string, unknown>;
+    console.log("update requestData", requestData);
     const userIndex = dataStore.users.findIndex((u) => u.id === userId);
 
     if (userIndex === -1) {
-      return createErrorResponse('User not found', 404);
+      return createErrorResponse("User not found", 404);
     }
 
     const updatedUser = {
@@ -69,7 +71,7 @@ const handleUpdateUser = async (
     dataStore.users[userIndex] = updatedUser;
     return HttpResponse.json(updatedUser);
   } catch (error) {
-    return createErrorResponse('Failed to update user');
+    return createErrorResponse("Failed to update user");
   }
 };
 
@@ -78,7 +80,7 @@ const handleDeleteUser = async (userId: string): Promise<HttpResponse> => {
     const userIndex = dataStore.users.findIndex((u) => u.id === userId);
 
     if (userIndex === -1) {
-      return createErrorResponse('User not found', 404);
+      return createErrorResponse("User not found", 404);
     }
 
     //Get the user
@@ -95,7 +97,7 @@ const handleDeleteUser = async (userId: string): Promise<HttpResponse> => {
 
     return HttpResponse.json(user);
   } catch (error) {
-    return createErrorResponse('Failed to delete user');
+    return createErrorResponse("Failed to delete user");
   }
 };
 
@@ -111,23 +113,23 @@ const handleGetAllUsers = (): HttpResponse => {
 
 // Main handlers
 export const userHandlers = [
-  http.get(baseUrl + 'api/users/current/', () => {
+  http.get(baseUrl + "api/users/current/", () => {
     return handleGetCurrentUser();
   }),
 
-  http.get(baseUrl + 'api/users/', () => {
+  http.get(baseUrl + "api/users/", () => {
     return handleGetAllUsers();
   }),
 
-  http.post(baseUrl + 'api/users/', async ({ request }) => {
+  http.post(baseUrl + "api/users/", async ({ request }) => {
     return handleCreateUser(request);
   }),
 
-  http.put(baseUrl + 'api/users/:userId/', async ({ request, params }) => {
+  http.put(baseUrl + "api/users/:userId/", async ({ request, params }) => {
     return handleUpdateUser(request, params.userId as string);
   }),
 
-  http.delete(baseUrl + 'api/users/:userId/', async ({ params }) => {
+  http.delete(baseUrl + "api/users/:userId/", async ({ params }) => {
     return handleDeleteUser(params.userId as string);
   }),
 ];
@@ -142,8 +144,8 @@ export const getUserDataResponse = (userId?: string): HttpResponse => {
     if (user) {
       return HttpResponse.json(user);
     }
-    return createErrorResponse('User not found', 404);
+    return createErrorResponse("User not found", 404);
   } catch (error) {
-    return createErrorResponse('Internal server error', 500);
+    return createErrorResponse("Internal server error", 500);
   }
 };

@@ -5,16 +5,16 @@ import {
   courseLevel,
   courseRole,
   enrollmentStatus,
-} from '../../../store/useCourseStore';
-import { UserBackendData } from '../users/types';
-import { subjectTopics } from './constants';
+} from "../../../components/Courses/store/useCourseStore";
+import { UserBackendData } from "../users/types";
+import { subjectTopics } from "./constants";
 import {
   CourseBackendData,
   CourseEnrollmentBackendData,
   CourseEventBackendData,
   CourseRawBackendData,
   CourseRelationBackendData,
-} from './types';
+} from "./types";
 
 // Add this helper function at the top
 function preGenerateTopicSequences(totalCourses: number) {
@@ -33,9 +33,9 @@ function preGenerateTopicSequences(totalCourses: number) {
     const topic = topics[basicCodeCounter % topics.length];
 
     sequences.push(
-      { topic, subject, basicCode: basicCodeCounter, level: 'basic' },
-      { topic, subject, basicCode: basicCodeCounter, level: 'intermediate' },
-      { topic, subject, basicCode: basicCodeCounter, level: 'advanced' }
+      { topic, subject, basicCode: basicCodeCounter, level: "basic" },
+      { topic, subject, basicCode: basicCodeCounter, level: "intermediate" },
+      { topic, subject, basicCode: basicCodeCounter, level: "advanced" }
     );
     basicCodeCounter++;
   }
@@ -59,10 +59,10 @@ function generateMockEvent(
     end_time: new Date(
       baseDate.getTime() + Math.random() * 864000000
     ).toISOString(),
-    location: 'Online',
+    location: "Online",
     teachers: teachers as CourseEnrollmentBackendData[],
     recurring: {
-      frequency: 'weekly',
+      frequency: "weekly",
       until: new Date(baseDate.getTime() + 864000000 * 10).toISOString(),
     },
   };
@@ -77,7 +77,7 @@ type HighestLevelOfExistingTopicsType = {
 //Lets ensure the basicCode is unique and
 const basicCodeOfTopic: { [key: string]: string } = {};
 const HighestLevelOfExistingTopics: HighestLevelOfExistingTopicsType = {};
-const languages = ['en', 'fi', 'sv', 'de', 'fr', 'es', 'it', 'ru', 'zh', 'ja'];
+const languages = ["en", "fi", "sv", "de", "fr", "es", "it", "ru", "zh", "ja"];
 
 function generateMockCourse(
   id: number,
@@ -97,11 +97,11 @@ function generateMockCourse(
     basicCode,
     level: courseLevel,
   } = preGeneratedSequence;
-  const courseCode = `${subject}.${basicCode}${courseLevel === 'basic' ? '1' : courseLevel === 'intermediate' ? '2' : '3'}`;
+  const courseCode = `${subject}.${basicCode}${courseLevel === "basic" ? "1" : courseLevel === "intermediate" ? "2" : "3"}`;
 
   // Cache the date calculations
-  const semester = Math.random() > 0.5 ? 'spring' : 'fall';
-  const baseDate = new Date(year, semester === 'spring' ? 0 : 7);
+  const semester = Math.random() > 0.5 ? "spring" : "fall";
+  const baseDate = new Date(year, semester === "spring" ? 0 : 7);
 
   // Update topic tracking
   basicCodeOfTopic[basicCode.toString()] = topic;
@@ -112,20 +112,20 @@ function generateMockCourse(
     year >= 2024 && Math.random() > 0.5 ? year + 2 : year;
 
   const prerequisites = [];
-  if (HighestLevelOfExistingTopics[topic] === 'intermediate') {
+  if (HighestLevelOfExistingTopics[topic] === "intermediate") {
     const previousCoursecode = `${subject}.${basicCode}1`;
     prerequisites.push({
       code: previousCoursecode,
-      type: 'prerequisite',
-      description: 'Basic concepts required for this course',
+      type: "prerequisite",
+      description: "Basic concepts required for this course",
     });
   }
-  if (HighestLevelOfExistingTopics[topic] === 'advanced') {
+  if (HighestLevelOfExistingTopics[topic] === "advanced") {
     const previousCoursecode = `${subject}.${basicCode}2`;
     prerequisites.push({
       code: previousCoursecode,
-      type: 'prerequisite',
-      description: 'Intermediate concepts required for this course',
+      type: "prerequisite",
+      description: "Intermediate concepts required for this course",
     });
     //Look for the previous course and add this course as continuation
     const previousCourse = existingCourses.find(
@@ -134,8 +134,8 @@ function generateMockCourse(
     if (previousCourse?.relationships) {
       previousCourse.relationships.continuations.push({
         code: courseCode,
-        type: 'continues_from',
-        description: 'Advanced concepts covered in this course',
+        type: "continues_from",
+        description: "Advanced concepts covered in this course",
       });
     }
   }
@@ -152,13 +152,13 @@ function generateMockCourse(
     name: `${subject}_module`,
     credits: 5,
     level:
-      courseLevel === 'advanced'
-        ? 'advanced'
-        : courseLevel === 'basic'
-          ? 'basic'
-          : ('intermediate' as courseLevel),
+      courseLevel === "advanced"
+        ? "advanced"
+        : courseLevel === "basic"
+          ? "basic"
+          : ("intermediate" as courseLevel),
     order:
-      courseLevel === 'advanced' ? 3 : courseLevel === 'intermediate' ? 2 : 1,
+      courseLevel === "advanced" ? 3 : courseLevel === "intermediate" ? 2 : 1,
   };
   const diceRoll = Math.random();
 
@@ -167,7 +167,7 @@ function generateMockCourse(
   const isCompleted = id % 3 === 0; // Every third course will be completed
   const endDate = new Date(
     isCompleted ? year - 1 : possiblyFutureYear,
-    semester === 'spring' ? 5 : 11
+    semester === "spring" ? 5 : 11
   );
 
   return {
@@ -179,44 +179,44 @@ function generateMockCourse(
     code: courseCode,
     instance: `${semester}-${year}`,
     lti_login_url: `https://example.com/lti/${id}`,
-    services: ['edutest'],
+    services: ["edutest"],
     events: {
       lecture: Array(5)
         .fill(null)
         .map((_, i) =>
-          generateMockEvent(`${id}_lecture_${i}`, teachers, 'lecture', baseDate)
+          generateMockEvent(`${id}_lecture_${i}`, teachers, "lecture", baseDate)
         ),
       exercise: [],
       exam: [],
       deadline: [],
       other: [],
     },
-    start_date: new Date(year, semester === 'spring' ? 0 : 7).toISOString(),
+    start_date: new Date(year, semester === "spring" ? 0 : 7).toISOString(),
     end_date: endDate.toISOString(),
     visibility: {
-      mode: diceRoll > 0.3 ? 'public' : diceRoll > 0.5 ? 'enrolled' : 'private',
-      start_date: new Date(year, semester === 'spring' ? 0 : 7).toISOString(),
+      mode: diceRoll > 0.3 ? "public" : diceRoll > 0.5 ? "enrolled" : "private",
+      start_date: new Date(year, semester === "spring" ? 0 : 7).toISOString(),
       end_date: endDate.toISOString(),
     },
     data_processing: {
-      purposes: ['course_delivery', 'assessment'],
+      purposes: ["course_delivery", "assessment"],
       retention: 365,
       third_party_processors: [],
       special_categories: false,
-      legal_basis: 'consent',
+      legal_basis: "consent",
     },
     enrollment: {
-      start_date: new Date(year, semester === 'spring' ? 0 : 7).toISOString(),
+      start_date: new Date(year, semester === "spring" ? 0 : 7).toISOString(),
       end_date: new Date(
         possiblyFutureYear,
-        semester === 'spring' ? 5 : 11
+        semester === "spring" ? 5 : 11
       ).toISOString(),
       status: {
         open: diceRoll > 0.2,
         max_students: Math.floor(diceRoll * 150) + 50,
       },
     },
-    tags: ['programming', 'computer science'],
+    tags: ["programming", "computer science"],
     language: languages[Math.floor(diceRoll * languages.length)],
     relationships,
     study_module,
@@ -230,7 +230,7 @@ const createEnrollment = (
   courseId: string,
   forcedStatus?: enrollmentStatus
 ): CourseEnrollmentBackendData => {
-  const statusOptions: enrollmentStatus[] = ['enrolled', 'pending', 'rejected'];
+  const statusOptions: enrollmentStatus[] = ["enrolled", "pending", "rejected"];
   return {
     user_id: user.id,
     name: user.name,
@@ -253,7 +253,7 @@ export function generateCourses(config: {
   enrollmentsByCourse: { [key: string]: CourseEnrollmentBackendData[] };
 } {
   if (config.users.length === 0) {
-    throw new Error('No users provided');
+    throw new Error("No users provided");
   }
   const courses: CourseBackendData[] = [];
   const enrollmentsByCourse: { [key: string]: CourseEnrollmentBackendData[] } =
@@ -282,20 +282,20 @@ export function generateCourses(config: {
       if (firstUserParticipates) {
         // Determine role and status with more variation
         const firstUserRole: courseRole =
-          Math.random() > 0.7 ? 'teacher' : 'student';
+          Math.random() > 0.7 ? "teacher" : "student";
 
         // More varied enrollment status based on patterns
         let enrollmentStatus: enrollmentStatus;
         const statusRoll = Math.random();
         if (statusRoll < 0.6) {
           // 60% chance of being enrolled
-          enrollmentStatus = 'enrolled';
+          enrollmentStatus = "enrolled";
         } else if (statusRoll < 0.8) {
           // 20% chance of pending
-          enrollmentStatus = 'pending';
+          enrollmentStatus = "pending";
         } else {
           // 20% chance of rejected
-          enrollmentStatus = 'rejected';
+          enrollmentStatus = "rejected";
         }
 
         firstUserEnrollment = createEnrollment(
@@ -310,15 +310,15 @@ export function generateCourses(config: {
       const otherTeachers = teacherIndices.map((index) =>
         createEnrollment(
           otherUsers[index],
-          'teacher',
+          "teacher",
           (courseIndex + 1).toString(),
-          'enrolled'
+          "enrolled"
         )
       );
 
       // Combine teachers based on first user's participation and role
       const teachersOfCourse =
-        firstUserEnrollment?.role === 'teacher'
+        firstUserEnrollment?.role === "teacher"
           ? [firstUserEnrollment, ...otherTeachers]
           : otherTeachers;
 
@@ -335,20 +335,20 @@ export function generateCourses(config: {
       // Create student enrollments with more variation
       const studentEnrollments = otherUsers
         .filter((_, idx) => idx % 20 !== 0) // Not a regular teacher
-        .filter((_, idx) => Math.random() > 0.4) // Only 60% chance of attempting enrollment
+        .filter((_, __) => Math.random() > 0.4) // Only 60% chance of attempting enrollment
         .map((user) => {
           const statusRoll = Math.random();
           let status: enrollmentStatus;
           if (statusRoll < 0.7) {
-            status = 'enrolled';
+            status = "enrolled";
           } else if (statusRoll < 0.9) {
-            status = 'pending';
+            status = "pending";
           } else {
-            status = 'rejected';
+            status = "rejected";
           }
           return createEnrollment(
             user,
-            'student',
+            "student",
             (courseIndex + 1).toString(),
             status
           );
@@ -357,7 +357,7 @@ export function generateCourses(config: {
       // Combine all enrollments
       enrollmentsByCourse[(courseIndex + 1).toString()] = [
         ...teachersOfCourse,
-        ...(firstUserEnrollment?.role === 'student'
+        ...(firstUserEnrollment?.role === "student"
           ? [firstUserEnrollment]
           : []),
         ...studentEnrollments,
