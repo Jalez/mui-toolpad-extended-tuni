@@ -37,7 +37,7 @@ export interface UserRawBackendData {
       is_teacher_old: boolean;
       available: boolean;
     };
-    visible_navigation: Record<string, boolean>;
+    visible_navigation: string[]
   };
 }
 

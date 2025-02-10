@@ -91,17 +91,14 @@ function generateMockCourse(
     level: courseLevel;
   }
 ): CourseBackendData {
-  const {
-    topic,
-    subject,
-    basicCode,
-    level: courseLevel,
-  } = preGeneratedSequence;
-  const courseCode = `${subject}.${basicCode}${courseLevel === "basic" ? "1" : courseLevel === "intermediate" ? "2" : "3"}`;
+  const { topic, subject, basicCode, level: courseLevel } = preGeneratedSequence;
+  const courseCode = `${subject}.${basicCode}${
+    courseLevel === "basic" ? "1" : courseLevel === "intermediate" ? "2" : "3"
+  }`;
 
   // Cache the date calculations
   const semester = Math.random() > 0.5 ? "spring" : "fall";
-  const baseDate = new Date(year, semester === "spring" ? 0 : 7);
+  let courseStartDate = new Date(year, semester === "spring" ? 0 : 7);
 
   // Update topic tracking
   basicCodeOfTopic[basicCode.toString()] = topic;
@@ -111,6 +108,7 @@ function generateMockCourse(
   const possiblyFutureYear =
     year >= 2024 && Math.random() > 0.5 ? year + 2 : year;
 
+  // Handle prerequisites and relationships
   const prerequisites = [];
   if (HighestLevelOfExistingTopics[topic] === "intermediate") {
     const previousCoursecode = `${subject}.${basicCode}1`;
@@ -127,7 +125,7 @@ function generateMockCourse(
       type: "prerequisite",
       description: "Intermediate concepts required for this course",
     });
-    //Look for the previous course and add this course as continuation
+    // Look for the previous course and add this course as continuation
     const previousCourse = existingCourses.find(
       (course) => course.code === previousCoursecode
     );
@@ -139,8 +137,6 @@ function generateMockCourse(
       });
     }
   }
-
-  // Add relationships based on subject and level
   const relationships = {
     prerequisites: prerequisites as CourseRelationBackendData[],
     continuations: [] as CourseRelationBackendData[],
@@ -155,20 +151,60 @@ function generateMockCourse(
       courseLevel === "advanced"
         ? "advanced"
         : courseLevel === "basic"
-          ? "basic"
-          : ("intermediate" as courseLevel),
+        ? "basic"
+        : ("intermediate" as courseLevel),
     order:
       courseLevel === "advanced" ? 3 : courseLevel === "intermediate" ? 2 : 1,
   };
+
   const diceRoll = Math.random();
 
-  // Deterministically set the end date based on course ID and year
-  // This ensures we have a mix of completed and active courses
-  const isCompleted = id % 3 === 0; // Every third course will be completed
-  const endDate = new Date(
+  // Deterministically set the end date based on course ID and year.
+  // Every third course is marked as completed.
+  let isCompleted = id % 3 === 0;
+  let courseEndDate = new Date(
     isCompleted ? year - 1 : possiblyFutureYear,
     semester === "spring" ? 5 : 11
   );
+
+  const now = new Date();
+  // If this course is for the current year, adjust dates so it shows as active.
+  if (year === now.getFullYear()) {
+    // Force current courses to be active.
+    isCompleted = false;
+    // If the computed start date is already in the past, shift it to tomorrow.
+    if (courseStartDate < now) {
+      courseStartDate = new Date(now.getTime() + 86400000);
+    }
+    // Ensure the end date is in the future—here, set 6 months ahead.
+    courseEndDate = new Date(now.getTime() + 180 * 86400000);
+  } else {
+    // For non-current years, if we're in the middle of the course period, adjust start date for event generation.
+    if (!isCompleted && now > courseStartDate && now < courseEndDate) {
+      courseStartDate = new Date(now.getTime() + 86400000);
+    }
+  }
+
+  // Adjust the base date for event generation.
+  // If the course is active (not completed) and now is between the start and end dates,
+  // use tomorrow as the base date so that generated events are upcoming.
+  let baseDate = courseStartDate;
+  if (!isCompleted && now > courseStartDate && now < courseEndDate) {
+    baseDate = new Date(now.getTime() + 86400000);
+  }
+
+  // Generate events using the (possibly adjusted) baseDate.
+  const events = {
+    lecture: Array(5)
+      .fill(null)
+      .map((_, i) =>
+        generateMockEvent(`${id}_lecture_${i}`, teachers, "lecture", baseDate)
+      ),
+    exercise: [],
+    exam: [],
+    deadline: [],
+    other: [],
+  };
 
   return {
     id: id.toString(),
@@ -177,26 +213,16 @@ function generateMockCourse(
     created_at: new Date(year, 0).toISOString(),
     updated_at: new Date(year, 0).toISOString(),
     code: courseCode,
-    instance: `${semester}-${year}`,
+    instance: `${semester}-${courseStartDate.getFullYear()}`,
     lti_login_url: `https://example.com/lti/${id}`,
     services: ["edutest"],
-    events: {
-      lecture: Array(5)
-        .fill(null)
-        .map((_, i) =>
-          generateMockEvent(`${id}_lecture_${i}`, teachers, "lecture", baseDate)
-        ),
-      exercise: [],
-      exam: [],
-      deadline: [],
-      other: [],
-    },
-    start_date: new Date(year, semester === "spring" ? 0 : 7).toISOString(),
-    end_date: endDate.toISOString(),
+    events,
+    start_date: courseStartDate.toISOString(),
+    end_date: courseEndDate.toISOString(),
     visibility: {
       mode: diceRoll > 0.3 ? "public" : diceRoll > 0.5 ? "enrolled" : "private",
-      start_date: new Date(year, semester === "spring" ? 0 : 7).toISOString(),
-      end_date: endDate.toISOString(),
+      start_date: courseStartDate.toISOString(),
+      end_date: courseEndDate.toISOString(),
     },
     data_processing: {
       purposes: ["course_delivery", "assessment"],
@@ -206,7 +232,7 @@ function generateMockCourse(
       legal_basis: "consent",
     },
     enrollment: {
-      start_date: new Date(year, semester === "spring" ? 0 : 7).toISOString(),
+      start_date: courseStartDate.toISOString(),
       end_date: new Date(
         possiblyFutureYear,
         semester === "spring" ? 5 : 11
@@ -222,6 +248,7 @@ function generateMockCourse(
     study_module,
   };
 }
+
 
 //Randomly enroll some of the users. Make some students, some teachers
 const createEnrollment = (

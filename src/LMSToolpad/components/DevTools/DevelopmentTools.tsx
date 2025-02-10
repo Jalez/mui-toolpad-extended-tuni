@@ -34,6 +34,10 @@ const DevelopmentTools: React.FC = () => {
 
   const handleReset = async () => {
     try {
+      addNotificationData({
+        type: "info",
+        message: "Resetting store...",
+      });
       const response = await fetch("/api/dev/reset", { method: "POST" });
       if (!response.ok) throw new Error("Reset failed");
 

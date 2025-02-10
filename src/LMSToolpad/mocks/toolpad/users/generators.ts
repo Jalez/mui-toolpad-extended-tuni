@@ -57,7 +57,7 @@ function generateMockUser(
         is_teacher_old: false,
         available: true,
       },
-      visible_navigation: {},
+      visible_navigation: [],
     },
   };
 }
