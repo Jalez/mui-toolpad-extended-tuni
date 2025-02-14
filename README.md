@@ -273,7 +273,9 @@ const {
 ```tsx
 const {
   navigation, // Current navigation structure
-  updateSection, // Update navigation section
+  addSection, // Add a new section with optional header
+  removeSection, // Remove a section and its header if last section
+  addMicroserviceNavigation, // Add microservice navigation items
   setNavigation, // Set entire navigation
 } = useNavigationStore();
 ```
