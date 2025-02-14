@@ -1,34 +1,34 @@
 /** @format */
 
-import { create } from "zustand";
+import { create } from 'zustand';
 import {
   getCourseByUrl,
   getCourses,
   updateCourse,
-} from "../../../network/courses";
-import { groupCoursesByEnrollment } from "../../../utils/courseFilters";
-import { fetchState } from "../../../interfaces";
+} from '../../../network/courses';
+import { groupCoursesByEnrollment } from '../../../utils/courseFilters';
+import { fetchState } from '../../../interfaces';
 
-export type courseRole = "student" | "teacher" | "guest";
+export type courseRole = 'student' | 'teacher' | 'guest';
 
-export type visibilityMode = "public" | "enrolled" | "private";
+export type visibilityMode = 'public' | 'enrolled' | 'private';
 
 export type courseEventType =
-  | "lecture"
-  | "exercise"
-  | "exam"
-  | "deadline"
-  | "other";
+  | 'lecture'
+  | 'exercise'
+  | 'exam'
+  | 'deadline'
+  | 'other';
 
-export type courseEventFrequency = "daily" | "weekly" | "biweekly";
+export type courseEventFrequency = 'daily' | 'weekly' | 'biweekly';
 
 export type legalBasis =
-  | "consent" // Processing is based on explicit user consent
-  | "contract" // Processing is necessary for fulfilling educational contract
-  | "legal_obligation" // Processing is required by law (e.g., mandatory reporting)
-  | "legitimate_interests"; // Processing serves legitimate educational purposes
+  | 'consent' // Processing is based on explicit user consent
+  | 'contract' // Processing is necessary for fulfilling educational contract
+  | 'legal_obligation' // Processing is required by law (e.g., mandatory reporting)
+  | 'legitimate_interests'; // Processing serves legitimate educational purposes
 
-export type enrollmentStatus = "enrolled" | "pending" | "rejected";
+export type enrollmentStatus = 'enrolled' | 'pending' | 'rejected';
 
 interface EnrollmentData {
   courseId: string;
@@ -59,15 +59,15 @@ interface CourseEvent {
 }
 
 export type courseRelationType =
-  | "prerequisite" // Must complete before taking this course
-  | "recommended" // Should complete before taking this course
-  | "parallel" // Can/should be taken simultaneously
-  | "continues_from" // Natural continuation of this course
-  | "alternative_to" // Equivalent course (can't take both)
-  | "part_of" // Part of a larger study module/specialization
-  | "prepares_for"; // Helps prepare for this advanced course
+  | 'prerequisite' // Must complete before taking this course
+  | 'recommended' // Should complete before taking this course
+  | 'parallel' // Can/should be taken simultaneously
+  | 'continues_from' // Natural continuation of this course
+  | 'alternative_to' // Equivalent course (can't take both)
+  | 'part_of' // Part of a larger study module/specialization
+  | 'prepares_for'; // Helps prepare for this advanced course
 
-export type courseLevel = "basic" | "intermediate" | "advanced";
+export type courseLevel = 'basic' | 'intermediate' | 'advanced';
 
 export interface CourseRelation {
   code: string;
@@ -140,6 +140,7 @@ export interface CourseRaw {
     level: courseLevel; // Basic, intermediate, or advanced
   };
 }
+
 export interface Course extends CourseRaw {
   id: string; // Unique ID for the course
   createdAt: string; // Date when this course chat instance was created
@@ -147,19 +148,19 @@ export interface Course extends CourseRaw {
 }
 
 export const courseTemplate: CourseRaw = {
-  code: "",
-  instance: "",
-  title: "",
-  description: "",
+  code: '',
+  instance: '',
+  title: '',
+  description: '',
   image: {
-    large: "",
-    medium: "",
-    thumbnail: "",
+    large: '',
+    medium: '',
+    thumbnail: '',
   },
   startDate: null,
   endDate: null,
   visibility: {
-    mode: "private" as const,
+    mode: 'private' as const,
     startDate: null,
     endDate: null,
   },
@@ -171,13 +172,13 @@ export const courseTemplate: CourseRaw = {
     other: [],
   },
   tags: [],
-  language: "",
+  language: '',
   dataProcessing: {
-    purposes: ["course_delivery", "assessment"],
+    purposes: ['course_delivery', 'assessment'],
     retention: 365,
     thirdPartyProcessors: [],
     specialCategories: false,
-    legalBasis: "consent", // Default to most restrictive option
+    legalBasis: 'consent', // Default to most restrictive option
   },
   enrollment: {
     startDate: null,
@@ -194,9 +195,9 @@ export const courseTemplate: CourseRaw = {
     related: [],
   },
   studyModule: {
-    name: "",
+    name: '',
     credits: 5,
-    level: "basic",
+    level: 'basic',
   },
 };
 
@@ -237,8 +238,8 @@ interface CourseStore {
  * - Changed course identification logic to use code + instance
  */
 const useCourseStore = create<CourseStore>((set, get) => ({
-  fetchState: "loading",
-  currentCourseUrl: "",
+  fetchState: 'loading',
+  currentCourseUrl: '',
   currentCourse: null,
   courses: [],
   currentCourseCode: null,
@@ -253,7 +254,7 @@ const useCourseStore = create<CourseStore>((set, get) => ({
       const course = await getCourseByUrl(url);
       set({ currentCourse: course });
     } catch (error) {
-      console.error("Failed to fetch course by URL:", error);
+      console.error('Failed to fetch course by URL:', error);
     }
   },
   setCourseToUpdate: (course) => set({ courseToUpdate: course }),
@@ -276,20 +277,20 @@ const useCourseStore = create<CourseStore>((set, get) => ({
       }));
       return updatedCourse;
     } catch (error) {
-      console.error("Failed to update the course:", error);
+      console.error('Failed to update the course:', error);
       throw error; // Re-throw to handle in component
     }
   },
   getCourses: async () => {
     try {
-      set({ fetchState: "loading" });
+      set({ fetchState: 'loading' });
       const courses = await getCourses();
 
       // Group courses immediately after fetching
       const { isStudent, isStudentOld, isTeacher, isTeacherOld, available } =
         groupCoursesByEnrollment(courses);
       set({
-        fetchState: "idle",
+        fetchState: 'idle',
         learningCourses: isStudent,
         learningCoursesOld: isStudentOld,
         teachingCourses: isTeacher,
@@ -298,8 +299,8 @@ const useCourseStore = create<CourseStore>((set, get) => ({
         courses: courses,
       });
     } catch (error) {
-      set({ fetchState: "error" });
-      console.error("Failed to fetch courses:", error);
+      set({ fetchState: 'error' });
+      console.error('Failed to fetch courses:', error);
     }
   },
 }));

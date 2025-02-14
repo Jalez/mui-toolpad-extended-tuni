@@ -34,7 +34,7 @@ const setupDataStore = async () => {
     const { courses, enrollmentsByCourse } = generateCourses({
       coursesPerYear: 20,
       startYear: 2021,
-      numberOfYears: 4,
+      numberOfYears: 5,
       users: users,
     });
     dataStore = {
