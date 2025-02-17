@@ -2,8 +2,8 @@
 
 import useCourseStore, { Course } from "./store/useCourseStore";
 import CourseItem from "./CourseItem";
-import VerticalScroller from "../Common/Panel/VerticalScroller";
 import { useNavigate } from "react-router-dom";
+import Scroller from "../Common/Panel/Scroller";
 
 type CourseListForInstanceProps = {
   code: string;
@@ -24,8 +24,14 @@ const CourseListForInstance = ({
     navigate(`${course.instance}`);
   };
 
+  const itemHeight = 100;
+
   return (
-    <VerticalScroller itemHeight={200} containerHeight={containerHeight}>
+    <Scroller
+      direction="vertical"
+      itemSize={itemHeight}
+      containerSize={containerHeight}
+    >
       {filteredCourses.map((course) => (
         <CourseItem
           key={course.id}
@@ -35,7 +41,7 @@ const CourseListForInstance = ({
           onClick={handleCourseClick}
         />
       ))}
-    </VerticalScroller>
+    </Scroller>
   );
 };
 

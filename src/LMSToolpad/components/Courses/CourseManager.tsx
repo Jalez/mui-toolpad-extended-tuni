@@ -1,14 +1,19 @@
 import { useEffect } from "react";
 import useCourseStore from "./store/useCourseStore";
 import { CourseNavigationBuilder } from "./CourseNavigationbuilder";
+import { useRetry } from "../../../hooks/useRetry";
 
 const CourseManager = () => {
-  const { getCourses, setCurrentCourseUrl, getCourseByUrl } = useCourseStore();
+  const { getCourses, setCurrentCourseUrl, getCourseByUrl, courses } =
+    useCourseStore();
 
-  // Fetch courses on mount
-  useEffect(() => {
-    getCourses();
-  }, [getCourses]);
+  // Use the retry hook for fetching courses
+  useRetry({
+    action: getCourses,
+    condition: courses.length < 1,
+    successMessage: "Courses fetched successfully",
+    errorMessage: "Failed to fetch courses, retrying...",
+  });
 
   // Listen for parent frame URL messages to set current course
   useEffect(() => {
@@ -28,7 +33,7 @@ const CourseManager = () => {
     return () => window.removeEventListener("message", messageHandler);
   }, [getCourseByUrl, setCurrentCourseUrl]);
 
-  return <CourseNavigationBuilder />; // This is a manager component, no UI needed
+  return <CourseNavigationBuilder />;
 };
 
 export default CourseManager;

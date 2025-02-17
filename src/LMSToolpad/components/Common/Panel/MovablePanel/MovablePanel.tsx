@@ -1,8 +1,8 @@
 /** @format */
 
-import { Box } from '@mui/material';
-import React, { useState, useRef, useEffect } from 'react';
-import { usePanelStore } from '../Resizable/store/usePanelStore';
+import { Box } from "@mui/material";
+import React, { useState, useRef, useEffect } from "react";
+import { usePanelStore } from "../Resizable/store/usePanelStore";
 import {
   DndContext,
   DragOverlay,
@@ -12,17 +12,17 @@ import {
   useSensors,
   DragStartEvent,
   DragEndEvent,
-} from '@dnd-kit/core';
+} from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
   horizontalListSortingStrategy,
   useSortable,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { restrictToWindowEdges } from '@dnd-kit/modifiers';
-import { loadPanelOrder, savePanelOrder } from './hooks/usePersistentOrder';
-import { ToolsContainerWrapper } from '../PanelTools/ToolsContainer';
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { restrictToWindowEdges } from "@dnd-kit/modifiers";
+import { loadPanelOrder, savePanelOrder } from "./hooks/usePersistentOrder";
+import { ToolsContainerWrapper } from "../PanelTools/ToolsContainer";
 
 interface SortableItemProps {
   id: number;
@@ -44,7 +44,7 @@ const SortableItem = ({ id, children, moveMode }: SortableItemProps) => {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    cursor: moveMode ? 'move' : 'default',
+    cursor: moveMode ? "move" : "default",
   };
 
   return (
@@ -122,30 +122,34 @@ const MovablePanel = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      modifiers={[restrictToWindowEdges]}>
+      modifiers={[restrictToWindowEdges]}
+    >
       <Box
-        position='relative' // Add position relative for tools
-        width='100%'
-        sx={{ minHeight: '500px' }}>
+        position="relative" // Add position relative for tools
+        width="100%"
+        sx={{ minHeight: "500px" }}
+      >
         {tools && (
-          <ToolsContainerWrapper position='bottom-right'>
+          <ToolsContainerWrapper position="bottom-right">
             {tools}
           </ToolsContainerWrapper>
         )}
         <Box
-          display='flex'
-          flexDirection='row'
-          flexWrap='wrap'
-          justifyContent='center'
+          display="flex"
+          flexDirection="row"
+          flexWrap="wrap"
+          justifyContent="center"
           gap={gap}
           sx={{
-            width: '100%',
-            minHeight: '500px',
+            width: "100%",
+            minHeight: "500px",
             p: 1,
-          }}>
+          }}
+        >
           <SortableContext
             items={orderIndices}
-            strategy={horizontalListSortingStrategy}>
+            strategy={horizontalListSortingStrategy}
+          >
             {items.map((item) => (
               <SortableItem key={item.id} id={item.id} moveMode={moveMode}>
                 {item.content}
@@ -160,9 +164,10 @@ const MovablePanel = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
           <Box
             sx={{
               opacity: 0.8,
-              transform: 'scale(1.05)',
-              cursor: 'grabbing',
-            }}>
+              transform: "scale(1.05)",
+              cursor: "grabbing",
+            }}
+          >
             {items.find((item) => item.id === activeId)?.content}
           </Box>
         )}

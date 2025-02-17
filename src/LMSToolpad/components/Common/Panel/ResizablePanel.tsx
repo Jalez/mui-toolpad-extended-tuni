@@ -1,24 +1,24 @@
 /** @format */
 
-import { Box, useTheme } from '@mui/material';
-import { useEffect, useRef } from 'react';
-import { usePanelStore } from './Resizable/store/usePanelStore';
-import BlurOverlay from './Resizable/BlurOverlay';
-import ResizeIndicator from './Resizable/ResizeIndicator';
-import InternalScrolling from './Resizable/InternalScrolling';
-import ResizeHandlers from './Resizable/ResizeHandlers';
+import { Box, useTheme } from "@mui/material";
+import { useEffect, useRef } from "react";
+import { usePanelStore } from "./Resizable/store/usePanelStore";
+import BlurOverlay from "./Resizable/BlurOverlay";
+import ResizeIndicator from "./Resizable/ResizeIndicator";
+import InternalScrolling from "./Resizable/InternalScrolling";
+import ResizeHandlers from "./Resizable/ResizeHandlers";
 import {
   useItemCounts,
   useResizeContext,
   ResizeProvider,
-} from './Resizable/Context/ResizeContext';
-import { startDragging } from './Resizable/Hooks/useResizeHandlers';
-import { useResizablePanel } from './Resizable/Hooks/useResizablePanel';
+} from "./Resizable/Context/ResizeContext";
+import { startDragging } from "./Resizable/Hooks/useResizeHandlers";
+import { useResizablePanel } from "./Resizable/Hooks/useResizablePanel";
 import {
   loadDesiredWidth,
   saveDesiredWidth,
-} from './Resizable/Hooks/usePersistentDimensions';
-import { ToolsContainerWrapper } from './PanelTools/ToolsContainer';
+} from "./Resizable/Hooks/usePersistentDimensions";
+import { ToolsContainerWrapper } from "./PanelTools/ToolsContainer";
 
 interface ResizablePanelProps {
   id: string; // New required prop
@@ -86,12 +86,11 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     if (isUserResizingRef.current) {
       // Update userChosenWidth when user is actually dragging
       userChosenWidthRef.current = newDim.width;
-      console.log('User dragged to width:', newDim.width);
     }
     originalHandleDimensionsChange(newDim);
   };
 
-  const handleMouseDown = (direction: 'vertical' | 'horizontal' | 'corner') => {
+  const handleMouseDown = (direction: "vertical" | "horizontal" | "corner") => {
     isUserResizingRef.current = true;
     return startDragging(
       direction,
@@ -102,7 +101,7 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     );
   };
 
-  const handleTouchStart = (direction: 'vertical' | 'horizontal' | 'corner') =>
+  const handleTouchStart = (direction: "vertical" | "horizontal" | "corner") =>
     startDragging(direction, resizeMode, dimensions, setIsDragging, dragStart);
 
   useEffect(() => {
@@ -111,16 +110,16 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
         userChosenWidthRef.current = dimensions.width;
         // Save the desired width when user finishes dragging
         saveDesiredWidth(id, dimensions.width);
-        console.log(
-          'User finished resize, new chosen width:',
-          dimensions.width
-        );
+        // console.log(
+        //   'User finished resize, new chosen width:',
+        //   dimensions.width
+        // );
       }
       isUserResizingRef.current = false;
     };
 
-    document.addEventListener('mouseup', handleMouseUp);
-    return () => document.removeEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mouseup", handleMouseUp);
+    return () => document.removeEventListener("mouseup", handleMouseUp);
   }, [dimensions.width, id]); // Add id as dependency
 
   // Add effect to calculate and log item count using snapDimensions
@@ -128,12 +127,12 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     if (snapDimensions.width > 0 && panelRef.current) {
       const actualWidth = panelRef.current.offsetWidth;
       const itemsVisible = Math.floor(actualWidth / snapDimensions.width);
-      console.log(
-        '[ResizablePanel] Actually showing:',
-        itemsVisible,
-        'items',
-        `(Computed width: ${actualWidth}px, Snap width: ${snapDimensions.width}px)`
-      );
+      // console.log(
+      //   "[ResizablePanel] Actually showing:",
+      //   itemsVisible,
+      //   "items",
+      //   `(Computed width: ${actualWidth}px, Snap width: ${snapDimensions.width}px)`
+      // );
     }
   }, [dimensions.width, snapDimensions.width]);
 
@@ -145,9 +144,11 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
       panelRef.current
     ) {
       const actualWidth = panelRef.current.offsetWidth;
-      const horizontalItemsVisible = Math.floor(
-        actualWidth / snapDimensions.width
+      const horizontalItemsVisible = Math.max(
+        1,
+        Math.floor(actualWidth / snapDimensions.width)
       );
+
       const verticalItemsVisible = Math.floor(
         dimensions.height / snapDimensions.height
       );
@@ -261,13 +262,13 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     }
 
     // Also handle window resizing for fallback
-    window.addEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
 
     // Run once on mount
     handleResize();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
       if (observer) observer.disconnect();
     };
   }, [
@@ -306,11 +307,11 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
 
   // Add debug logging
   useEffect(() => {
-    console.log('Width changed:', {
-      dimensionsWidth: dimensions.width,
-      userChosenWidth: userChosenWidthRef.current,
-      isUserResizing: isUserResizingRef.current,
-    });
+    // console.log("Width changed:", {
+    //   dimensionsWidth: dimensions.width,
+    //   userChosenWidth: userChosenWidthRef.current,
+    //   isUserResizing: isUserResizingRef.current,
+    // });
   }, [dimensions.width]);
 
   return (
@@ -318,36 +319,37 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
       ref={panelRef}
       sx={{
         m: 1,
-        position: 'relative',
+        position: "relative",
         // padding: 1,
         // border box
-        boxSizing: 'border-box',
+        boxSizing: "border-box",
         // width: dimensions.width,
-        maxWidth: '100%', // Constrain width
+        maxWidth: "100%", // Constrain width
         height: dimensions.height,
         backgroundColor: theme.palette.background.paper,
         borderRadius: resizeMode ? 1 : 0,
         outline: resizeMode
           ? `0.1em dashed ${theme.palette.primary.main}`
-          : 'none',
-        display: 'flex', // Add this
-        flexDirection: 'column', // Add this
-        overflow: 'hidden', // Add this
+          : "none",
+        display: "flex", // Add this
+        flexDirection: "column", // Add this
+        overflow: "hidden", // Add this
         // Add smooth transitions except during drag
         transition:
           isDragging.horizontal || isDragging.vertical
-            ? 'none'
-            : 'width 0.3s ease-in-out, height 0.3s ease-in-out',
+            ? "none"
+            : "width 0.3s ease-in-out, height 0.3s ease-in-out",
         // Optimize animations
-        willChange: 'width, height',
-      }}>
+        willChange: "width, height",
+      }}
+    >
       {tools && (
-        <ToolsContainerWrapper position='bottom-right'>
+        <ToolsContainerWrapper position="bottom-right">
           {tools}
         </ToolsContainerWrapper>
       )}
       <InternalScrolling dimensions={dimensions}>
-        {typeof children === 'function' ? children(dimensions) : children}
+        {typeof children === "function" ? children(dimensions) : children}
       </InternalScrolling>
 
       {(isDragging.vertical || isDragging.horizontal) && (

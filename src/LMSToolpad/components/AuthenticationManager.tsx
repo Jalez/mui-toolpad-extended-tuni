@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "../store/useUserStore";
 import { useNotificationStore } from "./Notifications/store/useNotificationsStore";
 import useCourseStore from "./Courses/store/useCourseStore";
+import { useRetry } from "../../hooks/useRetry";
 
 const AuthenticationManager = () => {
   const [loggingIn, setLoggingIn] = useState(false);
@@ -10,10 +11,13 @@ const AuthenticationManager = () => {
   const { addNotificationData } = useNotificationStore();
   const [parentUrl, setParentUrl] = useState<string | null>(null);
 
-  // Fetch user when logging in or course changes
-  useEffect(() => {
-    getUser();
-  }, [loggingIn, currentCourse?.id, getUser]);
+  // Use the retry hook for fetching user
+  useRetry({
+    action: getUser,
+    condition: !user?.platformRoles,
+    successMessage: "User authenticated successfully",
+    errorMessage: "Failed to get user platform role, retrying...",
+  });
 
   // Handle return from authentication
   useEffect(() => {

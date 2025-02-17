@@ -26,7 +26,7 @@ const Microservices = ({ children }: MicroservicesProps) => {
 
   // Call the store function to update sections with merged microservices
   useEffect(() => {
-    console.log("allMicroserviceNavigation", allMicroserviceNavigation);
+    // console.log("allMicroserviceNavigation", allMicroserviceNavigation);
     updateMicroserviceNavigationForSections();
   }, [
     allMicroserviceNavigation,

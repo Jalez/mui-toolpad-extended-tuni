@@ -1,14 +1,13 @@
 /** @format */
-
 import useCourseStore, { Course } from "./store/useCourseStore";
 import CourseItem from "./CourseItem";
 import { useUserStore } from "../../store/useUserStore";
-import VerticalScroller from "../Common/Panel/VerticalScroller";
+import Scroller from "../Common/Panel/Scroller"; // Our unified scroller
 import { priority } from "./NoCourseNotice";
-import HorizontalScroller from "../Common/Panel/HorizontalScroller";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useSetSnapDimensions } from "../Common/Panel/Resizable/Context/ResizeContext";
+import { Box, Typography } from "@mui/material";
 
 type CourseListProps = {
   displayMode?: "course" | "instance" | "instanceList";
@@ -37,7 +36,7 @@ const CourseList = ({
 
   useEffect(() => {
     setSnapDimensions({
-      width: itemReelWidth, // Account for padding
+      width: itemReelWidth, // Account for padding/margins if needed
       height: itemReelHeight,
     });
   }, [itemReelWidth, itemReelHeight, setSnapDimensions]);
@@ -46,18 +45,19 @@ const CourseList = ({
     navigate(`/${course.code}/${course.instance}`);
   };
 
+  // Render a section with a header and a horizontal scroller
   const renderCourseSection = (
     title: string,
     courseList: Course[],
-    priority: priority
+    prio: priority
   ) => {
     return (
-      <HorizontalScroller
-        itemCount={courseList.length}
-        height={itemReelHeight}
+      <Scroller
+        direction="horizontal"
+        itemSize={itemReelWidth}
+        containerSize={itemReelHeight}
         title={title}
-        priority={priority}
-        itemWidth={itemReelWidth}
+        priority={prio}
       >
         {courseList.map((course) => (
           <CourseItem
@@ -68,14 +68,15 @@ const CourseList = ({
             displayMode={displayMode}
           />
         ))}
-      </HorizontalScroller>
+      </Scroller>
     );
   };
 
   return (
-    <VerticalScroller
-      itemHeight={itemReelHeight}
-      containerHeight={containerHeight}
+    <Scroller
+      direction="vertical"
+      itemSize={itemReelHeight}
+      containerSize={containerHeight}
     >
       {visibleLists?.isStudent &&
         learningCourses.length !== 0 &&
@@ -92,7 +93,7 @@ const CourseList = ({
       {visibleLists?.available &&
         availableCourses.length !== 0 &&
         renderCourseSection("Available Courses", availableCourses, "low")}
-    </VerticalScroller>
+    </Scroller>
   );
 };
 

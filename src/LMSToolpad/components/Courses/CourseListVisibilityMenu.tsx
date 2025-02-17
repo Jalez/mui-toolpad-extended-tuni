@@ -65,10 +65,6 @@ export const CourseListVisibilityMenu = () => {
           ...visibleLists,
           [key]: !visibleLists[key],
         },
-        visibleNavigation: {
-          ...visibleNavigation,
-          [navHeader]: !visibleNavigation[key], // Sync with the visibleCourseLists state
-        },
       },
     };
 

@@ -1,11 +1,11 @@
 /** @format */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
-import FullCalendar from '@fullcalendar/react';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
-import interactionPlugin from '@fullcalendar/interaction';
-import { usePanelStore } from '../../Common/Panel/Resizable/store/usePanelStore'; // added import
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { usePanelStore } from "../../Common/Panel/Resizable/store/usePanelStore"; // added import
 import {
   useTheme,
   GlobalStyles,
@@ -13,22 +13,35 @@ import {
   Typography,
   IconButton,
   Tooltip,
-} from '@mui/material';
-import { StaticDatePicker } from '@mui/x-date-pickers/StaticDatePicker';
-import Popover from '@mui/material/Popover';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import TodayIcon from '@mui/icons-material/Today';
-import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-import { DateTime } from 'luxon';
-import { useSetSnapDimensions } from '../../Common/Panel/Resizable/Context/ResizeContext';
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import ViewWeekIcon from '@mui/icons-material/ViewWeek';
-import ViewDayIcon from '@mui/icons-material/ViewDay';
-import { SpeedDialButton } from '../../Common/SpeedDialButton';
+} from "@mui/material";
+import { StaticDatePicker } from "@mui/x-date-pickers/StaticDatePicker";
+import Popover from "@mui/material/Popover";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import TodayIcon from "@mui/icons-material/Today";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import { DateTime } from "luxon";
+import { useSetSnapDimensions } from "../../Common/Panel/Resizable/Context/ResizeContext";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import ViewWeekIcon from "@mui/icons-material/ViewWeek";
+import ViewDayIcon from "@mui/icons-material/ViewDay";
+import { SpeedDialButton } from "../../Common/SpeedDialButton";
+import useCourseStore from "../store/useCourseStore";
+import { subjectConfig } from "../../../config/subjectConfig";
 
+// Helper to determine contrast color based on hex background
+function getContrast(hexColor: string): string {
+  // Remove '#' if present and convert to integer values
+  const hex = hexColor.replace("#", "");
+  const r = parseInt(hex.substr(0, 2), 16);
+  const g = parseInt(hex.substr(2, 2), 16);
+  const b = parseInt(hex.substr(4, 2), 16);
+  // Calculate luminance
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance > 0.5 ? "black" : "white";
+}
 interface CalendarProps {
-  events: Array<{
+  events?: Array<{
     title: string;
     start: string;
     end?: string; // Make end optional
@@ -38,14 +51,16 @@ interface CalendarProps {
   }>;
 }
 
-type ViewMode = 'dayGridMonth' | 'timeGridWeek' | 'timeGridDay';
+type ViewMode = "dayGridMonth" | "timeGridWeek" | "timeGridDay";
 
-const Calendar: React.FC<CalendarProps> = ({ events }) => {
+const Calendar: React.FC<CalendarProps> = () => {
+  const { learningCourses } = useCourseStore();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<any>(null);
-  const [calendarView, setCalendarView] = useState<ViewMode>('dayGridMonth');
+  const [calendarView, setCalendarView] = useState<ViewMode>("dayGridMonth");
   const [manualSelection, setManualSelection] = useState(false);
-  const [currentTitle, setCurrentTitle] = useState('');
+  const [currentTitle, setCurrentTitle] = useState("");
   const { resizeMode } = usePanelStore(); // get resize mode state
   const theme = useTheme(); // use MUI theme
   const [isDragging, setIsDragging] = useState(false);
@@ -60,6 +75,44 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
 
   // Set snap dimensions for parent ResizablePanel
   const setSnapDimensions = useSetSnapDimensions();
+
+  const events = learningCourses.flatMap((course) => {
+    return Object.values(course.events)
+      .flat()
+      .map((event) => {
+        // console.log('event', event);
+        // Extract subject code (first two parts of course.code)
+        const subject = course.code.split(".").slice(0, 2).join(".");
+        const config = subjectConfig[subject] || {
+          baseColor: theme.palette.primary.dark,
+          levelShades: {
+            basic: theme.palette.primary.light,
+            intermediate: theme.palette.primary.main,
+            advanced: theme.palette.primary.dark,
+          },
+        };
+        const courseLevel = course.studyModule?.level || "basic";
+        const bgColor = config.levelShades[courseLevel];
+        const borderColor = config.baseColor;
+        const textColor = getContrast(bgColor);
+        return {
+          title: event.title,
+          start: event.startTime,
+          end: event.endTime,
+          backgroundColor: bgColor,
+          borderColor: borderColor,
+          textColor: textColor,
+        };
+      });
+  });
+
+  useEffect(() => {
+    if (calendarRef.current) {
+      const calendarApi = calendarRef.current.getApi();
+      calendarApi.removeAllEvents();
+      events.forEach((event) => calendarApi.addEvent(event));
+    }
+  }, [events]);
 
   useEffect(() => {
     setSnapDimensions({
@@ -77,11 +130,11 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
           const width = entry.contentRect.width;
           let view;
           if (width >= 1000) {
-            view = 'dayGridMonth';
+            view = "dayGridMonth";
           } else if (width >= 600) {
-            view = 'timeGridWeek';
+            view = "timeGridWeek";
           } else {
-            view = 'timeGridDay';
+            view = "timeGridDay";
           }
           setCalendarView(view as ViewMode);
         }
@@ -101,10 +154,10 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
   useEffect(() => {
     if (calendarRef.current) {
       // Select the first '.fc-scroller' element
-      const scrollable = containerRef.current?.querySelector('.fc-scroller');
+      const scrollable = containerRef.current?.querySelector(".fc-scroller");
       if (scrollable) {
         // Enable scrolling by overriding inline style
-        (scrollable as HTMLElement).style.overflow = 'auto';
+        (scrollable as HTMLElement).style.overflow = "auto";
         scrollableRef.current = scrollable as HTMLElement;
       }
     }
@@ -180,9 +233,9 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
 
   // Define view actions for SpeedDial
   const viewActions = [
-    { icon: <CalendarMonthIcon />, name: 'Month', value: 'dayGridMonth' },
-    { icon: <ViewWeekIcon />, name: 'Week', value: 'timeGridWeek' },
-    { icon: <ViewDayIcon />, name: 'Day', value: 'timeGridDay' },
+    { icon: <CalendarMonthIcon />, name: "Month", value: "dayGridMonth" },
+    { icon: <ViewWeekIcon />, name: "Week", value: "timeGridWeek" },
+    { icon: <ViewDayIcon />, name: "Day", value: "timeGridDay" },
   ];
 
   const viewIcons = {
@@ -205,106 +258,89 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
   return (
     <Box
       sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        pointerEvents: resizeMode ? 'none' : 'auto',
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        pointerEvents: resizeMode ? "none" : "auto",
         backgroundColor: theme.palette.background.paper,
         color: theme.palette.text.primary,
         // borderRadius: theme.shape.borderRadius,
         padding: theme.spacing(2),
         boxShadow: theme.shadows[2],
       }}
-      ref={containerRef}>
+      ref={containerRef}
+    >
       <GlobalStyles
         styles={{
-          '.fc .fc-day-today': {
-            backgroundColor: theme.palette.background.default + ' !important',
-            // color:
-            //   theme.palette.getContrastText(theme.palette.action.hover) +
-            //   ' !important',
+          ".fc .fc-day-today": {
+            backgroundColor: theme.palette.background.default + " !important",
           },
-          '.fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link, .fc-timegrid-slot-lane, .fc-timegrid-slot-lane-frame':
+          ".fc-timegrid-event-harness-inset .fc-timegrid-event, .fc-timegrid-event.fc-event-mirror, .fc-timegrid-more-link, .fc-timegrid-slot-lane, .fc-timegrid-slot-lane-frame":
             {
-              border: 'none !important',
-              boxShadow: 'none !important',
+              border: "none !important",
+              boxShadow: "none !important",
               font: theme.typography.body2.fontFamily,
             },
-          'fc-event-main-frame': {
-            backgroundColor: 'white' + ' !important',
-            // bgcolor: 'white',
+          "fc-event-main-frame": {
+            backgroundColor: "white" + " !important",
           },
-          '.fc-theme-standard td, .fc-theme-standard th': {
-            border: 'none !important',
+          ".fc-theme-standard td, .fc-theme-standard th": {
+            border: "none !important",
           },
-          '.fc .fc-col-header-cell .fc-day .fc-day-mon .fc-day-past .fc-daygrid-day-frame, .fc .fc-daygrid-day-top, .fc .fc-daygrid-day-bg, .fc .fc-scrollgrid-liquid':
+          ".fc .fc-col-header-cell .fc-day .fc-day-mon .fc-day-past .fc-daygrid-day-frame, .fc .fc-daygrid-day-top, .fc .fc-daygrid-day-bg, .fc .fc-scrollgrid-liquid":
             {
-              border: 'none !important',
+              border: "none !important",
             },
           td: {
-            border: 'none !important',
+            border: "none !important",
             padding: 0,
-            //make the cells stylish
-            // '&:hover': {
-            //   backgroundColor: theme.palette.action.hover,
-            // },
-            //Make only that row change background color
           },
-          // '.fc .fc-daygrid-body tr:hover': {
-          //   backgroundColor: theme.palette.action.hover + ' !important',
-          // },
-          '.fc .fc-daygrid-body tbody tr:hover > td': {
-            backgroundColor: theme.palette.action.hover + ' !important',
+
+          ".fc .fc-daygrid-body tbody tr:hover > td": {
+            backgroundColor: theme.palette.action.hover + " !important",
           },
-          '.fc-daygrid-row:hover': {
-            '& .fc-daygrid-day': {
-              backgroundColor: theme.palette.action.hover + ' !important',
+          ".fc-daygrid-row:hover": {
+            "& .fc-daygrid-day": {
+              backgroundColor: theme.palette.action.hover + " !important",
             },
           },
-          '.fc-timegrid-slot-lane:hover': {
-            backgroundColor: theme.palette.action.hover + ' !important',
+          ".fc-timegrid-slot-lane:hover": {
+            backgroundColor: theme.palette.action.hover + " !important",
           },
-          '.fc-daygrid-day:hover': {
-            backgroundColor: theme.palette.action.hover + ' !important',
+          ".fc-daygrid-day:hover": {
+            backgroundColor: theme.palette.action.hover + " !important",
           },
-          // Remove or comment out these styles that might override individual event colors
-          // '.fc-timegrid-event': {
-          //   backgroundColor: `${theme.palette.primary.dark} !important`,
-          //   borderColor: `${theme.palette.primary.main} !important`,
-          //   '& .fc-event-main': {
-          //     backgroundColor: 'transparent !important',
-          //     color: `${theme.palette.primary.contrastText} !important`,
-          //   },
-          // },
         }}
       />
       {/* Custom header styled similar to CourseHeaderActions */}
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           mb: 1,
           px: 1,
-        }}>
+        }}
+      >
         {/* Left controls with IconButtons */}
-        <Box sx={{ display: 'flex', gap: 1 }}>
-          <Tooltip title='Previous'>
-            <IconButton size='small' onClick={handlePrev}>
-              <ChevronLeftIcon fontSize='small' />
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Tooltip title="Previous">
+            <IconButton size="small" onClick={handlePrev}>
+              <ChevronLeftIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Go to today'>
-            <IconButton size='small' onClick={handleToday}>
-              <TodayIcon fontSize='small' />
+          <Tooltip title="Go to today">
+            <IconButton size="small" onClick={handleToday}>
+              <TodayIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title='Select date'>
+          <Tooltip title="Select date">
             <IconButton
-              size='small'
-              onClick={(e) => setAnchorEl(e.currentTarget)}>
-              <CalendarMonthIcon fontSize='small' />
+              size="small"
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+            >
+              <CalendarMonthIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           {/* <Tooltip title='Toggle all-day slot'>
@@ -319,23 +355,24 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
               open={Boolean(anchorEl)}
               anchorEl={anchorEl}
               onClose={() => setAnchorEl(null)}
-              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-              transformOrigin={{ vertical: 'top', horizontal: 'center' }}>
+              anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+              transformOrigin={{ vertical: "top", horizontal: "center" }}
+            >
               <StaticDatePicker
-                displayStaticWrapperAs='desktop'
+                displayStaticWrapperAs="desktop"
                 value={null}
                 onChange={handleDateSelect}
               />
             </Popover>
           )}
-          <Tooltip title='Next'>
-            <IconButton size='small' onClick={handleNext}>
-              <ChevronRightIcon fontSize='small' />
+          <Tooltip title="Next">
+            <IconButton size="small" onClick={handleNext}>
+              <ChevronRightIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </Box>
         {/* Center title */}
-        <Typography variant='subtitle1' component='div'>
+        <Typography variant="subtitle1" component="div">
           {currentTitle}
         </Typography>
         <SpeedDialButton
@@ -354,27 +391,29 @@ const Calendar: React.FC<CalendarProps> = ({ events }) => {
         sx={{
           flex: 1,
           minHeight: 0,
-          overflow: 'hidden',
-          '& .fc-scroller-liquid-absolute': {
-            cursor: 'grab',
-            '&:active': {
-              cursor: 'grabbing',
+          overflow: "hidden",
+          "& .fc-scroller-liquid-absolute": {
+            cursor: "grab",
+            "&:active": {
+              cursor: "grabbing",
             },
           },
-        }}>
+        }}
+      >
         <FullCalendar
+          key={JSON.stringify(events)}
           ref={calendarRef}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
           initialView={calendarView}
           events={events}
           eventDidMount={handleEventDidMount} // <-- New callback added
-          height='100%'
+          height="100%"
           headerToolbar={false}
           datesSet={handleDatesSet}
           editable={false}
           selectable={false}
-          slotMinTime='00:00:00'
-          slotMaxTime='24:00:00'
+          slotMinTime="00:00:00"
+          slotMaxTime="24:00:00"
           expandRows={true}
           handleWindowResize={true}
           allDaySlot={showAllDaySlot}

@@ -246,7 +246,7 @@ export const useUserStore = create<UserState>((set) => ({
       const user = await getCurrentUser();
 
       if (user) {
-        console.log("User", user);
+        // console.log("User", user);
         set({
           user: { ...user },
           fetchState: "idle",
@@ -292,21 +292,17 @@ export const useUserStore = create<UserState>((set) => ({
   },
   updateUser: async (userData) => {
     try {
-      console.log("Updating user with data:", userData);
       set({ fetchState: "loading" });
       const updatedUser = await updateUser(userData);
-      console.log("Server response:", updatedUser);
 
       // Update both user and userToUpdate states
       set((state) => {
-        console.log("Previous state:", state);
         const newState = {
           fetchState: "idle" as fetchState,
           userToUpdate: updatedUser,
           // If this is the current user, update that too
           user: state.user?.id === updatedUser.id ? updatedUser : state.user,
         };
-        console.log("New state:", newState);
         return newState;
       });
 

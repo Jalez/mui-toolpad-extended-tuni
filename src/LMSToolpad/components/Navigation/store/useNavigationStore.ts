@@ -283,8 +283,7 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
     set((state) => {
       const newSections = { ...state.sections };
       let hasChanges = false;
-      console.log("Updating microservices", state.allMicroserviceNavigation);
-      console.log("Sections", newSections);
+
       Object.keys(newSections).forEach((sectionKey) => {
         const section = newSections[sectionKey];
         Object.keys(section.pages).forEach((pageKey) => {

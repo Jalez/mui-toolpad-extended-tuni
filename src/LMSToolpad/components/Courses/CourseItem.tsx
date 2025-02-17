@@ -60,6 +60,8 @@ const CourseItem = ({
     <Card
       elevation={0}
       sx={{
+        marginLeft: 2,
+        marginRight: 2,
         boxSizing: "border-box",
         position: "relative",
         cursor: "pointer",

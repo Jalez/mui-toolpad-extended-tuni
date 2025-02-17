@@ -48,19 +48,22 @@ function generateMockEvent(
   type: courseEventType,
   baseDate: Date
 ): CourseEventBackendData {
+  // Generate a random offset for the start time (up to 10 days)
+  const startOffset = Math.random() * 864000000;
+  const startTime = new Date(baseDate.getTime() + startOffset);
+
+  // Generate a random duration between 30 minutes and 2.5 hours
+  const duration = Math.random() * 7200000 + 1800000;
+  const endTime = new Date(startTime.getTime() + duration);
+
   return {
     id,
     type,
     title: `${type.charAt(0).toUpperCase() + type.slice(1)} Session`,
-
-    start_time: new Date(
-      baseDate.getTime() + Math.random() * 864000000
-    ).toISOString(),
-    end_time: new Date(
-      baseDate.getTime() + Math.random() * 864000000
-    ).toISOString(),
+    start_time: startTime.toISOString(),
+    end_time: endTime.toISOString(),
     location: "Online",
-    teachers: teachers as CourseEnrollmentBackendData[],
+    teachers,
     recurring: {
       frequency: "weekly",
       until: new Date(baseDate.getTime() + 864000000 * 10).toISOString(),
@@ -91,7 +94,12 @@ function generateMockCourse(
     level: courseLevel;
   }
 ): CourseBackendData {
-  const { topic, subject, basicCode, level: courseLevel } = preGeneratedSequence;
+  const {
+    topic,
+    subject,
+    basicCode,
+    level: courseLevel,
+  } = preGeneratedSequence;
   const courseCode = `${subject}.${basicCode}${
     courseLevel === "basic" ? "1" : courseLevel === "intermediate" ? "2" : "3"
   }`;
@@ -151,8 +159,8 @@ function generateMockCourse(
       courseLevel === "advanced"
         ? "advanced"
         : courseLevel === "basic"
-        ? "basic"
-        : ("intermediate" as courseLevel),
+          ? "basic"
+          : ("intermediate" as courseLevel),
     order:
       courseLevel === "advanced" ? 3 : courseLevel === "intermediate" ? 2 : 1,
   };
@@ -248,7 +256,6 @@ function generateMockCourse(
     study_module,
   };
 }
-
 
 //Randomly enroll some of the users. Make some students, some teachers
 const createEnrollment = (

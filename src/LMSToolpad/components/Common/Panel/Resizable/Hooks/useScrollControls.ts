@@ -1,136 +1,141 @@
 /** @format */
-
-/**
- * useScrollControls:
- * Manages both mouse/touch dragging and pagination for horizontal/vertical scrollers.
- * Returns refs and handlers to enable snapping, arrow button controls, and more.
- */
-
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useState, useEffect, useCallback } from "react";
 
 interface ScrollControlsOptions {
-  direction: 'horizontal' | 'vertical';
+  direction: "horizontal" | "vertical";
   itemSize: number;
-  itemsPerPage?: number; // New prop
-  itemCount?: number; // Add this
+  itemsPerPage?: number;
+  itemCount?: number;
 }
 
-// Add at the top of the file
+// Global scroll cooldown vars remain unchanged.
 let lastHorizontalScrollTime = 0;
 let lastVerticalScrollTime = 0;
 const SCROLL_COOLDOWN = 500; // ms
 
+// New thresholds
+const DRAG_TIME_THRESHOLD = 200; // ms for long press drag
+const DRAG_DISTANCE_THRESHOLD = 5; // pixels
+
 export const useScrollControls = ({
-  direction: scrollAxis, // rename for clarity
+  direction: scrollAxis,
   itemSize,
   itemsPerPage = 1,
-  itemCount, // Add this parameter
+  itemCount,
 }: ScrollControlsOptions) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [showStartButton, setShowStartButton] = useState(false);
   const [showEndButton, setShowEndButton] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState({ pos: 0, scroll: 0 });
   const [hasDragged, setHasDragged] = useState(false);
+  const [dragStart, setDragStart] = useState({ pos: 0, scroll: 0 });
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
-  const lastDragDirection = useRef<'start' | 'end' | null>(null);
+  const lastDragDirection = useRef<"start" | "end" | null>(null);
+  const dragTimerRef = useRef<number | null>(null);
 
+  // (Scroll, resize, and mutation observers remain the same)
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-
     let throttleTimeout: NodeJS.Timeout | null = null;
-
     const checkScroll = () => {
-      const isHorizontal = scrollAxis === 'horizontal';
+      const container = containerRef.current;
+      if (!container) return;
+      const isHorizontal = scrollAxis === "horizontal";
       const currentScroll = isHorizontal
         ? container.scrollLeft
         : container.scrollTop;
-
-      // Use itemCount prop if provided, fallback to DOM children count
       const actualItemCount = itemCount ?? container.children.length;
+      const buffer = 5; // small buffer to account for partial visibility
 
-      // Calculate total pages based on items and items per page
-      const totalPagesCalc = Math.max(
-        1,
-        Math.ceil(actualItemCount / itemsPerPage)
-      );
-
-      // Calculate current page
-      const currentPageCalc = Math.min(
-        Math.floor(currentScroll / itemSize),
-        totalPagesCalc - 1
-      );
-
-      setTotalPages(totalPagesCalc);
-      setCurrentPage(currentPageCalc);
-
-      // Simple button state based on current page and total pages
-      setShowStartButton(currentPageCalc > 0);
-      setShowEndButton(currentPageCalc < totalPagesCalc - 1);
+      if (isHorizontal) {
+        const effectiveItemsPerPage = Math.max(
+          1,
+          Math.round((container.clientWidth + buffer) / itemSize)
+        );
+        const totalPagesCalc = Math.max(
+          1,
+          actualItemCount - effectiveItemsPerPage + 1
+        );
+        const currentPageCalc = Math.min(
+          Math.floor(currentScroll / itemSize),
+          totalPagesCalc - 1
+        );
+        setTotalPages(totalPagesCalc);
+        setCurrentPage(currentPageCalc);
+        setShowStartButton(currentPageCalc > 0);
+        setShowEndButton(currentPageCalc < totalPagesCalc - 1);
+      } else {
+        // Use similar logic for vertical scrolling:
+        const effectiveItemsPerPage = Math.max(
+          1,
+          Math.round((container.clientHeight + buffer) / itemSize)
+        );
+        const totalPagesCalc = Math.max(
+          1,
+          actualItemCount - effectiveItemsPerPage + 1
+        );
+        const currentPageCalc = Math.min(
+          Math.floor(currentScroll / itemSize),
+          totalPagesCalc - 1
+        );
+        setTotalPages(totalPagesCalc);
+        setCurrentPage(currentPageCalc);
+        setShowStartButton(currentPageCalc > 0);
+        setShowEndButton(currentPageCalc < totalPagesCalc - 1);
+      }
     };
-
     const throttledCheckScroll = () => {
       if (throttleTimeout === null) {
         throttleTimeout = setTimeout(() => {
           throttleTimeout = null;
           checkScroll();
-        }, 100); // Adjust delay as needed
+        }, 100);
       }
     };
 
-    // Replace raw scroll logger with one that logs only when near a snap point
-
     const resizeObserver = new ResizeObserver(checkScroll);
     resizeObserver.observe(container);
-    container.addEventListener('scroll', throttledCheckScroll);
-    // Use new snapped logger
-    // Add MutationObserver to capture changes in container children
+    container.addEventListener("scroll", throttledCheckScroll);
     const mutationObserver = new MutationObserver(checkScroll);
     mutationObserver.observe(container, { childList: true, subtree: true });
-    // Defer initial check until layout is settled
     requestAnimationFrame(() => {
       requestAnimationFrame(checkScroll);
     });
-
     return () => {
-      container.removeEventListener('scroll', throttledCheckScroll);
+      container.removeEventListener("scroll", throttledCheckScroll);
       resizeObserver.disconnect();
       mutationObserver.disconnect();
       if (throttleTimeout) clearTimeout(throttleTimeout);
     };
-  }, [scrollAxis, itemSize, itemsPerPage, itemCount]); // Add itemCount to dependencies
+  }, [scrollAxis, itemSize, itemsPerPage, itemCount]);
 
-  // Add new effect specifically for itemCount changes
   useEffect(() => {
     const container = containerRef.current;
     if (!container || !itemCount) return;
-
     const currentScroll =
-      scrollAxis === 'horizontal' ? container.scrollLeft : container.scrollTop;
+      scrollAxis === "horizontal" ? container.scrollLeft : container.scrollTop;
     const totalPagesCalc = Math.max(1, Math.ceil(itemCount / itemsPerPage));
     const currentPageCalc = Math.min(
       Math.floor(currentScroll / itemSize),
       totalPagesCalc - 1
     );
-
     setTotalPages(totalPagesCalc);
     setCurrentPage(currentPageCalc);
     setShowStartButton(currentPageCalc > 0);
     setShowEndButton(currentPageCalc < totalPagesCalc - 1);
   }, [itemCount, itemsPerPage, itemSize, scrollAxis]);
 
-  // Common function to snap to nearest item
   const snapToClosest = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
-    const isHorizontal = scrollAxis === 'horizontal';
+    const isHorizontal = scrollAxis === "horizontal";
     const currentScroll = isHorizontal
       ? container.scrollLeft
       : container.scrollTop;
     const snapPoint = Math.round(currentScroll / itemSize) * itemSize;
-    container.style.scrollBehavior = 'smooth';
+    container.style.scrollBehavior = "smooth";
     if (isHorizontal) {
       container.scrollLeft = snapPoint;
     } else {
@@ -138,7 +143,7 @@ export const useScrollControls = ({
     }
   }, [scrollAxis, itemSize]);
 
-  // Add global mouseup listener to clear dragging state
+  // Global mouseup to clear dragging and timer.
   useEffect(() => {
     const handleGlobalMouseUp = (e: MouseEvent) => {
       e.preventDefault();
@@ -146,138 +151,147 @@ export const useScrollControls = ({
         setIsDragging(false);
         snapToClosest();
       }
+      if (dragTimerRef.current) {
+        clearTimeout(dragTimerRef.current);
+        dragTimerRef.current = null;
+      }
     };
-    window.addEventListener('mouseup', handleGlobalMouseUp);
-    return () => window.removeEventListener('mouseup', handleGlobalMouseUp);
+    window.addEventListener("mouseup", handleGlobalMouseUp);
+    return () => window.removeEventListener("mouseup", handleGlobalMouseUp);
   }, [isDragging, snapToClosest]);
 
   const handleScrollAction = (forward: boolean) => {
     const container = containerRef.current;
     if (!container) return;
-
-    // Log scrolling action with direction and current scroll value.
     const currentScroll =
-      scrollAxis === 'horizontal' ? container.scrollLeft : container.scrollTop;
-
+      scrollAxis === "horizontal" ? container.scrollLeft : container.scrollTop;
     const targetScroll = currentScroll + (forward ? itemSize : -itemSize);
-    container.style.scrollBehavior = 'smooth';
-    if (scrollAxis === 'horizontal') {
+    container.style.scrollBehavior = "smooth";
+    if (scrollAxis === "horizontal") {
       container.scrollLeft = targetScroll;
     } else {
       container.scrollTop = targetScroll;
     }
   };
 
-  const scroll = (scrollDirection: 'start' | 'end') => {
-    handleScrollAction(scrollDirection === 'end');
+  const scroll = (scrollDirection: "start" | "end") => {
+    handleScrollAction(scrollDirection === "end");
   };
 
   const scrollToPage = (page: number) => {
     if (!containerRef.current) return;
-    const containerSize =
-      scrollAxis === 'horizontal'
-        ? containerRef.current.clientWidth
-        : containerRef.current.clientHeight;
-    const itemsPerView = Math.floor(containerSize / itemSize);
-    const targetScroll = page * (itemSize * itemsPerView);
-
-    containerRef.current.style.scrollBehavior = 'smooth';
-    if (scrollAxis === 'horizontal') {
+    const targetScroll = page * itemSize;
+    containerRef.current.style.scrollBehavior = "smooth";
+    if (scrollAxis === "horizontal") {
       containerRef.current.scrollLeft = targetScroll;
     } else {
       containerRef.current.scrollTop = targetScroll;
     }
   };
 
-  const DRAG_THRESHOLD = itemSize * 0.01;
-
+  // --- Updated Mouse Handlers ---
   const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsDragging(true);
     setHasDragged(false);
-    const pos = scrollAxis === 'horizontal' ? e.pageX : e.pageY;
+    const pos = scrollAxis === "horizontal" ? e.pageX : e.pageY;
     const scrollPos =
-      scrollAxis === 'horizontal'
+      scrollAxis === "horizontal"
         ? containerRef.current!.scrollLeft
         : containerRef.current!.scrollTop;
-
     setDragStart({ pos, scroll: scrollPos });
     lastDragDirection.current = null;
-
     if (containerRef.current) {
-      containerRef.current.style.scrollBehavior = 'auto';
+      containerRef.current.style.scrollBehavior = "auto";
     }
+    // Start a timer so a long press marks this as a drag.
+    dragTimerRef.current = window.setTimeout(() => {
+      setIsDragging(true);
+      dragTimerRef.current = null;
+    }, DRAG_TIME_THRESHOLD);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !containerRef.current) return;
-    e.preventDefault();
-
-    const currentPos = scrollAxis === 'horizontal' ? e.pageX : e.pageY;
+    if (!containerRef.current) return;
+    if (e.buttons === 0) {
+      setIsDragging(false);
+      if (dragTimerRef.current) {
+        clearTimeout(dragTimerRef.current);
+        dragTimerRef.current = null;
+      }
+      return;
+    }
+    const currentPos = scrollAxis === "horizontal" ? e.pageX : e.pageY;
     const delta = dragStart.pos - currentPos;
-
-    if (Math.abs(delta) > DRAG_THRESHOLD) {
+    if (Math.abs(delta) > DRAG_DISTANCE_THRESHOLD) {
+      setHasDragged(true);
+      if (!isDragging) {
+        setIsDragging(true);
+        if (dragTimerRef.current) {
+          clearTimeout(dragTimerRef.current);
+          dragTimerRef.current = null;
+        }
+      }
+      // Optionally, use a cooldown to prevent rapid page scrolls.
       const now = performance.now();
-      // Prevent triggering the other axis if it has fired recently.
-      if (scrollAxis === 'horizontal') {
+      if (scrollAxis === "horizontal") {
         if (now - lastVerticalScrollTime < SCROLL_COOLDOWN) return;
         lastHorizontalScrollTime = now;
       } else {
         if (now - lastHorizontalScrollTime < SCROLL_COOLDOWN) return;
         lastVerticalScrollTime = now;
       }
-
-      const direction = delta > 0 ? 'end' : 'start';
+      const direction = delta > 0 ? "end" : "start";
       if (direction !== lastDragDirection.current) {
         lastDragDirection.current = direction;
         scroll(direction);
       }
-      setHasDragged(true);
     }
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
-
     e.preventDefault();
     setIsDragging(false);
     lastDragDirection.current = null;
-
-    if (hasDragged) {
-      e.stopPropagation();
+    if (dragTimerRef.current) {
+      clearTimeout(dragTimerRef.current);
+      dragTimerRef.current = null;
     }
-
     snapToClosest();
   };
 
-  // Add touch handling
+  // --- Updated Touch Handlers (similar to mouse) ---
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
-    const pos = scrollAxis === 'horizontal' ? touch.pageX : touch.pageY;
+    const pos = scrollAxis === "horizontal" ? touch.pageX : touch.pageY;
     const scrollPos =
-      scrollAxis === 'horizontal'
+      scrollAxis === "horizontal"
         ? containerRef.current!.scrollLeft
         : containerRef.current!.scrollTop;
-
-    setIsDragging(true);
     setHasDragged(false);
     setDragStart({ pos, scroll: scrollPos });
+    dragTimerRef.current = window.setTimeout(() => {
+      setIsDragging(true);
+      dragTimerRef.current = null;
+    }, DRAG_TIME_THRESHOLD);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !containerRef.current) return;
-
+    if (!containerRef.current) return;
     const touch = e.touches[0];
-    const currentPos = scrollAxis === 'horizontal' ? touch.pageX : touch.pageY;
+    const currentPos = scrollAxis === "horizontal" ? touch.pageX : touch.pageY;
     const delta = dragStart.pos - currentPos;
-
-    if (Math.abs(delta) > 5) {
+    if (Math.abs(delta) > DRAG_DISTANCE_THRESHOLD) {
       setHasDragged(true);
-
-      // Prevent page scrolling while swiping
+      if (!isDragging) {
+        setIsDragging(true);
+        if (dragTimerRef.current) {
+          clearTimeout(dragTimerRef.current);
+          dragTimerRef.current = null;
+        }
+      }
       e.preventDefault();
-
-      if (scrollAxis === 'horizontal') {
+      if (scrollAxis === "horizontal") {
         containerRef.current.scrollLeft = dragStart.scroll + delta;
       } else {
         containerRef.current.scrollTop = dragStart.scroll + delta;
@@ -287,8 +301,10 @@ export const useScrollControls = ({
 
   const handleTouchEnd = () => {
     setIsDragging(false);
-
-    // Snap to nearest item
+    if (dragTimerRef.current) {
+      clearTimeout(dragTimerRef.current);
+      dragTimerRef.current = null;
+    }
     if (containerRef.current && hasDragged) {
       snapToClosest();
     }
@@ -302,6 +318,7 @@ export const useScrollControls = ({
     showEndButton,
     isDragging,
     hasDragged,
+    setHasDragged, // Add this line
     scroll,
     handleMouseDown,
     handleMouseMove,
@@ -314,6 +331,6 @@ export const useScrollControls = ({
     handleTouchStart,
     handleTouchMove,
     handleTouchEnd,
-    canScroll, // Added canScroll property
+    canScroll,
   };
 };
