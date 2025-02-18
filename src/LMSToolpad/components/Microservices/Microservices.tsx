@@ -11,6 +11,7 @@ import {
 } from "../Navigation/store/useNavigationStore";
 import ToolDisplayer from "../Tool/ToolDisplayer";
 import Home from "../Routes/Home/Home";
+import Mindmap from "../Routes/Home/Mindmap";
 import { useEffect } from "react";
 
 type MicroservicesProps = {
@@ -33,14 +34,22 @@ const Microservices = ({ children }: MicroservicesProps) => {
     updateMicroserviceNavigationForSections,
     sections,
   ]);
+  const returnBasicRoutes = () => {
+    return (
+      <>
+        <Route path="" element={<Home />} index />
+        <Route path="mindmap" element={<Mindmap />} />
+        <Route path="help" element={<div>Help</div>} />
+        <Route path="contact" element={<div>Contact</div>} />
+      </>
+    );
+  }
 
   return (
     <>
       {children}
       <Routes>
-        <Route path="" element={<Home />} index />
-        <Route path="help" element={<div>Help</div>} />
-        <Route path="contact" element={<div>Contact</div>} />
+        {returnBasicRoutes()}
         <Route path=":code" element={<CourseCodeLoader />}>
           <Route index element={<CourseInstanceSelector />} />
           <Route path=":instance" element={<CourseInstanceLoader />}>

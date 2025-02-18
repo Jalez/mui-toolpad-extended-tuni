@@ -1,5 +1,5 @@
 /** @format */
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   useNavigationStore,
   addSectionProps,
@@ -19,6 +19,9 @@ export const NavigationSectionBuilder: React.FC<
 > = ({ sections }) => {
   const { addSection, recalculateNavigation } = useNavigationStore();
 
+  // Memoize sections to prevent unnecessary re-renders
+  const memoizedSections = useMemo(() => sections, [JSON.stringify(sections)]);
+
   useEffect(() => {
     registerAppToolbarAction("global", NavigationFilter);
     return () => {
@@ -27,13 +30,11 @@ export const NavigationSectionBuilder: React.FC<
   }, []);
 
   useEffect(() => {
-    // For each provided section, add it to the navigation store.
-    sections.forEach((section) => {
+    memoizedSections.forEach((section) => {
       addSection(section);
     });
-    // After all sections are added, recalculate the flat navigation array.
     recalculateNavigation();
-  }, [sections, addSection, recalculateNavigation]);
+  }, [memoizedSections, addSection, recalculateNavigation]);
 
   return null;
 };

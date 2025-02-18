@@ -26,6 +26,7 @@ import { createTheme, Theme } from "@mui/material";
 import RegisteredAppTools from "./layout/Toolbars/AppToolbar/RegisteredAppTools";
 import PageContent from "./layout/Content/PageContent";
 import { UserManager } from "./components/UserManager";
+import { MindmapNavigationBuilder } from "./components/Routes/Home/Mindmap/MindmapNavigationbuilder";
 
 export interface EduMLProviderProps {
   children?: ReactNode;
@@ -116,6 +117,7 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
           session={session}
           authentication={authentication}
         >
+          <MindmapNavigationBuilder/>
           <AuthenticationManager />
           <UserManager />
           <CourseManager />

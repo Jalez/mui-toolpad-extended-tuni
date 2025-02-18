@@ -5,6 +5,16 @@ import { useSetSnapDimensions } from "../../../Common/Panel/Resizable/Context/Re
 import { useLayoutEffect } from "react";
 
 function Mindmap() {
+
+
+  return (
+    <ReactFlowProvider>
+      <MindmapContent />
+    </ReactFlowProvider>
+  );
+}
+
+export const ResizeContextMindmap = () => {
   const setSnapDimensions = useSetSnapDimensions();
 
   // Match these with the ResizablePanel constraints
@@ -19,12 +29,7 @@ function Mindmap() {
       height: itemReelHeight,
     });
   }, [itemReelWidth, itemReelHeight, setSnapDimensions]);
-
-  return (
-    <ReactFlowProvider>
-      <MindmapContent />
-    </ReactFlowProvider>
-  );
+  return <Mindmap/>;
 }
 
 export default Mindmap;

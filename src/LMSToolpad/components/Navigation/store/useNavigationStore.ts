@@ -104,6 +104,7 @@ type ViewStore = {
   addMicroserviceNavigation: (
     microserviceNavigation: NavigationPageStoreItem
   ) => void;
+  addStandaloneNavigation: (navigation: NavigationPageStoreItem) => void;
   updateMicroserviceNavigationForSections: () => void;
   recalculateNavigation: () => void;
   // New: visibleSections state to track which sections are shown
@@ -218,6 +219,20 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
       const sectionKey = underHeader;
       const newSections = { ...state.sections };
 
+      // Check if section exists and has the exact same pages
+      if (newSections[sectionKey]) {
+        const currentPages = Object.values(newSections[sectionKey].pages);
+        const haveSamePages = pages.every(newPage => 
+          currentPages.some(existingPage => 
+            existingPage.segment === newPage.segment && 
+            existingPage.title === newPage.title
+          )
+        );
+        if (haveSamePages) {
+          return state; // Return existing state if no changes needed
+        }
+      }
+
       if (!newSections[sectionKey]) {
         newSections[sectionKey] = {
           header: { kind: "header", title: underHeader },
@@ -236,7 +251,14 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
           microservices,
           actionFC,
         } = pageConfig;
-        if (!newSections[sectionKey].pages[segment]) {
+
+        // Only update if the page doesn't exist or has changed
+        const existingPage = newSections[sectionKey].pages[segment];
+        const pageHasChanged = !existingPage || 
+          existingPage.title !== title || 
+          existingPage.iconFC !== Icon;
+
+        if (pageHasChanged) {
           const newPage: NavigationPageStoreItem = {
             kind: "page",
             segment,
@@ -264,7 +286,9 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
               })) || [],
           };
           newSections[sectionKey].pages[segment] = newPage;
-          newSections[sectionKey].pageOrder.push(segment);
+          if (!newSections[sectionKey].pageOrder.includes(segment)) {
+            newSections[sectionKey].pageOrder.push(segment);
+          }
         }
       });
 
@@ -331,6 +355,32 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
         });
       });
       return hasChanges ? { sections: newSections } : state;
+    }),
+
+  addStandaloneNavigation: (item) =>
+    set((state) => {
+      let newNavigation = [...state.navigation];
+      const exists = newNavigation.find(
+        (nav) => nav.kind === "page" && nav.segment === item.segment
+      );
+      
+      if (!exists) {
+        // Find the first divider or header after default navigation
+        const insertIndex = newNavigation.findIndex(
+          (nav) => nav.kind === "divider" || nav.kind === "header"
+        );
+        
+        if (insertIndex !== -1) {
+          // Insert before the first divider or header
+          newNavigation.splice(insertIndex, 0, item);
+        } else {
+          // If no divider/header found, append to the end
+          newNavigation.push(item);
+        }
+        
+        return { navigation: newNavigation };
+      }
+      return state;
     }),
 
   removeHeader: (header) =>

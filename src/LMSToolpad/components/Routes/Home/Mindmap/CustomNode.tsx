@@ -4,11 +4,9 @@ import { Handle, Position } from "reactflow";
 import { useTheme } from "@mui/material/styles";
 import { Box, Card, Typography } from "@mui/material";
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { subjectConfig } from "../../../../config/subjectConfig";
 import { NodeData } from "./types";
-import Tooltip from "@mui/material/Tooltip";
 
 const CustomNode = memo(
   ({
@@ -43,12 +41,7 @@ const CustomNode = memo(
             border: `2px solid ${theme.palette.background.paper}`,
             width: 16,
             height: 16,
-            borderRadius: 8,
-            opacity: 0.8,
-            cursor: "crosshair",
-            left: 1,
-            transform: "translateX(-50%)",
-            willChange: "transform",
+
           }}
         />
         <Card
@@ -83,7 +76,7 @@ const CustomNode = memo(
             disableGutters
             sx={{
               background: "transparent",
-              boxShadow: "none",
+              // boxShadow: "none",
               "&:before": { display: "none" },
               "& .MuiAccordionSummary-root": {
                 minHeight: 0,
@@ -217,12 +210,6 @@ const CustomNode = memo(
             border: `2px solid ${theme.palette.background.paper}`,
             width: 16,
             height: 16,
-            borderRadius: 8,
-            opacity: 0.8,
-            cursor: "crosshair",
-            right: 1,
-            transform: "translateX(50%)",
-            willChange: "transform",
           }}
         />
       </>
