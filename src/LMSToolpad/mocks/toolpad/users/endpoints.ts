@@ -67,7 +67,7 @@ const handleUpdateUser = async (
       ...dataStore.users[userIndex],
       ...requestData,
     } as UserBackendData;
-    // console.log("updatedUser", updatedUser);
+    console.log("updatedUser", updatedUser);
 
     dataStore.users[userIndex] = updatedUser;
     saveDataStore(dataStore);

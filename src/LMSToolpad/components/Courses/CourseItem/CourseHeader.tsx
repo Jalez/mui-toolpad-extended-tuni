@@ -1,7 +1,7 @@
 /** @format */
 
 import { Box, Typography } from "@mui/material";
-import { Course } from "./store/useCourseStore";
+import { Course } from "../store/useCourseStore";
 
 type CourseHeaderProps = {
   course: Course;

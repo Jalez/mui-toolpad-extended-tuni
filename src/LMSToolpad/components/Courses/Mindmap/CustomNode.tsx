@@ -5,8 +5,8 @@ import { useTheme } from "@mui/material/styles";
 import { Box, Card, Typography } from "@mui/material";
 import { Accordion, AccordionSummary, AccordionDetails } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { subjectConfig } from "../../../../config/subjectConfig";
 import { NodeData } from "./types";
+import { subjectConfig } from "../config/subjectConfig";
 
 const CustomNode = memo(
   ({
@@ -41,7 +41,6 @@ const CustomNode = memo(
             border: `2px solid ${theme.palette.background.paper}`,
             width: 16,
             height: 16,
-
           }}
         />
         <Card
@@ -49,7 +48,7 @@ const CustomNode = memo(
           sx={{
             display: "inline-block",
             width: "fit-content",
-            maxWidth: 300,
+            maxWidth: 400,
             backgroundColor: theme.palette.background.paper,
             borderLeft: `4px solid ${courseColor}`,
             overflow: "visible",
@@ -133,8 +132,8 @@ const CustomNode = memo(
                     sx={{
                       fontWeight: theme.typography.fontWeightMedium,
                       color: theme.palette.text.primary,
+                      fontSize: "1.5rem",
                     }}
-                    noWrap
                   >
                     {data.label}
                   </Typography>
@@ -172,6 +171,7 @@ const CustomNode = memo(
                   sx={{
                     borderTop: `1px solid ${theme.palette.divider}`,
                     pt: 1,
+                    fontSize: "1.2rem",
                   }}
                 >
                   {data.details}

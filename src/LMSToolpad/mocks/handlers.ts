@@ -1,16 +1,27 @@
 /** @format */
 
-import { HttpResponse, http } from 'msw';
-import { courseHandlers } from './toolpad/courses/endpoints';
-import { resetDataStore } from './store';
-import { userHandlers } from './toolpad/users/endpoints';
+import { HttpResponse, http } from "msw";
+import { courseHandlers } from "./toolpad/courses/endpoints";
+import { resetDataStore } from "./store";
+import { userHandlers } from "./toolpad/users/endpoints";
+
+interface MockDataConfig {
+  teacherCount: number;
+  studentCount: number;
+  adminCount: number;
+  coursesPerYear: number;
+  startYear: number;
+  numberOfYears: number;
+}
 
 const devHandlers = [
-  http.post('/api/dev/reset', async () => {
+  http.post("/api/dev/reset", async ({ request }) => {
     try {
-      await resetDataStore();
+      const config = (await request.json()) as MockDataConfig;
+      await resetDataStore(config);
       return HttpResponse.json({ success: true });
     } catch (error) {
+      console.error("Error resetting data store:", error);
       return HttpResponse.json({ success: false });
     }
   }),

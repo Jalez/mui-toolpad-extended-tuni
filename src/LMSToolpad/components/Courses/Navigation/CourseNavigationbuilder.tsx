@@ -1,11 +1,11 @@
 /** @format */
 import React from "react";
-import useCourseStore, { courseLevel } from "./store/useCourseStore";
-import { NavigationSectionBuilder } from "../Navigation/NavigationBuilder";
+import useCourseStore, { courseLevel } from "../store/useCourseStore";
+import { NavigationSectionBuilder } from "../../Navigation/NavigationBuilder";
 // import SchoolIcon from "@mui/icons-material/School";
-import type { addSectionProps } from "../Navigation/store/useNavigationStore";
-import { subjectConfig } from "../../config/subjectConfig";
-import { createCourseIcon } from "../Courses/CourseIcon";
+import type { addSectionProps } from "../../Navigation/store/useNavigationStore";
+import { subjectConfig } from "../config/subjectConfig";
+import { createCourseIcon } from "../CourseItem/CourseIcon";
 import { useMemo } from "react";
 
 const courseToPage = (course: any) => {

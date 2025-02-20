@@ -1,8 +1,7 @@
 /** @format */
 
 import { ReactNode, useEffect, useState, useMemo } from "react";
-import { DashboardLayout, Router, Session } from "@toolpad/core";
-import { AppProvider } from "@toolpad/core/react-router-dom";
+import { AppProvider, DashboardLayout, Router, Session } from "@toolpad/core";
 import { useNavigationStore } from "./components/Navigation/store/useNavigationStore";
 import { useUserStore } from "./store/useUserStore";
 import useCustomRouter from "./hooks/useCustomRouter";
@@ -15,7 +14,6 @@ import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 
 import { Logo } from "./layout/Toolbars/AppToolbar/Logo";
 import { ToolbarAccount } from "./layout/Toolbars/AppToolbar/Account";
-import { PageToolbar } from "./layout/Toolbars/PageToolbar/PageToolbar";
 import SidebarFooter from "./layout/sidebar/Footer";
 import AuthenticationManager from "./components/AuthenticationManager";
 import CourseManager from "./components/Courses/CourseManager";
@@ -26,9 +24,11 @@ import { createTheme, Theme } from "@mui/material";
 import RegisteredAppTools from "./layout/Toolbars/AppToolbar/RegisteredAppTools";
 import PageContent from "./layout/Content/PageContent";
 import { UserManager } from "./components/UserManager";
-import { MindmapNavigationBuilder } from "./components/Routes/Home/Mindmap/MindmapNavigationbuilder";
 
-export interface EduMLProviderProps {
+import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/RegisteredPageTools";
+import { PageContainer } from "@toolpad/core";
+
+export interface LMSProviderProps {
   children?: ReactNode;
 }
 
@@ -60,7 +60,7 @@ export interface EduMLProviderProps {
  * </BrowserRouter>
  * ```
  */
-const LMSProvider = ({ children }: EduMLProviderProps) => {
+const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
   const { user, getUser, logout } = useUserStore();
   const { navigation } = useNavigationStore();
   const router = useCustomRouter();
@@ -117,7 +117,6 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
           session={session}
           authentication={authentication}
         >
-          <MindmapNavigationBuilder/>
           <AuthenticationManager />
           <UserManager />
           <CourseManager />
@@ -158,8 +157,9 @@ const LMSProvider = ({ children }: EduMLProviderProps) => {
               sidebarFooter: SidebarFooter,
             }}
           >
-            <PageToolbar />
-            <PageContent>{children}</PageContent>
+            <PageContainer slots={{ header: HeaderWithPageRegistryToolbar }}>
+              <PageContent>{children}</PageContent>
+            </PageContainer>
             <Dialogs />
             <Notifications />
           </DashboardLayout>

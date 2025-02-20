@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { Box, useTheme, useMediaQuery } from "@mui/material";
 import { EventContentArg } from "@fullcalendar/core";
 import { courseEventType, courseLevel } from "../store/useCourseStore";
-import { subjectConfig } from "../../../config/subjectConfig";
+import { subjectConfig } from "../config/subjectConfig";
 import { CompactEventView, RegularView } from "./components/EventViews";
 import EventMenu from "./components/EventMenu";
 

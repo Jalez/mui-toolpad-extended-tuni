@@ -1,10 +1,10 @@
 /** @format */
 
 import { Card, Box } from "@mui/material";
-import { Course } from "./store/useCourseStore";
-import useDialogStore from "../../store/useDialogStore";
-import useCourseStore from "./store/useCourseStore";
-import { subjectConfig } from "../../config/subjectConfig";
+import { Course } from "../store/useCourseStore";
+import useDialogStore from "../../../store/useDialogStore";
+import useCourseStore from "../store/useCourseStore";
+import { subjectConfig } from "../config/subjectConfig";
 import { CourseHeader } from "./CourseHeader";
 import { CourseInfo } from "./CourseInfo";
 import { CourseHeaderActions } from "./CourseHeaderActions";

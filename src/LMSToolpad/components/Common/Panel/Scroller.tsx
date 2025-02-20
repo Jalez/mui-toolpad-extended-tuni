@@ -17,7 +17,7 @@ interface ScrollerProps {
   priority?: PriorityType; // For title styling (e.g., "high", "low", or default)
 }
 
-const PAGINATION_SIZE = 40; // For vertical: fixed width for pagination area
+const PAGINATION_SIZE = 25; // For vertical: fixed width for pagination area
 
 const Scroller = ({
   direction,
@@ -73,8 +73,6 @@ const Scroller = ({
               : priority === "low"
                 ? "text.secondary"
                 : "text.primary",
-          textAlign: "left",
-          mb: 1,
         }}
       >
         {title}
@@ -82,51 +80,38 @@ const Scroller = ({
     ) : null;
 
   // Define container styles.
-  const horizontalContainerStyles: SxProps<Theme> = {
-    width: "100%",
-    display: "flex",
-    overflowX: "hidden",
-    scrollBehavior: "smooth",
-    cursor: isDragging ? "grabbing" : "grab",
-    "&::-webkit-scrollbar": { display: "none" },
-    msOverflowStyle: "none",
-    scrollbarWidth: "none",
-    position: "relative",
+  let containerStyle: SxProps<Theme> = {
     zIndex: 1,
-    scrollSnapType: snapScroll ? "x mandatory" : "none",
-    userSelect: "none",
+    padding: 1,
+    width: "100%",
     height: "100%",
-    touchAction: "pan-x",
-  };
-
-  const verticalContainerStyles: SxProps<Theme> = {
     display: "flex",
-    flexDirection: "column",
-    overflowY: "auto",
+    overflow: "hidden",
     position: "relative",
-    scrollSnapType: snapScroll ? "y mandatory" : "none",
+    flexDirection: isVertical ? "column" : "row",
     cursor: isDragging ? "grabbing" : "grab",
-    touchAction: "pan-y",
-    WebkitOverflowScrolling: "touch",
-    "& > div": {
-      scrollSnapAlign: snapScroll ? "start" : "none",
-      minHeight: itemSize,
-      flex: "0 0 auto",
-      height: itemSize,
-      willChange: "transform",
-    },
-    "&::-webkit-scrollbar": { display: hideScrollbar ? "none" : "auto" },
+    touchAction: isVertical ? "pan-y" : "pan-x",
+    scrollSnapType: snapScroll ? "x mandatory" : "none",
     scrollbarWidth: hideScrollbar ? "none" : "auto",
-    height: "100%",
+    userSelect: "none",
+    scrollBehavior: "smooth",
+    WebkitOverflowScrolling: "touch",
+    msOverflowStyle: "none",
+    "&::-webkit-scrollbar": { display: hideScrollbar ? "none" : "auto" },
   };
 
-  const containerStyle = isVertical
-    ? {
-        ...verticalContainerStyles,
-        width: `calc(100% - ${PAGINATION_SIZE}px)`,
-        mb: "0!important",
-      }
-    : horizontalContainerStyles;
+  if (isVertical) {
+    containerStyle = {
+      ...containerStyle,
+      "& > div": {
+        scrollSnapAlign: snapScroll ? "start" : "none",
+        minHeight: itemSize,
+        flex: "0 0 auto",
+        height: itemSize,
+        willChange: "transform",
+      },
+    };
+  }
 
   // Common event handlers to cancel clicks after dragging.
   const commonHandlers = {
@@ -168,11 +153,13 @@ const Scroller = ({
             {children}
           </Box>
           <Box
+            data-testid="pagination-dots-container"
             sx={{
               width: PAGINATION_SIZE,
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
+              alignItems: "center",
             }}
           >
             <PaginationDots

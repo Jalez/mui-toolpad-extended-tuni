@@ -1,13 +1,13 @@
 /** @format */
 import useCourseStore, { Course } from "./store/useCourseStore";
-import CourseItem from "./CourseItem";
+import CourseItem from "./CourseItem/CourseItem";
 import { useUserStore } from "../../store/useUserStore";
 import Scroller from "../Common/Panel/Scroller"; // Our unified scroller
-import { priority } from "./NoCourseNotice";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useSetSnapDimensions } from "../Common/Panel/Resizable/Context/ResizeContext";
-import { Box, Typography } from "@mui/material";
+
+export type priority = "high" | "low" | "normal";
 
 type CourseListProps = {
   displayMode?: "course" | "instance" | "instanceList";

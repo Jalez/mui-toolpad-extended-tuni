@@ -7,7 +7,6 @@ import ReactFlow, {
   applyNodeChanges,
   Connection,
   addEdge,
-  Background,
   Controls,
   Edge,
   Node,
@@ -17,13 +16,11 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { useSetSnapDimensions } from "../../../../components/Common/Panel/Resizable/Context/ResizeContext";
 import { EditNodeDialog } from "./EditNodeDialog";
 import { CustomNode } from "./CustomNode";
 import {
   initializeNodes,
   initializeEdges,
-  hasChildren,
   runForceSimulation,
 } from "./mindmapUtils";
 import { useMindmapStore } from "./store";

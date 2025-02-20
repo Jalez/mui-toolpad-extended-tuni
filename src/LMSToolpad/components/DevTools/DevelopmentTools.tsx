@@ -9,6 +9,8 @@ import {
   Tooltip,
   Divider,
   Box,
+  TextField,
+  FormGroup,
 } from "@mui/material";
 import UserSwitcher from "./UserSwitcher";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -17,10 +19,27 @@ import EngineeringIcon from "@mui/icons-material/Engineering";
 import { useNotificationStore } from "../Notifications/store/useNotificationsStore";
 import { useState, MouseEvent } from "react";
 
+interface MockDataConfig {
+  teacherCount: number;
+  studentCount: number;
+  adminCount: number;
+  coursesPerYear: number;
+  startYear: number;
+  numberOfYears: number;
+}
+
 const DevelopmentTools: React.FC = () => {
   const devMode = window.location.hostname === "localhost";
   const { addNotificationData } = useNotificationStore();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [mockConfig, setMockConfig] = useState<MockDataConfig>({
+    teacherCount: 5,
+    studentCount: 50,
+    adminCount: 2,
+    coursesPerYear: 20,
+    startYear: 2021,
+    numberOfYears: 4,
+  });
 
   if (!devMode) return null;
 
@@ -38,7 +57,13 @@ const DevelopmentTools: React.FC = () => {
         type: "info",
         message: "Resetting store...",
       });
-      const response = await fetch("/api/dev/reset", { method: "POST" });
+      const response = await fetch("/api/dev/reset", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(mockConfig),
+      });
       if (!response.ok) throw new Error("Reset failed");
 
       addNotificationData({
@@ -55,6 +80,19 @@ const DevelopmentTools: React.FC = () => {
       });
     }
   };
+
+  const handleConfigChange =
+    (field: keyof MockDataConfig) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      //Can you unfocus the input field after changing the value?
+      event.target.blur();
+      const value = parseInt(event.target.value) || 0;
+      setMockConfig((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+      //stop the event after this- otherwise it keeps repeating
+    };
 
   return (
     <>
@@ -74,9 +112,7 @@ const DevelopmentTools: React.FC = () => {
         transformOrigin={{
           vertical: "top",
           horizontal: "right",
-          //add arrow to the menu
         }}
-        //Set margin to 0 to margin from MuiList-root MuiList-padding MuiMenu-list css-1toxriw-MuiList-root-MuiMenu-list
         sx={{ "& .MuiList-root": { p: 0 } }}
         data-testid="development-tools-menu"
       >
@@ -122,6 +158,91 @@ const DevelopmentTools: React.FC = () => {
 
           <Divider />
 
+          {/* Mock Data Configuration */}
+          <Box sx={{ p: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>
+              Mock Data Configuration
+            </Typography>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              display="block"
+              sx={{ mb: 1 }}
+            >
+              Configure the number of mock users and courses to generate when
+              resetting the store.
+            </Typography>
+            <FormGroup sx={{ gap: 1 }}>
+              <TextField
+                label="Teacher Count"
+                type="number"
+                size="small"
+                value={mockConfig.teacherCount}
+                onChange={handleConfigChange("teacherCount")}
+                slotProps={{
+                  htmlInput: { min: 1, step: 2 },
+                }}
+              />
+              <TextField
+                label="Student Count"
+                type="number"
+                size="small"
+                value={mockConfig.studentCount}
+                onChange={handleConfigChange("studentCount")}
+                slotProps={{
+                  input: { inputMode: "numeric" },
+                  htmlInput: { min: 1, step: 1 },
+                }}
+              />
+              <TextField
+                label="Admin Count"
+                type="number"
+                size="small"
+                value={mockConfig.adminCount}
+                onChange={handleConfigChange("adminCount")}
+                slotProps={{
+                  input: { inputMode: "numeric" },
+                  htmlInput: { min: 1, step: 1 },
+                }}
+              />
+              <TextField
+                label="Courses Per Year"
+                type="number"
+                size="small"
+                value={mockConfig.coursesPerYear}
+                onChange={handleConfigChange("coursesPerYear")}
+                slotProps={{
+                  input: { inputMode: "numeric" },
+                  htmlInput: { min: 1, step: 1 },
+                }}
+              />
+              <TextField
+                label="Start Year"
+                type="number"
+                size="small"
+                value={mockConfig.startYear}
+                onChange={handleConfigChange("startYear")}
+                slotProps={{
+                  input: { inputMode: "numeric" },
+                  htmlInput: { min: 2000, step: 1 },
+                }}
+              />
+              <TextField
+                label="Number of Years"
+                type="number"
+                size="small"
+                value={mockConfig.numberOfYears}
+                onChange={handleConfigChange("numberOfYears")}
+                slotProps={{
+                  input: { inputMode: "numeric" },
+                  htmlInput: { min: 1, step: 1 },
+                }}
+              />
+            </FormGroup>
+          </Box>
+
+          <Divider />
+
           {/* Data Management Section */}
           <Box sx={{ p: 2 }}>
             <Typography variant="subtitle2" gutterBottom>
@@ -134,8 +255,8 @@ const DevelopmentTools: React.FC = () => {
               sx={{ mb: 1 }}
             >
               Reset Store: Clears all local data and resets the application
-              state to its initial values. Useful when testing gets stuck or
-              data becomes inconsistent.
+              state using the configuration above. Useful when testing gets
+              stuck or data becomes inconsistent.
             </Typography>
             <Button
               startIcon={<RestartAltIcon />}

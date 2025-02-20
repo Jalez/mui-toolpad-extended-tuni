@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import useCourseStore from "./store/useCourseStore";
-import { CourseNavigationBuilder } from "./CourseNavigationbuilder";
+import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
 import { useRetry } from "../../../hooks/useRetry";
+import { MindmapNavigationBuilder } from "./Mindmap/MindmapNavigationbuilder";
+import { VisitedCoursesNavigationAdapter } from "./Navigation/VisitedCoursesNavigationAdapter";
 
 const CourseManager = () => {
   const { getCourses, setCurrentCourseUrl, getCourseByUrl, courses } =
@@ -33,7 +35,13 @@ const CourseManager = () => {
     return () => window.removeEventListener("message", messageHandler);
   }, [getCourseByUrl, setCurrentCourseUrl]);
 
-  return <CourseNavigationBuilder />;
+  return (
+    <>
+      <VisitedCoursesNavigationAdapter />
+      <MindmapNavigationBuilder />
+      <CourseNavigationBuilder />
+    </>
+  );
 };
 
 export default CourseManager;

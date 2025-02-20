@@ -1,12 +1,11 @@
 /** @format */
 import { ReactFlowProvider } from "reactflow";
 import { MindmapContent } from "./MindmapContent";
-import { useSetSnapDimensions } from "../../../Common/Panel/Resizable/Context/ResizeContext";
+
 import { useLayoutEffect } from "react";
+import { useSetSnapDimensions } from "../../Common/Panel/Resizable/Context/ResizeContext";
 
 function Mindmap() {
-
-
   return (
     <ReactFlowProvider>
       <MindmapContent />
@@ -29,7 +28,7 @@ export const ResizeContextMindmap = () => {
       height: itemReelHeight,
     });
   }, [itemReelWidth, itemReelHeight, setSnapDimensions]);
-  return <Mindmap/>;
-}
+  return <Mindmap />;
+};
 
 export default Mindmap;

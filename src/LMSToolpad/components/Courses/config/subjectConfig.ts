@@ -1,6 +1,6 @@
 /** @format */
 
-import { courseLevel } from "../components/Courses/store/useCourseStore";
+import { courseLevel } from "../store/useCourseStore";
 
 export const subjectConfig: {
   [key: string]: {

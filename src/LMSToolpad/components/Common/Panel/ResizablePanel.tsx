@@ -327,10 +327,10 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
         maxWidth: "100%", // Constrain width
         height: dimensions.height,
         backgroundColor: theme.palette.background.paper,
-        borderRadius: resizeMode ? 1 : 0,
+        borderRadius: 1,
         outline: resizeMode
           ? `0.1em dashed ${theme.palette.primary.main}`
-          : "none",
+          : `0.2em solid ${theme.palette.divider}`,
         display: "flex", // Add this
         flexDirection: "column", // Add this
         overflow: "hidden", // Add this

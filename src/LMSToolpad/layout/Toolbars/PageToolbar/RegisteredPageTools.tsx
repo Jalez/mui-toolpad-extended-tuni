@@ -1,13 +1,13 @@
 /** @format */
 
-import { Box } from '@mui/material';
-import { useLocation } from 'react-router-dom';
-import { PageContainerToolbar } from '@toolpad/core';
-import useToolbarStore from '../../../store/useToolbarStore';
+import { Box, useMediaQuery, useTheme } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import { PageHeader, PageHeaderToolbar, useActivePage } from "@toolpad/core";
+import useToolbarStore from "../../../store/useToolbarStore";
 import {
   useToolbarStore as useToolbarRegistry,
   getPageToolbarActions,
-} from '../toolbarRegistry';
+} from "../toolbarRegistry";
 
 /**
  * PageToolbar Component
@@ -51,21 +51,44 @@ const RegisteredPageTools = () => {
   if (!actions.length) return null;
 
   return (
-    <PageContainerToolbar>
+    <PageHeaderToolbar>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'right',
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "right",
           gap: 1,
-          width: '100%',
+          width: "100%",
           paddingRight: 2,
-        }}>
+          //when scrolled, leave them at the top
+          position: "sticky",
+          bgcolor: "transparent",
+        }}
+      >
         {actions.map((Action, index) => (
           <Action key={`${version}-${index}`} />
         ))}
       </Box>
-    </PageContainerToolbar>
+    </PageHeaderToolbar>
+  );
+};
+
+export const HeaderWithPageRegistryToolbar = () => {
+  const activePage = useActivePage();
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
+
+  let breadcrumbs = activePage?.breadcrumbs || [];
+  if (isSmallScreen) {
+    breadcrumbs = activePage?.breadcrumbs?.slice(-2) || [];
+  }
+
+  return (
+    <PageHeader
+      breadcrumbs={breadcrumbs}
+      title=""
+      slots={{ toolbar: RegisteredPageTools }}
+    />
   );
 };
 

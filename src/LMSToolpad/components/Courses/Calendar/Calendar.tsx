@@ -12,7 +12,7 @@ import CalendarBody from "./CalendarBody";
 import useCourseStore from "../store/useCourseStore";
 import { usePanelStore } from "../../Common/Panel/Resizable/store/usePanelStore";
 import { useSetSnapDimensions } from "../../Common/Panel/Resizable/Context/ResizeContext";
-import { subjectConfig } from "../../../config/subjectConfig";
+import { subjectConfig } from "../config/subjectConfig";
 
 // Helper function remains the same
 function getContrast(hexColor: string): string {

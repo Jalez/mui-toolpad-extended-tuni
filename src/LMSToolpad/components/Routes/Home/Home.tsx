@@ -13,7 +13,7 @@ import ToolsContainer from "../../Common/Panel/PanelTools/ToolsContainer";
 import Calendar from "../../Courses/Calendar/Calendar";
 import ResizeToggler from "../../Common/Panel/Resizable/Tools/ResizeToggler";
 import MoveToggler from "../../Common/Panel/MovablePanel/MoveToggler";
-import { ResizeContextMindmap } from "./Mindmap";
+import { ResizeContextMindmap } from "../../Courses/Mindmap";
 
 /**
  * Home component with enhanced layout options.
@@ -54,7 +54,7 @@ const Home = () => {
       >
         <CourseList displayMode={"instance"} containerHeight="100%" />
       </ResizablePanel>
-     
+
       <ResizablePanel
         id="home-calendar"
         defaultWidth={600}

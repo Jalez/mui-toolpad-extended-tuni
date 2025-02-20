@@ -19,8 +19,23 @@ export const NavigationSectionBuilder: React.FC<
 > = ({ sections }) => {
   const { addSection, recalculateNavigation } = useNavigationStore();
 
-  // Memoize sections to prevent unnecessary re-renders
-  const memoizedSections = useMemo(() => sections, [JSON.stringify(sections)]);
+  // Improved memoization that only considers necessary properties
+  const memoizedSections = useMemo(
+    () =>
+      sections.map((section) => ({
+        underHeader: section.underHeader,
+        pages: section.pages.map((page) => ({
+          segment: page.segment,
+          title: page.title,
+          Icon: page.Icon,
+          instances: page.instances,
+          description: page.description,
+          microservices: page.microservices,
+          actionFC: page.actionFC,
+        })),
+      })),
+    [sections]
+  );
 
   useEffect(() => {
     registerAppToolbarAction("global", NavigationFilter);

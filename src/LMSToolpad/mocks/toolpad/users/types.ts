@@ -1,7 +1,7 @@
 /** @format */
-import { PlatformRole } from '../../../store/usePlatformStore';
-import { navigationTypes } from '../../../store/useUserStore';
-import { randomPerson } from './constants';
+import { PlatformRole } from "../../../store/usePlatformStore";
+import { navigationTypes } from "../../../store/useUserStore";
+import { randomPerson } from "./constants";
 
 export interface UserRawBackendData {
   name: string;
@@ -38,6 +38,7 @@ export interface UserRawBackendData {
       available: boolean;
     };
     visible_navigation: string[];
+    last_visited_courses: string[];
   };
 }
 
@@ -50,7 +51,7 @@ export interface UserBackendData extends UserRawBackendData {
 export type UserCourseConnection = {
   userId: string;
   courseId: string;
-  role: 'teacher' | 'student';
+  role: "teacher" | "student";
 };
 
 export type randomPersonFromApi = typeof randomPerson;

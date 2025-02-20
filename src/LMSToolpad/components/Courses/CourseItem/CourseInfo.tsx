@@ -1,7 +1,7 @@
 /** @format */
 
 import { Box, Typography, IconButton, Tooltip } from "@mui/material";
-import { Course } from "./store/useCourseStore";
+import { Course } from "../store/useCourseStore";
 import EventIcon from "@mui/icons-material/Event";
 
 type CourseInfoProps = {

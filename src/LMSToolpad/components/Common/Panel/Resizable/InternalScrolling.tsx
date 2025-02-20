@@ -1,6 +1,6 @@
 /** @format */
 
-import { Box, useTheme } from '@mui/material';
+import { Box, useTheme } from "@mui/material";
 
 type InternalScrollingProps = {
   children?: React.ReactNode;
@@ -16,28 +16,28 @@ const InternalScrolling = ({
     <Box
       sx={{
         // only scale vertically
-
         // allow horizontal scrolling
-        overflowX: 'auto',
-        overflowY: 'hidden',
+        overflowX: "hidden",
+        overflowY: "hidden",
         width: dimensions.width + 25,
         height: dimensions.height,
-        pointerEvents: 'auto',
+        pointerEvents: "auto",
         // Hide scrollbar in Firefox
-        scrollbarWidth: 'thin',
+        scrollbarWidth: "thin",
 
         // Hide scrollbar in Chrome/Safari
-        '&::-webkit-scrollbar': {
-          width: '8px',
-          backgroundColor: 'transparent',
+        "&::-webkit-scrollbar": {
+          width: "8px",
+          backgroundColor: "transparent",
         },
-        '&::-webkit-scrollbar-thumb': {
+        "&::-webkit-scrollbar-thumb": {
           backgroundColor: theme.palette.divider,
-          borderRadius: '4px',
+          borderRadius: "4px",
         },
         // transition: 'width 0.3s ease-in-out, height 0.3s ease-in-out',
-        willChange: 'width, height',
-      }}>
+        willChange: "width, height",
+      }}
+    >
       {children}
     </Box>
   );

@@ -1,10 +1,5 @@
 /** @format */
 
-/**
- * @deprecated Use LMSProvider instead of EduMLProvider. Will be removed in version 2.0.0
- */
-export { default as EduMLProvider } from "./LMSToolpad/EduMLProvider";
-
 export { default as LMSProvider } from "./LMSToolpad/LMSProvider";
 
 //as of v3, No longer exists
@@ -60,7 +55,7 @@ export { default as FormDialog } from "./LMSToolpad/components/Dialogs/FormDialo
 
 export { default as IconWithBadge } from "./LMSToolpad/components/IconWithBadge";
 
-export { default as ExtendedDialog } from "./LMSToolpad/components/EduMLDialog";
+export { default as ExtendedDialog } from "./LMSToolpad/components/Dialogs/ExtendedDialog";
 
 export { default as CenteredHeading } from "./LMSToolpad/components/CenteredHeading";
 

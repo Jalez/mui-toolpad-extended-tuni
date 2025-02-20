@@ -56,6 +56,7 @@ export interface UserData {
       isTeacherOld: boolean;
       available: boolean;
     };
+    lastVisitedCourses: string[]; // Required array of courseId strings in format "code:instance"
     visibleNavigation: string[];
   };
 }
@@ -94,6 +95,7 @@ const defaultTestUsers = [
         isTeacherOld: true,
         available: true,
       },
+      lastVisitedCourses: [],
       visibleNavigation: ["Courses"],
     },
     platformRoles: ["creator", "moderator"] as PlatformRole[],
@@ -131,6 +133,7 @@ const defaultTestUsers = [
         isTeacherOld: true,
         available: true,
       },
+      lastVisitedCourses: [],
       visibleNavigation: ["Courses"],
     },
     platformRoles: ["user"] as PlatformRole[],
@@ -168,6 +171,7 @@ const defaultTestUsers = [
         isTeacherOld: true,
         available: true,
       },
+      lastVisitedCourses: [],
       visibleNavigation: ["Courses"],
     },
     platformRoles: ["user"] as PlatformRole[],
@@ -205,6 +209,7 @@ const defaultTestUsers = [
         isTeacherOld: true,
         available: true,
       },
+      lastVisitedCourses: [],
       visibleNavigation: ["Courses"],
     },
     platformRoles: ["creator", "moderator"] as PlatformRole[],

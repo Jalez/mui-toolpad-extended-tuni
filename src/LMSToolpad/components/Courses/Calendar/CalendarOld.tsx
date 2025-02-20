@@ -27,7 +27,7 @@ import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import ViewDayIcon from "@mui/icons-material/ViewDay";
 import { SpeedDialButton } from "../../Common/SpeedDialButton";
 import useCourseStore from "../store/useCourseStore";
-import { subjectConfig } from "../../../config/subjectConfig";
+import { subjectConfig } from "../config/subjectConfig";
 
 // Helper to determine contrast color based on hex background
 function getContrast(hexColor: string): string {

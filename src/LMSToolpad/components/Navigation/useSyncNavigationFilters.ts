@@ -17,8 +17,13 @@ export const useSyncNavigationFilters = () => {
       // Convert array of visible headers to Record<string, boolean>
       const initialFilters: Record<string, boolean> = {};
       sectionOrder.forEach((header) => {
-        initialFilters[header] =
-          user.preferences.visibleNavigation.includes(header);
+        // Always set "Last 5 visited courses" to visible if it exists
+        if (header === "Last 5 visited courses") {
+          initialFilters[header] = true;
+        } else {
+          initialFilters[header] =
+            user.preferences.visibleNavigation.includes(header);
+        }
       });
       setFilterOptions(initialFilters);
       isInitialLoad.current = false;
@@ -37,8 +42,12 @@ export const useSyncNavigationFilters = () => {
       if (lastUserUpdate.current !== newPrefs) {
         lastUserUpdate.current = newPrefs;
         // Convert Record<string, boolean> to array of visible headers
+        // Exclude "Last 5 visited courses" from being saved in preferences
         const visibleHeaders = Object.entries(filterOptions)
-          .filter(([_, isVisible]) => isVisible)
+          .filter(
+            ([header, isVisible]) =>
+              isVisible && header !== "Last 5 visited courses"
+          )
           .map(([header]) => header);
 
         const updatedUser = {

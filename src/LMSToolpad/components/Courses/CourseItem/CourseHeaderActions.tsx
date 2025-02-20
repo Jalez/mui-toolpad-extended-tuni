@@ -19,7 +19,7 @@ import GroupIcon from "@mui/icons-material/Group";
 import StarsIcon from "@mui/icons-material/Stars";
 import GroupAddIcon from "@mui/icons-material/GroupAdd"; // Add this import
 import { useState, MouseEvent } from "react";
-import { Course } from "./store/useCourseStore";
+import { Course } from "../store/useCourseStore";
 
 type CourseHeaderActionsProps = {
   course: Course;

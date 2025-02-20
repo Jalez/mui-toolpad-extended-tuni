@@ -156,82 +156,16 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
   sections: {},
   sectionOrder: [],
   allMicroserviceNavigation: [],
-  // Initialize visibleSections as an empty object; it will be set by the filter component.
   visibleSections: {},
 
   setVisibleSections: (options: Record<string, boolean>) => {
     set({ visibleSections: options });
   },
 
-  addMicroserviceNavigation: (item) =>
-    set((state) => {
-      const exists = state.allMicroserviceNavigation.find(
-        (ms) => ms.segment === item.segment
-      );
-      if (!exists) {
-        return {
-          allMicroserviceNavigation: [...state.allMicroserviceNavigation, item],
-        };
-      }
-      return state;
-    }),
-
-  /**
-   * Recalculate the flat navigation array from the segmented sections.
-   * Only includes sections whose visibleSections flag is true.
-   */
-  recalculateNavigation: () => {
-    const state = get();
-    const { visibleSections } = state;
-    // Compute the navigation built from sections
-    let sectionNavigation: NavigationStoreItem[] = [];
-    state.sectionOrder.forEach((sectionKey) => {
-      // Only include sections that are visible; treat undefined as not visible.
-      if (!visibleSections[sectionKey]) return;
-      const section = state.sections[sectionKey];
-      if (section) {
-        if (sectionNavigation.length > 0) {
-          sectionNavigation.push({ kind: "divider" });
-        }
-        sectionNavigation.push(section.header);
-        section.pageOrder.forEach((pageKey) => {
-          sectionNavigation.push(section.pages[pageKey]);
-        });
-      }
-    });
-    // Start with the default navigation items
-    let newNavigation: NavigationStoreItem[] = [...DEFAULTNAVIGATION];
-    // Optionally add a divider before appending section navigation
-    if (sectionNavigation.length > 0) {
-      newNavigation.push({ kind: "divider" }, ...sectionNavigation);
-    }
-    if (JSON.stringify(state.navigation) !== JSON.stringify(newNavigation)) {
-      set({ navigation: newNavigation });
-    }
-  },
-
-  /**
-   * Add a new section or add pages to an existing section.
-   * If the section does not exist, it is created.
-   */
   addSection: ({ underHeader, pages }) =>
     set((state) => {
       const sectionKey = underHeader;
       const newSections = { ...state.sections };
-
-      // Check if section exists and has the exact same pages
-      if (newSections[sectionKey]) {
-        const currentPages = Object.values(newSections[sectionKey].pages);
-        const haveSamePages = pages.every(newPage => 
-          currentPages.some(existingPage => 
-            existingPage.segment === newPage.segment && 
-            existingPage.title === newPage.title
-          )
-        );
-        if (haveSamePages) {
-          return state; // Return existing state if no changes needed
-        }
-      }
 
       if (!newSections[sectionKey]) {
         newSections[sectionKey] = {
@@ -252,47 +186,39 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
           actionFC,
         } = pageConfig;
 
-        // Only update if the page doesn't exist or has changed
-        const existingPage = newSections[sectionKey].pages[segment];
-        const pageHasChanged = !existingPage || 
-          existingPage.title !== title || 
-          existingPage.iconFC !== Icon;
+        const newPage = {
+          kind: "page" as const,
+          segment,
+          title,
+          iconFC: Icon,
+          actionFC,
+          metadata: {
+            description,
+            forRoles: ["student", "teacher"],
+            isRootTool: true,
+            underHeader,
+            microservices: instances ? undefined : microservices,
+          },
+          children:
+            instances?.map((instance) => ({
+              kind: "page" as const,
+              segment: instance,
+              title: instance,
+              metadata: {
+                description,
+                forRoles: ["student", "teacher"],
+                microservices: microservices,
+              },
+              children: [],
+            })) || [],
+        };
 
-        if (pageHasChanged) {
-          const newPage: NavigationPageStoreItem = {
-            kind: "page",
-            segment,
-            title,
-            iconFC: Icon,
-            actionFC,
-            metadata: {
-              description,
-              forRoles: ["student", "teacher"],
-              isRootTool: true,
-              underHeader,
-              microservices: instances ? undefined : microservices, // Only set microservices if instances is not provided: otherwise it's an instance specific microservice
-            },
-            children:
-              instances?.map((instance) => ({
-                kind: "page",
-                segment: instance,
-                title: instance,
-                metadata: {
-                  description,
-                  forRoles: ["student", "teacher"],
-                  microservices: microservices,
-                },
-                children: [],
-              })) || [],
-          };
-          newSections[sectionKey].pages[segment] = newPage;
-          if (!newSections[sectionKey].pageOrder.includes(segment)) {
-            newSections[sectionKey].pageOrder.push(segment);
-          }
+        newSections[sectionKey].pages[segment] = newPage;
+        if (!newSections[sectionKey].pageOrder.includes(segment)) {
+          newSections[sectionKey].pageOrder.push(segment);
         }
       });
 
-      // If the section is newly created, update the sectionOrder.
       const newSectionOrder = state.sections[sectionKey]
         ? state.sectionOrder
         : [...state.sectionOrder, sectionKey];
@@ -301,6 +227,53 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
         sections: newSections,
         sectionOrder: newSectionOrder,
       };
+    }),
+
+  recalculateNavigation: () => {
+    const state = get();
+    const { visibleSections } = state;
+    let sectionNavigation: NavigationStoreItem[] = [];
+
+    state.sectionOrder.forEach((sectionKey) => {
+      if (!visibleSections[sectionKey]) return;
+
+      const section = state.sections[sectionKey];
+      if (section) {
+        if (sectionNavigation.length > 0) {
+          sectionNavigation.push({ kind: "divider" });
+        }
+        sectionNavigation.push(section.header);
+        section.pageOrder.forEach((pageKey) => {
+          sectionNavigation.push(section.pages[pageKey]);
+        });
+      }
+    });
+
+    if (DEFAULTNAVIGATION.length > 0) {
+      if (sectionNavigation.length > 0) {
+        sectionNavigation.push({ kind: "divider" });
+      }
+      sectionNavigation = [...sectionNavigation, ...DEFAULTNAVIGATION];
+    }
+
+    if (
+      JSON.stringify(state.navigation) !== JSON.stringify(sectionNavigation)
+    ) {
+      set({ navigation: sectionNavigation });
+    }
+  },
+
+  addMicroserviceNavigation: (item) =>
+    set((state) => {
+      const exists = state.allMicroserviceNavigation.find(
+        (ms) => ms.segment === item.segment
+      );
+      if (!exists) {
+        return {
+          allMicroserviceNavigation: [...state.allMicroserviceNavigation, item],
+        };
+      }
+      return state;
     }),
 
   updateMicroserviceNavigationForSections: () =>
@@ -363,13 +336,13 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
       const exists = newNavigation.find(
         (nav) => nav.kind === "page" && nav.segment === item.segment
       );
-      
+
       if (!exists) {
         // Find the first divider or header after default navigation
         const insertIndex = newNavigation.findIndex(
           (nav) => nav.kind === "divider" || nav.kind === "header"
         );
-        
+
         if (insertIndex !== -1) {
           // Insert before the first divider or header
           newNavigation.splice(insertIndex, 0, item);
@@ -377,7 +350,7 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
           // If no divider/header found, append to the end
           newNavigation.push(item);
         }
-        
+
         return { navigation: newNavigation };
       }
       return state;

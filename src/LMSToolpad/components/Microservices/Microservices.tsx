@@ -11,45 +11,42 @@ import {
 } from "../Navigation/store/useNavigationStore";
 import ToolDisplayer from "../Tool/ToolDisplayer";
 import Home from "../Routes/Home/Home";
-import Mindmap from "../Routes/Home/Mindmap";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
+import { VisitedCoursesNavigationAdapter } from "../Courses/Navigation/VisitedCoursesNavigationAdapter";
+import Mindmap from "../Courses/Mindmap";
 
-type MicroservicesProps = {
-  children: React.ReactNode;
-};
-
-const Microservices = ({ children }: MicroservicesProps) => {
+/**
+ * Core component for handling microservices and course-related routing.
+ * Manages the integration between course navigation, tools, and microservices.
+ *
+ * @component
+ * @param {Object} props
+ * @param {React.ReactNode} props.children - Child components to render
+ */
+const Microservices = ({ children }: { children: React.ReactNode }) => {
   const {
     allMicroserviceNavigation,
     updateMicroserviceNavigationForSections,
     sections,
   } = useNavigationStore();
 
-  // Call the store function to update sections with merged microservices
   useEffect(() => {
-    // console.log("allMicroserviceNavigation", allMicroserviceNavigation);
     updateMicroserviceNavigationForSections();
   }, [
     allMicroserviceNavigation,
     updateMicroserviceNavigationForSections,
     sections,
   ]);
-  const returnBasicRoutes = () => {
-    return (
-      <>
+
+  return (
+    <>
+      <VisitedCoursesNavigationAdapter />
+      {children}
+      <Routes>
         <Route path="" element={<Home />} index />
         <Route path="mindmap" element={<Mindmap />} />
         <Route path="help" element={<div>Help</div>} />
         <Route path="contact" element={<div>Contact</div>} />
-      </>
-    );
-  }
-
-  return (
-    <>
-      {children}
-      <Routes>
-        {returnBasicRoutes()}
         <Route path=":code" element={<CourseCodeLoader />}>
           <Route index element={<CourseInstanceSelector />} />
           <Route path=":instance" element={<CourseInstanceLoader />}>

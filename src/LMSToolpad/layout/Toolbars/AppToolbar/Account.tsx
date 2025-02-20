@@ -7,6 +7,7 @@ import {
   AccountPopoverFooter,
   AccountPreview,
   SignOutButton,
+  ThemeSwitcher,
   ToolbarActions,
 } from "@toolpad/core";
 import { useUserStore } from "../../../store/useUserStore";
@@ -43,7 +44,7 @@ const AccountMenu = () => {
         spacing={2}
       >
         <AccountPreview variant="expanded" />
-        <ToolbarActions />
+        {/* <ToolbarActions /> */}
       </Stack>
       <Divider />
       <MenuItem sx={{ gap: 1 }} onClick={handleSettingsClick}>
@@ -57,6 +58,7 @@ const AccountMenu = () => {
       <AccountPopoverFooter>
         <SignOutButton />
       </AccountPopoverFooter>
+      {/* <ThemeSwitcher /> */}
     </Stack>
   );
 };

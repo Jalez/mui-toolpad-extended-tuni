@@ -66,6 +66,12 @@ export const NavigationFilter = () => {
     (event: React.MouseEvent<HTMLElement>, option: string) => {
       event.preventDefault();
       event.stopPropagation();
+
+      // Prevent toggling "Last 5 visited courses" section
+      if (option === "Last 5 visited courses") {
+        return;
+      }
+
       const newOptions = {
         ...localFilterOptions,
         [option]: !localFilterOptions[option],
@@ -119,6 +125,7 @@ export const NavigationFilter = () => {
           <MenuItem
             key={option}
             onClick={(event) => handleToggle(event, option)}
+            disabled={option === "Last 5 visited courses"}
           >
             <Checkbox checked={localFilterOptions[option]} />
             <ListItemText primary={option} />
