@@ -11,7 +11,7 @@ import useCourseStore, {
 } from "../../components/Courses/store/useCourseStore";
 import FormDialog from "../../components/Dialogs/FormDialog";
 import BasicInfoTab from "./tabs/BasicInfoTab";
-import { Box, useMediaQuery, useTheme } from "@mui/system";
+import { Box, useMediaQuery, useTheme } from "@mui/material";
 import CourseSettingsTabs from "./CourseSettingsTabs";
 import { useNotificationStore } from "../../components/Notifications/store/useNotificationsStore";
 import { useUserStore } from "../../store/useUserStore";

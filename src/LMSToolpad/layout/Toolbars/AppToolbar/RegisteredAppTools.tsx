@@ -41,6 +41,8 @@ const RegisteredAppTools = () => {
         p: 1,
       }}
     >
+      <ThemeSwitcher />
+
       {actions.map((Action, index) => (
         <Action key={`${version}-${index}`} />
       ))}

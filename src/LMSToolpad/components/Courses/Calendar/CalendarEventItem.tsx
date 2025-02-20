@@ -7,11 +7,11 @@ import { CompactEventView, RegularView } from "./components/EventViews";
 import EventMenu from "./components/EventMenu";
 
 const eventTypeIcons: Record<courseEventType, string> = {
-  lecture: "/public/static/images/icons/brain.svg",
-  exercise: "/public/static/images/icons/weight.svg",
-  exam: "/public/static/images/icons/code.svg",
-  deadline: "/public/static/images/icons/dna.svg",
-  other: "/public/static/images/icons/atom.svg",
+  lecture: "/static/images/icons/brain.svg",
+  exercise: "/static/images/icons/weight.svg",
+  exam: "/static/images/icons/code.svg",
+  deadline: "/static/images/icons/dna.svg",
+  other: "/static/images/icons/atom.svg",
 };
 
 type ExtendedEventContentArg = EventContentArg & {

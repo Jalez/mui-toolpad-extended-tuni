@@ -1,10 +1,10 @@
-import { Box } from "@mui/system";
+import { Box } from "@mui/material";
 
 // Wrapper component for actionHandlers with generic props type
-const ActionFCWrapper = <T extends Record<string, unknown>>({ 
-  ActionHandler, 
-  props 
-}: { 
+const ActionFCWrapper = <T extends Record<string, unknown>>({
+  ActionHandler,
+  props,
+}: {
   ActionHandler: React.FC<T>;
   props: T;
 }) => {
@@ -15,10 +15,11 @@ const ActionFCWrapper = <T extends Record<string, unknown>>({
   };
 
   return (
-    <Box onClick={handleClick}
-      data-testid='action-fc-wrapper' 
+    <Box
+      onClick={handleClick}
+      data-testid="action-fc-wrapper"
       sx={{
-        width: '100%',
+        width: "100%",
         // display: 'flex',
         //make it relative to the parent
         // position: 'relative',

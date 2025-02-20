@@ -10,12 +10,12 @@ import {
   DialogProps,
   IconButton,
   Dialog,
+  Box,
   DialogContentText,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import useDialogStore from "../../store/useDialogStore";
 import EduMLDialog from "./ExtendedDialog";
-import { Box } from "@mui/system";
 import { useState } from "react";
 
 interface FormDialogProps {

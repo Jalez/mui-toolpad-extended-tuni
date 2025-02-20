@@ -28,7 +28,6 @@ export const CourseInfo = ({
       {displayMode !== "course" && (
         <Typography
           variant="caption"
-          color="text.secondary"
           sx={{
             overflow: "hidden",
             textOverflow: "ellipsis",

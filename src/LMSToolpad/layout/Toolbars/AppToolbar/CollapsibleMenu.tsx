@@ -5,22 +5,22 @@ import {
   Tooltip,
   useMediaQuery,
   useTheme,
-} from '@mui/material';
+} from "@mui/material";
 
-import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import SettingsIcon from '@mui/icons-material/Settings';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import MicIcon from '@mui/icons-material/Mic';
-import { useEffect } from 'react';
-import DevelopmentTools from '../../../components/DevTools/DevelopmentTools';
-import { useUserStore } from '../../../store/useUserStore';
-import useDialogStore from '../../../store/useDialogStore';
-import { CollapsingButtons } from '../../../components/Common/CollapsingButtons';
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import SettingsIcon from "@mui/icons-material/Settings";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import MicIcon from "@mui/icons-material/Mic";
+import { useEffect } from "react";
+import DevelopmentTools from "../../../components/DevTools/DevelopmentTools";
+import { useUserStore } from "../../../store/useUserStore";
+import useDialogStore from "../../../store/useDialogStore";
+import { CollapsingButtons } from "../../../components/Common/CollapsingButtons";
 
 export const CollapsibleMenu = () => {
   // const [isExpanded, setIsExpanded] = useState(false);
   const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.up('md'));
+  const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));
   // const containerRef = useRef<HTMLDivElement>(null);
   // const expandTimeout = useRef<any>(null);
 
@@ -31,33 +31,35 @@ export const CollapsibleMenu = () => {
   return (
     <CollapsingButtons
       fullWidth={isLargeScreen}
-      collapseIcon={<MoreHorizIcon />}
+      collapseIcon={<MoreHorizIcon htmlColor={theme.palette.text.primary} />}
       collapseWidth={40}
-      tooltipTitle='More actions'>
-      <Stack direction='row' spacing={1}>
-        <Tooltip title='No Notifications'>
-          <IconButton size='small'>
+      tooltipTitle="More actions"
+    >
+      <Stack direction="row" spacing={1}>
+        <Tooltip title="No Notifications">
+          <IconButton size="small">
             <NotificationsIcon />
           </IconButton>
         </Tooltip>
-        <Tooltip title='Voice Command'>
+        <Tooltip title="Voice Command">
           <IconButton
-            size='small'
+            size="small"
             onClick={() => {
-              if ('webkitSpeechRecognition' in window) {
+              if ("webkitSpeechRecognition" in window) {
                 const recognition = new (
                   window as any
                 ).webkitSpeechRecognition();
                 recognition.continuous = false;
                 recognition.interimResults = false;
                 recognition.onresult = (event: any) => {
-                  console.log('Voice command:', event.results[0][0].transcript);
+                  console.log("Voice command:", event.results[0][0].transcript);
                 };
                 recognition.start();
               } else {
-                alert('Speech recognition not supported');
+                alert("Speech recognition not supported");
               }
-            }}>
+            }}
+          >
             <MicIcon />
           </IconButton>
         </Tooltip>
@@ -72,19 +74,20 @@ const PlatformSettingsOpener = () => {
   const { user } = useUserStore();
   const { setOpenDialog } = useDialogStore();
 
-  if (!user?.platformRoles.includes('admin')) return null;
+  if (!user?.platformRoles.includes("admin")) return null;
 
   const handleOpenPlatformSettings = () => {
-    console.log('Open Platform Settings');
-    setOpenDialog('PlatformSettings');
+    console.log("Open Platform Settings");
+    setOpenDialog("PlatformSettings");
   };
 
   return (
-    <Tooltip title='Platform Settings'>
+    <Tooltip title="Platform Settings">
       <IconButton
         onClick={handleOpenPlatformSettings}
-        size='small'
-        color='inherit'>
+        size="small"
+        color="inherit"
+      >
         <SettingsIcon />
       </IconButton>
     </Tooltip>

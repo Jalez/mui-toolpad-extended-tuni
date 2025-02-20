@@ -7,9 +7,9 @@ import {
   AccountPopoverFooter,
   AccountPreview,
   SignOutButton,
-  ThemeSwitcher,
-  ToolbarActions,
+  // ThemeSwitcher,
 } from "@toolpad/core";
+
 import { useUserStore } from "../../../store/useUserStore";
 import useDialogStore from "../../../store/useDialogStore";
 
@@ -26,12 +26,14 @@ export const ToolbarAccount = () => {
 const AccountMenu = () => {
   const { user, setUserToUpdate } = useUserStore();
   const { setOpenDialog } = useDialogStore();
+
   const handleSettingsClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
     e.preventDefault();
     setUserToUpdate(user);
     setOpenDialog("UserSettings");
   };
+
   return (
     <Stack direction="column">
       <Stack
@@ -44,7 +46,6 @@ const AccountMenu = () => {
         spacing={2}
       >
         <AccountPreview variant="expanded" />
-        {/* <ToolbarActions /> */}
       </Stack>
       <Divider />
       <MenuItem sx={{ gap: 1 }} onClick={handleSettingsClick}>
@@ -56,9 +57,11 @@ const AccountMenu = () => {
         Give feedback
       </MenuItem>
       <AccountPopoverFooter>
-        <SignOutButton />
+        <Stack spacing={1}>
+          {/* <ThemeSwitcher /> */}
+          <SignOutButton />
+        </Stack>
       </AccountPopoverFooter>
-      {/* <ThemeSwitcher /> */}
     </Stack>
   );
 };

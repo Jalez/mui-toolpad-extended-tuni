@@ -7,10 +7,10 @@ import {
   MenuItem,
   Select,
   Typography,
-} from '@mui/material';
-import { Box } from '@mui/system';
-import { useState } from 'react';
-import EditIcon from '@mui/icons-material/Edit';
+} from "@mui/material";
+import { Box } from "@mui/material";
+import { useState } from "react";
+import EditIcon from "@mui/icons-material/Edit";
 interface EditableSelectProps {
   value: string;
   onChange: (value: string) => void;
@@ -43,7 +43,8 @@ const EditableSelect = ({
           onChange={(e) => {
             onChange(e.target.value);
             setIsEditing(false);
-          }}>
+          }}
+        >
           {options.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               {option.label}
@@ -52,9 +53,10 @@ const EditableSelect = ({
         </Select>
         {explanation && (
           <Typography
-            variant='body2'
-            color='text.secondary'
-            sx={{ mt: 1, ml: 1 }}>
+            variant="body2"
+            color="text.secondary"
+            sx={{ mt: 1, ml: 1 }}
+          >
             {explanation}
           </Typography>
         )}
@@ -67,51 +69,55 @@ const EditableSelect = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       sx={{
-        position: 'relative',
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        alignItems: 'top',
-        justifyContent: 'space-between',
-      }}>
-      <Typography variant='body2' color='text.secondary' gutterBottom>
+        position: "relative",
+        width: "100%",
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        alignItems: "top",
+        justifyContent: "space-between",
+      }}
+    >
+      <Typography variant="body2" color="text.secondary" gutterBottom>
         {label}
       </Typography>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'flex-end',
-        }}>
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+        }}
+      >
         <Box
           sx={{
-            display: 'flex',
-            flexDirection: 'row',
-            alignItems: 'center',
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
             gap: 1,
-          }}>
+          }}
+        >
           <IconButton
-            size='small'
+            size="small"
             onClick={() => setIsEditing(true)}
             sx={{
               opacity: isHovered ? 1 : 0,
-            }}>
-            <EditIcon fontSize='small' />
+            }}
+          >
+            <EditIcon fontSize="small" />
           </IconButton>
-          <Typography variant='body1'>
+          <Typography variant="body1">
             {options.find((opt) => opt.value === value)?.label ||
               `No ${label.toLowerCase()} set`}
           </Typography>
         </Box>
         {explanation && (
-          <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
             {explanation}
           </Typography>
         )}
       </Box>
       {helperText && (
-        <Typography variant='caption' color='text.secondary' sx={{ mt: 0.5 }}>
+        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
           {helperText}
         </Typography>
       )}

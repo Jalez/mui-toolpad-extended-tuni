@@ -65,11 +65,16 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
   const { navigation } = useNavigationStore();
   const router = useCustomRouter();
   const { theme } = useThemeStore();
-  const [lmsTheme, setLmsTheme] = useState<Theme>(createTheme(theme as any));
+  const [lmsTheme, setLmsTheme] = useState<Theme>(() =>
+    createTheme(theme as any)
+  );
 
   // Update theme when it changes
   useEffect(() => {
-    setLmsTheme(createTheme(theme as any));
+    const newTheme = createTheme({
+      ...(theme as any),
+    });
+    setLmsTheme(newTheme);
   }, [theme]);
 
   // Create session data for Toolpad
@@ -122,7 +127,8 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
           <CourseManager />
           <DashboardLayout
             data-testid="dashboard-layout"
-            border={false}
+            // border={false}
+
             sx={{
               "& .MuiListItemIcon-root": {
                 paddingRight: "20px" + "!important",
@@ -150,7 +156,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
               },
             }}
             defaultSidebarCollapsed={true}
-            maxWidth={true}
+            // maxWidth={true}
             slots={{
               toolbarAccount: ToolbarAccount,
               toolbarActions: RegisteredAppTools,

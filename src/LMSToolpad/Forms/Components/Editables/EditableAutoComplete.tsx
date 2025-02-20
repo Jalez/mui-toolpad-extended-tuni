@@ -6,10 +6,10 @@ import {
   IconButton,
   TextField,
   Typography,
-} from '@mui/material';
-import EditIcon from '@mui/icons-material/Edit';
-import { Box } from '@mui/system';
-import { useState } from 'react';
+} from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
+import { Box } from "@mui/material";
+import { useState } from "react";
 
 interface EditableAutocompleteProps<T> {
   value: T[];
@@ -31,7 +31,7 @@ const EditableAutocomplete = <T extends string | { [key: string]: any }>({
 
   // Updated getLabel function to handle both string and object types
   const getLabel = (option: string | T) => {
-    if (typeof option === 'string') {
+    if (typeof option === "string") {
       return option;
     }
     if (getOptionLabel) {
@@ -42,7 +42,7 @@ const EditableAutocomplete = <T extends string | { [key: string]: any }>({
 
   // Add function to generate unique keys
   const getKey = (option: T): string => {
-    if (typeof option === 'string') {
+    if (typeof option === "string") {
       return option;
     }
     // For objects, create a key from their properties
@@ -70,7 +70,7 @@ const EditableAutocomplete = <T extends string | { [key: string]: any }>({
                 key={key}
                 {...otherProps}
                 label={getLabel(option)}
-                variant='outlined'
+                variant="outlined"
               />
             );
           })
@@ -91,36 +91,39 @@ const EditableAutocomplete = <T extends string | { [key: string]: any }>({
     <Box
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      sx={{ position: 'relative' }}>
-      <Typography variant='body2' color='text.secondary' gutterBottom>
+      sx={{ position: "relative" }}
+    >
+      <Typography variant="body2" color="text.secondary" gutterBottom>
         {label}
       </Typography>
       <Box
         sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          alignItems: 'flex-start',
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "flex-start",
           gap: 1,
-        }}>
+        }}
+      >
         <IconButton
-          size='small'
+          size="small"
           onClick={() => setIsEditing(true)}
           sx={{
             opacity: isHovered ? 1 : 0,
-          }}>
-          <EditIcon fontSize='small' />
+          }}
+        >
+          <EditIcon fontSize="small" />
         </IconButton>
-        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
           {value.length > 0 ? (
             value.map((tag) => (
               <Chip
                 key={getKey(tag)}
                 label={getLabel(tag)}
-                variant='outlined'
+                variant="outlined"
               />
             ))
           ) : (
-            <Typography variant='body1'>
+            <Typography variant="body1">
               {`No ${label.toLowerCase()} set`}
             </Typography>
           )}

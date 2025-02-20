@@ -7,16 +7,18 @@ type CourseHeaderProps = {
   course: Course;
 };
 
-export const CourseHeader = ({ course }: CourseHeaderProps) => (
-  <Box sx={{ mb: 1 }}>
-    <Typography
-      variant="subtitle1"
-      sx={{
-        fontWeight: 500,
-        width: "100%",
-      }}
-    >
-      {course.title} ({course.code})
-    </Typography>
-  </Box>
-);
+export const CourseHeader = ({ course }: CourseHeaderProps) => {
+  return (
+    <Box sx={{ mb: 1 }}>
+      <Typography
+        variant="subtitle1"
+        sx={{
+          fontWeight: 500,
+          width: "100%",
+        }}
+      >
+        {course.title} ({course.code})
+      </Typography>
+    </Box>
+  );
+};

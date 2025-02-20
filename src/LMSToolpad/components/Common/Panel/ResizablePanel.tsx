@@ -326,7 +326,8 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
         // width: dimensions.width,
         maxWidth: "100%", // Constrain width
         height: dimensions.height,
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: theme.palette.background.default,
+
         borderRadius: 1,
         outline: resizeMode
           ? `0.1em dashed ${theme.palette.primary.main}`
