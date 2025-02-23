@@ -5,13 +5,13 @@ import React, {
   useCallback,
   useLayoutEffect,
 } from "react";
-import { Box, GlobalStyles, useTheme, useMediaQuery } from "@mui/material";
+import { Box, useTheme, useMediaQuery } from "@mui/material";
 import CalendarHeader from "./CalendarHeader";
 import DatePickerPopover from "./DatePickerPopover";
 import CalendarBody from "./CalendarBody";
 import useCourseStore from "../store/useCourseStore";
 import { usePanelStore } from "../../Common/Panel/Resizable/store/usePanelStore";
-import { useSetSnapDimensions } from "../../Common/Panel/Resizable/Context/ResizeContext";
+import { useResizeContext } from "../../Common/Panel/Resizable/Context/ResizeContext";
 import { subjectConfig } from "../config/subjectConfig";
 
 // Helper function remains the same
@@ -30,7 +30,7 @@ const Calendar: React.FC = () => {
   const { learningCourses } = useCourseStore();
   const theme = useTheme();
   const { resizeMode } = usePanelStore();
-  const setSnapDimensions = useSetSnapDimensions();
+  const { setSnapDimensions } = useResizeContext();
   const isCompact = useMediaQuery(theme.breakpoints.down("sm"));
   const isMedium = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
@@ -225,7 +225,7 @@ const Calendar: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         pointerEvents: resizeMode ? "none" : "auto",
-        backgroundColor: theme.palette.background.paper,
+        // backgroundColor: theme.palette.background.primary,
         color: theme.palette.text.primary,
         padding: theme.spacing(2),
         boxShadow: theme.shadows[2],
@@ -262,14 +262,6 @@ const Calendar: React.FC = () => {
         },
       }}
     >
-      <GlobalStyles
-        styles={
-          {
-            /* Your FullCalendar styles here */
-          }
-        }
-      />
-
       <CalendarHeader
         onPrev={handlePrev}
         onToday={handleToday}

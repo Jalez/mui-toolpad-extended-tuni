@@ -1,10 +1,10 @@
 /** @format */
 import { Box, SxProps, Theme, Typography } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
 import { useScrollControls } from "./Resizable/Hooks/useScrollControls";
 import PaginationDots from "./PaginationDots";
-import { useItemCounts } from "./Resizable/Context/ResizeContext";
-import { priority as PriorityType } from "../../Courses/NoCourseNotice";
+import { ResizeContext } from "./Resizable/Context/ResizeContext";
+import { priority } from "../../Courses/CourseList";
 
 interface ScrollerProps {
   direction: "vertical" | "horizontal";
@@ -14,7 +14,7 @@ interface ScrollerProps {
   hideScrollbar?: boolean;
   snapScroll?: boolean;
   title?: string;
-  priority?: PriorityType; // For title styling (e.g., "high", "low", or default)
+  priority?: priority; // For title styling (e.g., "high", "low", or default)
 }
 
 const PAGINATION_SIZE = 25; // For vertical: fixed width for pagination area
@@ -29,7 +29,7 @@ const Scroller = ({
   title,
   priority,
 }: ScrollerProps) => {
-  const { itemCounts } = useItemCounts();
+  const { itemCounts } = useContext(ResizeContext);
   const itemsPerPage =
     direction === "vertical" ? itemCounts.vertical : itemCounts.horizontal;
 

@@ -310,7 +310,6 @@ export function MindmapContent() {
       sx={{
         height: "100%",
         width: "100%",
-        bgcolor: theme.palette.background.paper,
         position: "relative",
         overflow: "hidden",
         "& .react-flow__renderer": {

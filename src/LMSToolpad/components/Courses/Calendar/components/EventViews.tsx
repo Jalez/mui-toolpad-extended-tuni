@@ -335,7 +335,7 @@ export const RegularView = ({
           gap: minutes < 45 ? 0.5 : 0.75,
         }}
       >
-        <Box
+        {/* <Box
           component="img"
           src={eventTypeIcons[type] || config.icon}
           alt={type || subject}
@@ -346,7 +346,7 @@ export const RegularView = ({
             flexShrink: 0,
             mt: 0.25,
           }}
-        />
+        /> */}
         <Box
           sx={{
             minWidth: 0,

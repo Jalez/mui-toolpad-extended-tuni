@@ -5,9 +5,10 @@
  * Manages panel dimensions with snapping, storing/restoring from localStorage,
  * and applying mouse/touch event listeners for resize interactions.
  */
-import { useState, useRef, useEffect } from 'react';
-import { snapToGrid } from './useResizeHandlers';
-import { loadDimensions, saveDimensions } from './usePersistentDimensions';
+import { useState, useRef, useEffect } from "react";
+import { snapToGrid } from "./useResizeHandlers";
+import { loadDimensions, saveDimensions } from "./usePersistentDimensions";
+import { PanelDimensions } from "../Context/ResizeContext";
 
 interface UseResizablePanelOptions {
   id: string;
@@ -17,9 +18,14 @@ interface UseResizablePanelOptions {
   maxWidth: number;
   minHeight: number;
   maxHeight: number;
-  snapDimensions: { width: number; height: number };
-  onResize?: (dimensions: { width: number; height: number }) => void;
+  snapDimensions: PanelDimensions;
+  onResize?: (dimensions: PanelDimensions) => void;
 }
+
+export type handleDimensionsChangeType = (
+  dimensions: PanelDimensions,
+  isTemporary: boolean
+) => void;
 
 export function useResizablePanel({
   id,
@@ -39,14 +45,21 @@ export function useResizablePanel({
     vertical: false,
     horizontal: false,
   });
+  const [wasTemporary, setWasTemporary] = useState<boolean>(false);
   const dragStart = useRef({ x: 0, y: 0, width: 0, height: 0 });
 
-  const handleDimensionsChange = (newDimensions: {
-    width: number;
-    height: number;
-  }) => {
+  const handleDimensionsChange: handleDimensionsChangeType = (
+    newDimensions,
+    isTemporary = false
+  ) => {
+    // console.log("handleDimensionsChange", newDimensions);
+    if (!isTemporary) {
+      saveDimensions(id, newDimensions);
+    }
+    if (isTemporary !== wasTemporary) {
+      setWasTemporary(isTemporary);
+    }
     setDimensions(newDimensions);
-    saveDimensions(id, newDimensions);
     onResize?.(newDimensions);
   };
 
@@ -79,19 +92,24 @@ export function useResizablePanel({
           snapToGrid(maxHeight, snapDimensions.height)
         );
       }
-      handleDimensionsChange(newDimensions);
+      if (
+        newDimensions.width !== dimensions.width ||
+        newDimensions.height !== dimensions.height
+      ) {
+        handleDimensionsChange(newDimensions, wasTemporary);
+      }
     };
 
     const handleMouseUp = () =>
       setIsDragging({ vertical: false, horizontal: false });
 
     if (isDragging.vertical || isDragging.horizontal) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
     }
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [
     isDragging,
@@ -101,6 +119,7 @@ export function useResizablePanel({
     maxWidth,
     minHeight,
     maxHeight,
+    wasTemporary,
   ]);
 
   useEffect(() => {
@@ -139,17 +158,17 @@ export function useResizablePanel({
           snapToGrid(maxHeight, snapDimensions.height)
         );
       }
-      handleDimensionsChange(newDimensions);
+      handleDimensionsChange(newDimensions, false);
     };
     const handleTouchEnd = () =>
       setIsDragging({ vertical: false, horizontal: false });
 
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
+    document.addEventListener("touchend", handleTouchEnd);
 
     return () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
   }, [
     isDragging,
@@ -164,15 +183,15 @@ export function useResizablePanel({
   useEffect(() => {
     // ...existing code...
     if (isDragging.vertical || isDragging.horizontal) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.userSelect = 'none';
+      document.body.style.overflow = "hidden";
+      document.body.style.userSelect = "none";
     } else {
-      document.body.style.overflow = '';
-      document.body.style.userSelect = '';
+      document.body.style.overflow = "";
+      document.body.style.userSelect = "";
     }
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.userSelect = '';
+      document.body.style.overflow = "";
+      document.body.style.userSelect = "";
     };
   }, [isDragging]);
 

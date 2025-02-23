@@ -112,6 +112,21 @@ const CalendarBody: React.FC<CalendarBodyProps> = ({
         flex: 1,
         minHeight: 0,
         overflow: "hidden",
+        // Add custom scrollbar styling
+        "& ::-webkit-scrollbar": {
+          width: "8px",
+          height: "8px",
+        },
+        "& ::-webkit-scrollbar-track": {
+          background: theme.palette.background.default,
+        },
+        "& ::-webkit-scrollbar-thumb": {
+          backgroundColor: theme.palette.divider,
+          borderRadius: "4px",
+          "&:hover": {
+            backgroundColor: theme.palette.action.hover,
+          },
+        },
         "& .fc-scroller-liquid-absolute": {
           cursor: "grab",
           "&:active": { cursor: "grabbing" },
@@ -157,6 +172,7 @@ const CalendarBody: React.FC<CalendarBodyProps> = ({
         ".fc-timegrid-col": {
           borderRight: `1px solid ${theme.palette.divider}40 !important`,
         },
+
         // Make time slots more prominent
         ".fc-timegrid-slot": {
           height: densityConfig.slotHeight,
@@ -204,7 +220,6 @@ const CalendarBody: React.FC<CalendarBodyProps> = ({
         // Improve time column visibility
         ".fc-timegrid-axis": {
           borderRight: `2px solid ${theme.palette.divider}`,
-          background: theme.palette.background.paper,
           "& .fc-timegrid-axis-cushion": {
             padding: "4px 8px",
             fontSize: "0.75rem",

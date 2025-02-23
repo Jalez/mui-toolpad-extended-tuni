@@ -5,7 +5,7 @@ import { useUserStore } from "../../store/useUserStore";
 import Scroller from "../Common/Panel/Scroller"; // Our unified scroller
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useSetSnapDimensions } from "../Common/Panel/Resizable/Context/ResizeContext";
+import { useResizeContext } from "../Common/Panel/Resizable/Context/ResizeContext";
 
 export type priority = "high" | "low" | "normal";
 
@@ -28,7 +28,7 @@ const CourseList = ({
   } = useCourseStore();
   const navigate = useNavigate();
   const { user } = useUserStore();
-  const setSnapDimensions = useSetSnapDimensions();
+  const { setSnapDimensions } = useResizeContext();
   const visibleLists = user?.preferences.visibleCourseLists;
 
   const itemReelHeight = 200;

@@ -125,7 +125,7 @@ const MovablePanel = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
       modifiers={[restrictToWindowEdges]}
     >
       <Box
-        position="relative" // Add position relative for tools
+        // position="relative" // Add position relative for tools
         width="100%"
         sx={{ minHeight: "500px" }}
       >

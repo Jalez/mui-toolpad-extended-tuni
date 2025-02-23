@@ -14,6 +14,7 @@ import Calendar from "../../Courses/Calendar/Calendar";
 import ResizeToggler from "../../Common/Panel/Resizable/Tools/ResizeToggler";
 import MoveToggler from "../../Common/Panel/MovablePanel/MoveToggler";
 import { ResizeContextMindmap } from "../../Courses/Mindmap";
+import { Box } from "@mui/material";
 
 /**
  * Home component with enhanced layout options.
@@ -51,6 +52,7 @@ const Home = () => {
         maxWidth={1200}
         minHeight={200}
         maxHeight={800}
+        expandable={true}
       >
         <CourseList displayMode={"instance"} containerHeight="100%" />
       </ResizablePanel>
@@ -63,21 +65,35 @@ const Home = () => {
         maxWidth={1200}
         minHeight={200}
         maxHeight={800}
+        expandable={true}
       >
         <Calendar />
       </ResizablePanel>
+      {/* <Box
+        data-testid="expandable-panel"
+        sx={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          bgcolor: "black", // Just so we can see it
+          top: 0,
+          left: 0,
+          zIndex: 1000, // Make sure it's on top of everything
+        }}
+      > */}
       <ResizablePanel
         id="mindmap"
-        tools={panelTools}
         defaultWidth={600}
         defaultHeight={200}
         minWidth={300}
         maxWidth={1200}
         minHeight={200}
         maxHeight={800}
+        expandable={true}
       >
         <ResizeContextMindmap />
       </ResizablePanel>
+      {/* </Box> */}
     </MovablePanel>
   );
 };

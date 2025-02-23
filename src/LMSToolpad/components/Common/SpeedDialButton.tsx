@@ -1,11 +1,11 @@
 /** @format */
 
-import React, { useState } from 'react';
-import { useTheme } from '@mui/material';
-import SpeedDial from '@mui/material/SpeedDial';
-import SpeedDialIcon from '@mui/material/SpeedDialIcon';
-import SpeedDialAction from '@mui/material/SpeedDialAction';
-import Box from '@mui/material/Box';
+import React, { useState } from "react";
+import { useTheme } from "@mui/material";
+import SpeedDial from "@mui/material/SpeedDial";
+import SpeedDialIcon from "@mui/material/SpeedDialIcon";
+import SpeedDialAction from "@mui/material/SpeedDialAction";
+import Box from "@mui/material/Box";
 
 interface SpeedDialAction {
   icon: React.ReactNode;
@@ -16,7 +16,7 @@ interface SpeedDialAction {
 interface SpeedDialButtonProps {
   actions: SpeedDialAction[];
   value: string;
-  direction?: 'up' | 'down' | 'left' | 'right';
+  direction?: "up" | "down" | "left" | "right";
   onChange: (value: string) => void;
   icons: { [key: string]: React.ReactNode };
   openIcon?: React.ReactNode;
@@ -26,7 +26,7 @@ interface SpeedDialButtonProps {
 export const SpeedDialButton = ({
   actions,
   value,
-  direction = 'down',
+  direction = "down",
   onChange,
   icons,
   openIcon,
@@ -36,9 +36,10 @@ export const SpeedDialButton = ({
   const theme = useTheme();
 
   return (
-    <Box sx={{ position: 'relative', width: size, height: size }}>
+    <Box sx={{ position: "relative", width: size, height: size }}>
       <SpeedDial
-        ariaLabel='Options'
+        data-testid="speed-dial"
+        ariaLabel="Options"
         direction={direction}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
@@ -46,36 +47,39 @@ export const SpeedDialButton = ({
         icon={<SpeedDialIcon icon={icons[value]} openIcon={openIcon} />}
         FabProps={{
           sx: {
-            border: 'none',
+            zIndex: 10,
+            border: "none",
             backgroundColor: theme.palette.background.paper,
-            boxShadow: 'none',
+            boxShadow: "none",
             color: theme.palette.text.primary,
             width: size,
             height: size,
-            '&:hover': {
+            "&:hover": {
               backgroundColor: theme.palette.action.hover,
             },
           },
         }}
         sx={{
-          position: 'absolute',
+          zIndex: 10,
+          position: "absolute",
           top: 0,
           right: 0,
-          boxShadow: 'none',
-          '& .MuiSpeedDial-actions': {
+          boxShadow: "none",
+          "& .MuiSpeedDial-actions": {
             backgroundColor: open
               ? theme.palette.background.paper
-              : 'transparent',
-            boxShadow: 'none',
+              : "transparent",
+            boxShadow: "none",
             borderRadius: 1,
           },
-          '& .MuiSpeedDial-fab': {
+          "& .MuiSpeedDial-fab": {
             width: size,
             height: size,
-            boxShadow: 'none',
-            border: 'none',
+            boxShadow: "none",
+            border: "none",
           },
-        }}>
+        }}
+      >
         {actions.map((action) => (
           <SpeedDialAction
             key={action.name}
@@ -88,11 +92,11 @@ export const SpeedDialButton = ({
             FabProps={{
               sx: {
                 backgroundColor: theme.palette.background.paper,
-                boxShadow: 'none',
+                boxShadow: "none",
                 color: theme.palette.text.primary,
                 width: size - 4,
                 height: size - 4,
-                '&:hover': {
+                "&:hover": {
                   backgroundColor: theme.palette.action.hover,
                 },
               },

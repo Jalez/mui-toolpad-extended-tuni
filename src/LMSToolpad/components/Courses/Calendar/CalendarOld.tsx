@@ -1,6 +1,12 @@
 /** @format */
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  useCallback,
+  useContext,
+} from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -21,13 +27,13 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TodayIcon from "@mui/icons-material/Today";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { DateTime } from "luxon";
-import { useSetSnapDimensions } from "../../Common/Panel/Resizable/Context/ResizeContext";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import ViewDayIcon from "@mui/icons-material/ViewDay";
 import { SpeedDialButton } from "../../Common/SpeedDialButton";
 import useCourseStore from "../store/useCourseStore";
 import { subjectConfig } from "../config/subjectConfig";
+import { ResizeContext } from "../../Common/Panel/Resizable/Context/ResizeContext";
 
 // Helper to determine contrast color based on hex background
 function getContrast(hexColor: string): string {
@@ -74,8 +80,7 @@ const Calendar: React.FC<CalendarProps> = () => {
   const itemReelWidth = 300; // Width of the course item
 
   // Set snap dimensions for parent ResizablePanel
-  const setSnapDimensions = useSetSnapDimensions();
-
+  const { setSnapDimensions } = useContext(ResizeContext);
   const events = learningCourses.flatMap((course) => {
     return Object.values(course.events)
       .flat()

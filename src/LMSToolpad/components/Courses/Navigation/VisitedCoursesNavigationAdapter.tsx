@@ -24,7 +24,7 @@ export const VisitedCoursesNavigationAdapter: React.FC = () => {
   useEffect(() => {
     // This function will be called whenever visited courses change
     const handleVisitedCourses = (visitedCourseIds: string[]) => {
-      console.log("Received visited course IDs:", visitedCourseIds); // Debug log
+      // console.log("Received visited course IDs:", visitedCourseIds); // Debug log
       if (!courses.length) return;
 
       const visitedCourses = visitedCourseIds
@@ -37,7 +37,7 @@ export const VisitedCoursesNavigationAdapter: React.FC = () => {
         .filter((course): course is Course => !!course);
 
       if (visitedCourses.length > 0) {
-        console.log("Found matching courses:", visitedCourses); // Debug log
+        // console.log("Found matching courses:", visitedCourses); // Debug log
         addDynamicSection({
           header: "Last 5 visited courses",
           keepVisible: true,
@@ -51,7 +51,7 @@ export const VisitedCoursesNavigationAdapter: React.FC = () => {
     if (courses.length > 0) {
       // Initial load - get current visited courses
       const initialCourses = getVisitedCourses();
-      console.log("Initial visited courses:", initialCourses); // Debug log
+      // console.log("Initial visited courses:", initialCourses); // Debug log
       handleVisitedCourses(initialCourses);
 
       // Subscribe to future updates

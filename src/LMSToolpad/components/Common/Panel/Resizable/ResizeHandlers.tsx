@@ -1,100 +1,74 @@
 /** @format */
 
-import { Box, useTheme } from '@mui/material';
+import { Box } from "@mui/material";
+import React from "react";
 
-export type direction = 'horizontal' | 'vertical' | 'corner';
-
-type ResizeHandlesProps = {
-  handleMouseDown: (direction: direction) => (e: React.MouseEvent) => void;
-  handleTouchStart: (direction: direction) => (e: React.TouchEvent) => void; // Add this prop
-};
+interface ResizeHandlersProps {
+  handleMouseDown: (
+    direction: "vertical" | "horizontal" | "corner"
+  ) => (e: React.MouseEvent | React.TouchEvent) => void;
+  handleTouchStart: (
+    direction: "vertical" | "horizontal" | "corner"
+  ) => (e: React.MouseEvent | React.TouchEvent) => void;
+}
 
 const ResizeHandlers = ({
   handleMouseDown,
   handleTouchStart,
-}: ResizeHandlesProps) => {
-  const theme = useTheme();
+}: ResizeHandlersProps) => {
+  const commonStyles = {
+    position: "absolute",
+    backgroundColor: "transparent",
+    transition: "background-color 0.2s",
+    "&:hover": {
+      backgroundColor: "rgba(0, 0, 0, 0.05)",
+    },
+  };
+
   return (
     <>
+      {/* Right handle */}
       <Box
-        onMouseDown={handleMouseDown('horizontal')}
-        onTouchStart={handleTouchStart('horizontal')} // Add touch handler
+        onMouseDown={(e) => handleMouseDown("horizontal")(e)}
+        onTouchStart={(e) => handleTouchStart("horizontal")(e)}
         sx={{
-          position: 'absolute',
+          ...commonStyles,
           right: 0,
           top: 0,
-          width: '4px',
-          height: '100%',
-          cursor: 'ew-resize',
-          '&:hover': {
-            backgroundColor: theme.palette.primary.main,
-            opacity: 0.2,
-          },
-          '&:active': {
-            opacity: 0.4,
-          },
-          '@media (hover: none)': {
-            // Add mobile styles
-            width: '12px', // Wider touch target
-          },
+          width: "10px",
+          height: "100%",
+          cursor: "ew-resize",
+          zIndex: 10,
         }}
       />
+
+      {/* Bottom handle */}
       <Box
-        onMouseDown={handleMouseDown('vertical')}
-        onTouchStart={handleTouchStart('vertical')} // Add touch handler
+        onMouseDown={(e) => handleMouseDown("vertical")(e)}
+        onTouchStart={(e) => handleTouchStart("vertical")(e)}
         sx={{
-          position: 'absolute',
-          bottom: -1,
+          ...commonStyles,
+          bottom: 0,
           left: 0,
-          height: '4px',
-          width: '100%',
-          cursor: 'ns-resize',
-          '&:hover': {
-            backgroundColor: theme.palette.primary.main,
-            opacity: 0.2,
-          },
-          '&:active': {
-            opacity: 0.4,
-          },
-          '@media (hover: none)': {
-            // Add mobile styles
-            height: '12px', // Taller touch target
-          },
+          width: "100%",
+          height: "8px",
+          cursor: "ns-resize",
+          zIndex: 10,
         }}
       />
+
+      {/* Corner handle */}
       <Box
-        onMouseDown={handleMouseDown('corner')}
-        onTouchStart={handleTouchStart('corner')} // Add touch handler
+        onMouseDown={(e) => handleMouseDown("corner")(e)}
+        onTouchStart={(e) => handleTouchStart("corner")(e)}
         sx={{
-          position: 'absolute',
+          ...commonStyles,
           bottom: 0,
           right: 0,
-          height: '12px',
-          width: '12px',
-          cursor: 'nwse-resize',
-          '&:hover': {
-            '&::after': {
-              opacity: 0.2,
-            },
-          },
-          '&::after': {
-            content: '""',
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            width: 0,
-            height: 0,
-            borderStyle: 'solid',
-            borderWidth: '0 0 12px 12px',
-            borderColor: `transparent transparent ${theme.palette.primary.main} transparent`,
-            opacity: 0.1,
-            transition: 'opacity 0.2s ease',
-          },
-          '@media (hover: none)': {
-            // Add mobile styles
-            height: '24px',
-            width: '24px',
-          },
+          width: "16px",
+          height: "16px",
+          cursor: "nwse-resize",
+          zIndex: 10,
         }}
       />
     </>

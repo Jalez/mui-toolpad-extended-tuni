@@ -26,7 +26,6 @@ const CustomNode = memo(
     const level = data.nodeLevel || "basic";
     const courseColor = config.levelShades[level];
 
-    console.log("Rendering node:", data.label);
     return (
       <>
         <Handle

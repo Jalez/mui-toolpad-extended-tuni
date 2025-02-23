@@ -1,33 +1,30 @@
 /** @format */
 
-import { Box, useTheme } from '@mui/material';
-type BlurOverlayProps = {
-  children?: React.ReactNode;
-};
+import { Box } from "@mui/material";
+import React from "react";
 
-const BlurOverlay = ({ children }: BlurOverlayProps) => {
-  const theme = useTheme();
-  return (
-    <Box
-      sx={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        //for bgcolor, use theme.palette.background.default
-        bgcolor: theme.palette.background.default,
-        opacity: 0.5,
-        zIndex: theme.zIndex.modal,
-        transition: 'opacity 0.2s ease',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        pointerEvents: 'auto',
-      }}>
-      {children}
-    </Box>
-  );
-};
+interface BlurOverlayProps {
+  children: React.ReactNode;
+}
+
+const BlurOverlay = ({ children }: BlurOverlayProps) => (
+  <Box
+    sx={{
+      position: "absolute",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(255, 255, 255, 0.6)",
+      backdropFilter: "blur(2px)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 1,
+    }}
+  >
+    {children}
+  </Box>
+);
 
 export default BlurOverlay;

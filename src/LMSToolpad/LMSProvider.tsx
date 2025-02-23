@@ -20,7 +20,7 @@ import CourseManager from "./components/Courses/CourseManager";
 
 import Dialogs from "./components/Dialogs/Dialogs";
 import { useThemeStore } from "./store/useThemeStore";
-import { createTheme, Theme } from "@mui/material";
+import { createTheme, Theme, useTheme } from "@mui/material";
 import RegisteredAppTools from "./layout/Toolbars/AppToolbar/RegisteredAppTools";
 import PageContent from "./layout/Content/PageContent";
 import { UserManager } from "./components/UserManager";
@@ -64,6 +64,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
   const { user, getUser, logout } = useUserStore();
   const { navigation } = useNavigationStore();
   const router = useCustomRouter();
+  const themeUsed = useTheme();
   const { theme } = useThemeStore();
   const [lmsTheme, setLmsTheme] = useState<Theme>(() =>
     createTheme(theme as any)
@@ -152,7 +153,22 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
                 padding: 0,
                 margin: 0,
                 width: "100%",
-                paddingLeft: 1,
+                // paddingLeft: 1,
+              },
+              "& nav.MuiBox-root": {
+                margin: 0,
+                overflowY: "auto",
+                overflowX: "hidden",
+                scrollbarWidth: "thin",
+                scrollbarColor: "transparent transparent",
+                //Make scrollbars opacity 0
+                "&:hover": {
+                  //Give the scrollbars theme color on hover, not transparent
+                  scrollbarColor:
+                    themeUsed.palette.divider +
+                    " " +
+                    themeUsed.palette.background.paper,
+                },
               },
             }}
             defaultSidebarCollapsed={true}

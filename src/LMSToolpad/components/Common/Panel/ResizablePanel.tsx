@@ -1,31 +1,24 @@
 /** @format */
 
 import { Box, useTheme } from "@mui/material";
-import { useEffect, useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { usePanelStore } from "./Resizable/store/usePanelStore";
-import BlurOverlay from "./Resizable/BlurOverlay";
-import ResizeIndicator from "./Resizable/ResizeIndicator";
-import InternalScrolling from "./Resizable/InternalScrolling";
-import ResizeHandlers from "./Resizable/ResizeHandlers";
 import {
-  useItemCounts,
   useResizeContext,
   ResizeProvider,
 } from "./Resizable/Context/ResizeContext";
 import { startDragging } from "./Resizable/Hooks/useResizeHandlers";
 import { useResizablePanel } from "./Resizable/Hooks/useResizablePanel";
-import {
-  loadDesiredWidth,
-  saveDesiredWidth,
-} from "./Resizable/Hooks/usePersistentDimensions";
-import { ToolsContainerWrapper } from "./PanelTools/ToolsContainer";
+import { useExpandablePanel } from "./Resizable/Hooks/useExpandablePanel";
+import { useDimensionManagement } from "./Resizable/Hooks/useDimensionManagement";
+import PanelContent from "./Resizable/PanelContent";
 
 interface ResizablePanelProps {
-  id: string; // New required prop
+  id: string;
   children:
     | React.ReactNode
     | ((dimensions: { width: number; height: number }) => React.ReactNode);
-  tools?: React.ReactNode; // Add this prop
+  tools?: React.ReactNode;
   minHeight?: number;
   maxHeight?: number;
   minWidth?: number;
@@ -33,9 +26,9 @@ interface ResizablePanelProps {
   defaultHeight?: number;
   defaultWidth?: number;
   onResize?: (dimensions: { width: number; height: number }) => void;
+  expandable?: boolean;
 }
 
-// Inner component that uses context
 const ResizablePanelContent = (props: ResizablePanelProps) => {
   const {
     id,
@@ -48,13 +41,21 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     defaultHeight = 200,
     defaultWidth = 900,
     onResize,
+    expandable = false,
   } = props;
 
   const theme = useTheme();
   const { resizeMode } = usePanelStore();
-  const { snapDimensions } = useResizeContext();
-  const { setItemCounts } = useItemCounts();
+  const { snapDimensions, setItemCounts } = useResizeContext();
   const panelRef = useRef<HTMLDivElement>(null);
+  const [panelLocationAndDimensions, setPanelLocationAndDimensions] = useState({
+    top: 0,
+    left: 0,
+    dimensions: {
+      width: 0,
+      height: 0,
+    },
+  });
 
   const {
     dimensions,
@@ -74,21 +75,117 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     onResize,
   });
 
-  const isUserResizingRef = useRef(false);
-  const userChosenWidthRef = useRef(loadDesiredWidth(id, defaultWidth)); // Initialize with stored value
+  const {
+    isUserResizingRef,
+    wrappedHandleDimensionsChange,
+    userChosenDimensionsRef,
+  } = useDimensionManagement({
+    id,
+    dimensions,
+    handleDimensionsChange,
+  });
 
-  // Update preferred width during any dimension change
-  const originalHandleDimensionsChange = handleDimensionsChange;
-  const wrappedHandleDimensionsChange = (newDim: {
-    width: number;
-    height: number;
-  }) => {
-    if (isUserResizingRef.current) {
-      // Update userChosenWidth when user is actually dragging
-      userChosenWidthRef.current = newDim.width;
+  // Handle responsive resizing
+  useEffect(() => {
+    if (!panelRef.current) return;
+
+    console.log("panelRef.current.offsetTop", panelRef.current.offsetTop);
+    console.log("panelRef.current.offsetLeft", panelRef.current.offsetLeft);
+    const updateDimensions = () => {
+      const panel = panelRef.current;
+      if (!panel) return;
+
+      const rect = panel.getBoundingClientRect();
+      const offsetLeft = rect.left;
+      const documentWidth = document.documentElement.clientWidth;
+      const marginRight = 16;
+      const availableSpace = documentWidth - offsetLeft - marginRight;
+
+      const maxPossibleItems = Math.floor(
+        (availableSpace - 25) / snapDimensions.width
+      );
+      const maxPossibleWidth = maxPossibleItems * snapDimensions.width;
+      const currentItems = Math.floor(dimensions.width / snapDimensions.width);
+      const desiredItems = Math.floor(
+        userChosenDimensionsRef.current.width / snapDimensions.width
+      );
+
+      if (dimensions.width + 25 > availableSpace) {
+        const newItems = Math.min(currentItems - 1, maxPossibleItems);
+        const newWidth = Math.max(newItems * snapDimensions.width, minWidth);
+
+        if (newWidth < dimensions.width) {
+          wrappedHandleDimensionsChange({
+            width: newWidth,
+            height: dimensions.height,
+          });
+        }
+      } else if (
+        !isUserResizingRef.current &&
+        userChosenDimensionsRef.current.width > dimensions.width
+      ) {
+        const nextItems = Math.min(
+          currentItems + 1,
+          desiredItems,
+          maxPossibleItems
+        );
+        const nextWidth = nextItems * snapDimensions.width;
+
+        if (nextWidth > dimensions.width && nextWidth <= maxPossibleWidth) {
+          wrappedHandleDimensionsChange({
+            width: nextWidth,
+            height: dimensions.height,
+          });
+        }
+      }
+    };
+
+    const observer = new ResizeObserver(updateDimensions);
+    if (panelRef.current.offsetParent) {
+      observer.observe(panelRef.current.offsetParent);
     }
-    originalHandleDimensionsChange(newDim);
-  };
+
+    window.addEventListener("resize", updateDimensions);
+    updateDimensions();
+
+    return () => {
+      window.removeEventListener("resize", updateDimensions);
+      observer.disconnect();
+    };
+  }, [
+    dimensions,
+    snapDimensions.width,
+    minWidth,
+    wrappedHandleDimensionsChange,
+    isUserResizingRef,
+    userChosenDimensionsRef,
+  ]);
+
+  // Update item counts
+  useEffect(() => {
+    if (!panelRef.current) return;
+
+    const actualWidth = panelRef.current.offsetWidth;
+    const horizontalItemsVisible = Math.max(
+      1,
+      Math.floor(actualWidth / snapDimensions.width)
+    );
+    const verticalItemsVisible = Math.floor(
+      dimensions.height / snapDimensions.height
+    );
+
+    setItemCounts({
+      horizontal: horizontalItemsVisible,
+      vertical: verticalItemsVisible,
+    });
+  }, [dimensions, snapDimensions, setItemCounts]);
+
+  const { isExpanded, toggleExpand, expandedPanelId } = useExpandablePanel({
+    id,
+    defaultWidth,
+    defaultHeight,
+    handleDimensionsChange,
+  });
 
   const handleMouseDown = (direction: "vertical" | "horizontal" | "corner") => {
     isUserResizingRef.current = true;
@@ -103,274 +200,179 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
 
   const handleTouchStart = (direction: "vertical" | "horizontal" | "corner") =>
     startDragging(direction, resizeMode, dimensions, setIsDragging, dragStart);
+  const [expandedStyle, setExpandedStyle] = useState<React.CSSProperties>({});
+  const [animateExpansion, setAnimateExpansion] = useState(false);
 
+  // When isExpanded toggles, first capture the current bounds.
   useEffect(() => {
-    const handleMouseUp = () => {
-      if (isUserResizingRef.current) {
-        userChosenWidthRef.current = dimensions.width;
-        // Save the desired width when user finishes dragging
-        saveDesiredWidth(id, dimensions.width);
-        // console.log(
-        //   'User finished resize, new chosen width:',
-        //   dimensions.width
-        // );
+    if (isExpanded && panelRef.current) {
+      const parent = panelRef.current.offsetParent as HTMLElement;
+      if (parent) {
+        // setExpandedStyle({
+        //   position: "absolute",
+        //   top: panelLocationAndDimensions?.top,
+        //   left: panelLocationAndDimensions?.left,
+        //   height: panelLocationAndDimensions.dimensions.height,
+        //   width: panelLocationAndDimensions.dimensions.width,
+        //   transition: "all 0.3s ease-in-out",
+        // });
+        // toggleExpand();
+
+        // On next render (using a short timeout), trigger the animation.
+        setTimeout(() => {
+          setAnimateExpansion(true);
+        }, 500);
       }
-      isUserResizingRef.current = false;
-    };
-
-    document.addEventListener("mouseup", handleMouseUp);
-    return () => document.removeEventListener("mouseup", handleMouseUp);
-  }, [dimensions.width, id]); // Add id as dependency
-
-  // Add effect to calculate and log item count using snapDimensions
-  useEffect(() => {
-    if (snapDimensions.width > 0 && panelRef.current) {
-      const actualWidth = panelRef.current.offsetWidth;
-      const itemsVisible = Math.floor(actualWidth / snapDimensions.width);
-      // console.log(
-      //   "[ResizablePanel] Actually showing:",
-      //   itemsVisible,
-      //   "items",
-      //   `(Computed width: ${actualWidth}px, Snap width: ${snapDimensions.width}px)`
-      // );
+    } else {
+      setAnimateExpansion(false);
+      setExpandedStyle({});
     }
-  }, [dimensions.width, snapDimensions.width]);
+  }, [isExpanded]);
 
-  // Add effect to calculate and log both horizontal and vertical item counts
+  // When animateExpansion becomes true, update the style to fill the parent.
+  // On the next render, update style to fill parent's visible area (without forcing scroll).
   useEffect(() => {
-    if (
-      snapDimensions.width > 0 &&
-      snapDimensions.height > 0 &&
-      panelRef.current
-    ) {
-      const actualWidth = panelRef.current.offsetWidth;
-      const horizontalItemsVisible = Math.max(
-        1,
-        Math.floor(actualWidth / snapDimensions.width)
-      );
-
-      const verticalItemsVisible = Math.floor(
-        dimensions.height / snapDimensions.height
-      );
-
-      setItemCounts({
-        horizontal: horizontalItemsVisible,
-        vertical: verticalItemsVisible,
-      });
-    }
-  }, [
-    dimensions.width,
-    dimensions.height,
-    snapDimensions.width,
-    snapDimensions.height,
-    setItemCounts,
-  ]);
-
-  useEffect(() => {
-    if (!panelRef.current || snapDimensions.width <= 0) return;
-    const parentWidth =
-      panelRef.current.offsetParent?.clientWidth || window.innerWidth;
-    const totalDesiredWidth = dimensions.width + 25;
-    if (totalDesiredWidth > parentWidth) {
-      const allowableItems = Math.floor(
-        (parentWidth - 25) / snapDimensions.width
-      );
-      const newWidth = Math.max(
-        allowableItems * snapDimensions.width,
-        minWidth
-      );
-      if (newWidth < dimensions.width) {
-        wrappedHandleDimensionsChange({
-          width: newWidth,
-          height: dimensions.height,
-        });
-      }
-    }
-  }, [
-    dimensions.width,
-    dimensions.height,
-    snapDimensions.width,
-    minWidth,
-    panelRef,
-    wrappedHandleDimensionsChange,
-  ]);
-
-  useEffect(() => {
-    if (!panelRef.current) return;
-
-    const handleResize = () => {
-      if (!panelRef.current || snapDimensions.width <= 0) return;
-
-      // Calculate total horizontal space taken by other elements
-      const rect = panelRef.current.getBoundingClientRect();
-      const offsetLeft = rect.left;
-      const documentWidth = document.documentElement.clientWidth;
-      const marginRight = 16; // Account for safety margin
-      const availableSpace = documentWidth - offsetLeft - marginRight;
-
-      // Calculate based on actual available space
-      const maxPossibleItems = Math.floor(
-        (availableSpace - 25) / snapDimensions.width
-      );
-      const maxPossibleWidth = maxPossibleItems * snapDimensions.width;
-      const currentItems = Math.floor(dimensions.width / snapDimensions.width);
-      const desiredItems = Math.floor(
-        userChosenWidthRef.current / snapDimensions.width
-      );
-
-      // Rest of resize logic using new available space calculation
-      if (dimensions.width + 25 > availableSpace) {
-        // Shrink immediately when needed
-        const newItems = Math.min(currentItems - 1, maxPossibleItems);
-        const newWidth = Math.max(newItems * snapDimensions.width, minWidth);
-
-        if (newWidth < dimensions.width) {
-          wrappedHandleDimensionsChange({
-            width: newWidth,
-            height: dimensions.height,
-          });
-        }
-      } else if (
-        !isUserResizingRef.current &&
-        userChosenWidthRef.current > dimensions.width
-      ) {
-        // Delay growth to prevent rapid back-and-forth
-        // clearTimeout(growthTimeout);
-        // growthTimeout = setTimeout(() => {
-        const nextItems = Math.min(
-          currentItems + 1,
-          desiredItems,
-          maxPossibleItems
+    if (animateExpansion && panelRef.current) {
+      const parent = panelRef.current.offsetParent as HTMLElement;
+      if (parent) {
+        // Compute parent's bounding rectangle.
+        const parentRect = parent.getBoundingClientRect();
+        // Compute the maximum visible dimensions.
+        const visibleWidth = parent.clientWidth;
+        const visibleHeight = Math.min(
+          parent.clientHeight,
+          window.innerHeight - parentRect.top
         );
-        const nextWidth = nextItems * snapDimensions.width;
-
-        if (nextWidth > dimensions.width && nextWidth <= maxPossibleWidth) {
-          wrappedHandleDimensionsChange({
-            width: nextWidth,
-            height: dimensions.height,
-          });
-        }
-        // }); // Add a delay before growing
-      }
-    };
-
-    // Observe parent size
-    let observer: ResizeObserver | null = null;
-    if (panelRef.current.offsetParent) {
-      observer = new ResizeObserver(handleResize);
-      observer.observe(panelRef.current.offsetParent as Element);
-    }
-
-    // Also handle window resizing for fallback
-    window.addEventListener("resize", handleResize);
-
-    // Run once on mount
-    handleResize();
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      if (observer) observer.disconnect();
-    };
-  }, [
-    dimensions.width,
-    dimensions.height,
-    snapDimensions.width,
-    minWidth,
-    maxWidth,
-    wrappedHandleDimensionsChange,
-  ]);
-
-  // Add a new effect to handle initial dimensions
-  useEffect(() => {
-    const storedDesiredWidth = loadDesiredWidth(id, defaultWidth);
-    if (storedDesiredWidth !== dimensions.width) {
-      // Update dimensions to match stored desired width if possible
-      const parentWidth =
-        panelRef.current?.offsetParent?.clientWidth || window.innerWidth;
-      const availableSpace = parentWidth - 25;
-      const maxPossibleItems = Math.floor(
-        availableSpace / snapDimensions.width
-      );
-      const maxPossibleWidth = maxPossibleItems * snapDimensions.width;
-
-      // Use the smaller of stored width or maximum possible width
-      const targetWidth = Math.min(storedDesiredWidth, maxPossibleWidth);
-
-      if (targetWidth !== dimensions.width) {
-        wrappedHandleDimensionsChange({
-          width: targetWidth,
-          height: dimensions.height,
+        setExpandedStyle({
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: visibleWidth,
+          height: visibleHeight,
+          transition: "all 0.3s ease-in-out",
         });
       }
     }
-  }, [id, defaultWidth, snapDimensions.width]); // Run once on mount with required deps
+  }, [animateExpansion]);
 
-  // Add debug logging
+  // Also update expanded style on window resize while expanded.
   useEffect(() => {
-    // console.log("Width changed:", {
-    //   dimensionsWidth: dimensions.width,
-    //   userChosenWidth: userChosenWidthRef.current,
-    //   isUserResizing: isUserResizingRef.current,
-    // });
-  }, [dimensions.width]);
+    if (!isExpanded || !panelRef.current) return;
+    const parent = panelRef.current.offsetParent as HTMLElement;
+    if (!parent) return;
+
+    // Our original update function:
+    const updateExpandedStyle = () => {
+      const parentRect = parent.getBoundingClientRect();
+      const visibleWidth = parent.clientWidth;
+      const visibleHeight = Math.min(
+        parent.clientHeight,
+        window.innerHeight - parentRect.top
+      );
+      setExpandedStyle({
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: visibleWidth,
+        height: visibleHeight,
+        transition: "all 0.3s ease-in-out",
+      });
+
+      wrappedHandleDimensionsChange({
+        width: visibleWidth,
+        height: visibleHeight,
+      });
+    };
+
+    // Debounce logic: wait until no resize events for 250ms.
+    let resizeTimer: ReturnType<typeof setTimeout>;
+    const debouncedUpdate = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        updateExpandedStyle();
+      }, 250);
+    };
+
+    window.addEventListener("resize", debouncedUpdate);
+    return () => {
+      window.removeEventListener("resize", debouncedUpdate);
+      clearTimeout(resizeTimer);
+    };
+  }, [isExpanded]);
+
+  //If something is expanded and its not this, collapse it
+  // if (expandedPanelId && expandedPanelId !== id) {
+  //   return null;
+  // }
+
+  const handleToggleExpand = () => {
+    //Save the location of the panel
+    if (panelRef.current) {
+      setExpandedStyle({
+        position: "absolute",
+        top: panelRef.current.offsetTop,
+        left: panelRef.current.offsetLeft,
+        height: panelRef.current.offsetHeight,
+        width: panelRef.current.offsetWidth,
+        transition: "all 0.3s ease-in-out",
+      });
+      // setPanelLocationAndDimensions({
+      //   top: panelRef.current.offsetTop,
+      //   left: panelRef.current.offsetLeft,
+      //   dimensions: {
+      //     width: panelRef.current.offsetWidth,
+      //     height: panelRef.current.offsetHeight,
+      //   },
+      // });
+    }
+    toggleExpand();
+  };
 
   return (
     <Box
       ref={panelRef}
       sx={{
-        m: 1,
-        position: "relative",
-        // padding: 1,
-        // border box
-        boxSizing: "border-box",
-        // width: dimensions.width,
-        maxWidth: "100%", // Constrain width
-        height: dimensions.height,
-        backgroundColor: theme.palette.background.default,
+        // m: (isExpanded && 0) || 1,
 
+        boxSizing: "border-box",
+        maxWidth: "100%",
+        // height: dimensions.height,
+        height:
+          expandedPanelId && expandedPanelId !== id ? 0 : dimensions.height,
+        backgroundColor: theme.palette.background.default,
         borderRadius: 1,
         outline: resizeMode
           ? `0.1em dashed ${theme.palette.primary.main}`
-          : `0.2em solid ${theme.palette.divider}`,
-        display: "flex", // Add this
-        flexDirection: "column", // Add this
-        overflow: "hidden", // Add this
-        // Add smooth transitions except during drag
+          : "none",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
         transition:
           isDragging.horizontal || isDragging.vertical
-            ? "none"
-            : "width 0.3s ease-in-out, height 0.3s ease-in-out",
-        // Optimize animations
-        willChange: "width, height",
+            ? 0
+            : "all 0.3s ease-in-out",
+        willChange: "width, height, margin, position",
+        // If expanded, merge our computed inline styles.
+        ...(isExpanded ? expandedStyle : { position: "relative" }),
+        ...(isExpanded && { zIndex: 10 }),
       }}
     >
-      {tools && (
-        <ToolsContainerWrapper position="bottom-right">
-          {tools}
-        </ToolsContainerWrapper>
-      )}
-      <InternalScrolling dimensions={dimensions}>
-        {typeof children === "function" ? children(dimensions) : children}
-      </InternalScrolling>
-
-      {(isDragging.vertical || isDragging.horizontal) && (
-        <BlurOverlay>
-          <ResizeIndicator dimensions={dimensions} />
-        </BlurOverlay>
-      )}
-
-      {/* Resize handles */}
-      {resizeMode && (
-        <ResizeHandlers
-          handleMouseDown={handleMouseDown}
-          handleTouchStart={handleTouchStart}
-        />
-      )}
+      <PanelContent
+        children={children}
+        dimensions={dimensions}
+        isDragging={isDragging}
+        isExpanded={isExpanded}
+        expandable={expandable}
+        tools={tools}
+        resizeMode={resizeMode}
+        handleMouseDown={handleMouseDown}
+        handleTouchStart={handleTouchStart}
+        toggleExpand={handleToggleExpand}
+      />
     </Box>
   );
 };
 
-// Main component that provides context
 const ResizablePanel = (props: ResizablePanelProps) => {
   return (
     <ResizeProvider>

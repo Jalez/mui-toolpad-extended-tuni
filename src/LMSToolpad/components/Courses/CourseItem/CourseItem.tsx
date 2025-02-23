@@ -1,6 +1,7 @@
 /** @format */
 
-import { Card, Box } from "@mui/material";
+import React, { useState } from "react";
+import { Card, Box, Skeleton } from "@mui/material";
 import { Course } from "../store/useCourseStore";
 import useDialogStore from "../../../store/useDialogStore";
 import useCourseStore from "../store/useCourseStore";
@@ -39,6 +40,8 @@ const CourseItem = ({
       (event) => new Date(event.startTime) > new Date()
     )
   );
+
+  const [imgLoaded, setImgLoaded] = useState(false);
 
   const handleSettingsClick = (e: React.MouseEvent<HTMLElement>) => {
     e.stopPropagation();
@@ -81,20 +84,37 @@ const CourseItem = ({
       }}
       onClick={handleCourseSelect}
     >
+      {!imgLoaded && (
+        <Skeleton
+          variant="rectangular"
+          sx={{
+            position: "absolute",
+            right: -10,
+            bottom: -10,
+            width: "80px",
+            height: "80px",
+            opacity: 0.08,
+            transition: "all 0.3s ease-in-out",
+          }}
+          animation="wave"
+        />
+      )}
       <Box
         component="img"
         className="subject-icon"
         src={config.icon}
         alt={subject}
+        loading="lazy"
+        onLoad={() => setImgLoaded(true)}
         sx={{
           position: "absolute",
           right: -10,
           bottom: -10,
           width: "80px",
           height: "80px",
-          opacity: 0.08,
-          transition: "all 0.3s ease-in-out",
+          transition: "opacity 0.3s ease-in-out",
           filter: `drop-shadow(0 0 1px ${courseColor})`,
+          opacity: 0.08,
         }}
       />
       <Box

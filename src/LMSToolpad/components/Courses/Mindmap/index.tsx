@@ -3,7 +3,7 @@ import { ReactFlowProvider } from "reactflow";
 import { MindmapContent } from "./MindmapContent";
 
 import { useLayoutEffect } from "react";
-import { useSetSnapDimensions } from "../../Common/Panel/Resizable/Context/ResizeContext";
+import { useResizeContext } from "../../Common/Panel/Resizable/Context/ResizeContext";
 
 function Mindmap() {
   return (
@@ -14,7 +14,7 @@ function Mindmap() {
 }
 
 export const ResizeContextMindmap = () => {
-  const setSnapDimensions = useSetSnapDimensions();
+  const { setSnapDimensions } = useResizeContext();
 
   // Match these with the ResizablePanel constraints
   const itemReelHeight = 200;

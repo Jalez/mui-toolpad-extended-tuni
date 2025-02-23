@@ -1,8 +1,8 @@
 /** @format */
 
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from "react";
 
-interface SnapDimensions {
+export interface PanelDimensions {
   width: number;
   height: number;
 }
@@ -13,17 +13,21 @@ interface ItemCounts {
 }
 
 interface ResizeContextType {
-  snapDimensions: SnapDimensions;
-  setSnapDimensions: (dimensions: SnapDimensions) => void;
+  snapDimensions: PanelDimensions;
+  setSnapDimensions: (dimensions: PanelDimensions) => void;
   itemCounts: ItemCounts;
   setItemCounts: (counts: ItemCounts) => void;
 }
 
-// Provides snapDimensions and itemCounts for components that need sizing/resize information.
-const ResizeContext = createContext<ResizeContextType | undefined>(undefined);
+export const ResizeContext = createContext<ResizeContextType>({
+  snapDimensions: { width: 200, height: 200 },
+  setSnapDimensions: () => {},
+  itemCounts: { horizontal: 1, vertical: 1 },
+  setItemCounts: () => {},
+});
 
 export const ResizeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [snapDimensions, setSnapDimensions] = useState<SnapDimensions>({
+  const [snapDimensions, setSnapDimensions] = useState<PanelDimensions>({
     width: 200,
     height: 200,
   });
@@ -39,7 +43,8 @@ export const ResizeProvider = ({ children }: { children: React.ReactNode }) => {
         setSnapDimensions,
         itemCounts,
         setItemCounts,
-      }}>
+      }}
+    >
       {children}
     </ResizeContext.Provider>
   );
@@ -48,20 +53,7 @@ export const ResizeProvider = ({ children }: { children: React.ReactNode }) => {
 export const useResizeContext = () => {
   const context = useContext(ResizeContext);
   if (!context) {
-    throw new Error('useResizeContext must be used within a ResizeProvider');
+    throw new Error("useResizeContext must be used within a ResizeProvider");
   }
   return context;
-};
-
-export const useSetSnapDimensions = () => {
-  const { setSnapDimensions } = useResizeContext();
-  return setSnapDimensions;
-};
-
-export const useItemCounts = () => {
-  const context = useResizeContext();
-  return {
-    itemCounts: context.itemCounts,
-    setItemCounts: context.setItemCounts,
-  };
 };
