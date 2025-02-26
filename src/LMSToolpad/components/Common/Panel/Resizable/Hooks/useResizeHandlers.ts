@@ -14,7 +14,7 @@ export function snapToGrid(value: number, snapSize: number) {
  * and storing initial dimensions.
  */
 export function startDragging(
-  direction: 'vertical' | 'horizontal' | 'corner',
+  direction: "vertical" | "horizontal" | "corner",
   resizeMode: boolean,
   dimensions: { width: number; height: number },
   setIsDragging: (d: { vertical: boolean; horizontal: boolean }) => void,
@@ -23,20 +23,21 @@ export function startDragging(
     y: number;
     width: number;
     height: number;
-  }>
+  }>,
+  leap: { x: number; y: number }
 ) {
   return (e: React.MouseEvent | React.TouchEvent) => {
     if (!resizeMode) return;
-    const { clientX, clientY } = 'touches' in e ? e.touches[0] : e;
+    const { clientX, clientY } = "touches" in e ? e.touches[0] : e;
     setIsDragging({
-      vertical: direction === 'vertical' || direction === 'corner',
-      horizontal: direction === 'horizontal' || direction === 'corner',
+      vertical: direction === "vertical" || direction === "corner",
+      horizontal: direction === "horizontal" || direction === "corner",
     });
     dragStart.current = {
       x: clientX,
       y: clientY,
-      width: dimensions.width,
-      height: dimensions.height,
+      width: snapToGrid(dimensions.width, leap.x),
+      height: snapToGrid(dimensions.height, leap.y),
     };
     e.preventDefault();
   };

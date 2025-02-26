@@ -44,8 +44,8 @@ const ResizeHandlers = ({
 
       {/* Bottom handle */}
       <Box
-        onMouseDown={(e) => handleMouseDown("vertical")(e)}
-        onTouchStart={(e) => handleTouchStart("vertical")(e)}
+        onMouseDown={handleMouseDown("vertical")}
+        onTouchStart={handleTouchStart("vertical")}
         sx={{
           ...commonStyles,
           bottom: 0,

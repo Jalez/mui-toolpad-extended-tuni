@@ -1,14 +1,14 @@
 /** @format */
 import { Box, SxProps, Theme, Typography } from "@mui/material";
-import React, { useContext } from "react";
-import { useScrollControls } from "./Resizable/Hooks/useScrollControls";
+import { useScrollControls } from "./hooks/useScrollControls";
 import PaginationDots from "./PaginationDots";
-import { ResizeContext } from "./Resizable/Context/ResizeContext";
-import { priority } from "../../Courses/CourseList";
+import { priority } from "../../../Courses/CourseList";
+import { useScrollContext } from "./context/ScrollerContextProvider";
+import React, { ReactNode } from "react";
 
 interface ScrollerProps {
   direction: "vertical" | "horizontal";
-  children: React.ReactNode;
+  children: ReactNode;
   itemSize: number; // For vertical: item height; for horizontal: item width.
   containerSize?: string | number; // For vertical: overall height; for horizontal: container height.
   hideScrollbar?: boolean;
@@ -29,7 +29,7 @@ const Scroller = ({
   title,
   priority,
 }: ScrollerProps) => {
-  const { itemCounts } = useContext(ResizeContext);
+  const { itemCounts } = useScrollContext();
   const itemsPerPage =
     direction === "vertical" ? itemCounts.vertical : itemCounts.horizontal;
 

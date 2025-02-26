@@ -11,7 +11,7 @@ import {
   DragStartEvent,
 } from "@dnd-kit/core";
 import EditableSwitch from "../../Components/Editables/EditableSwitch";
-import DraggableItem from "../../../components/Common/Panel/MovablePanel/DraggableItem";
+import DraggableItem from "../../../components/Common/Panel/Movable/DraggableItem";
 
 interface AITabProps {
   settings: Platform;

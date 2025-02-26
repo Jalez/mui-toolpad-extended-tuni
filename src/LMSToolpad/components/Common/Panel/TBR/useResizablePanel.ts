@@ -6,9 +6,13 @@
  * and applying mouse/touch event listeners for resize interactions.
  */
 import { useState, useRef, useEffect } from "react";
-import { snapToGrid } from "./useResizeHandlers";
-import { loadDimensions, saveDimensions } from "./usePersistentDimensions";
-import { PanelDimensions } from "../Context/ResizeContext";
+import { snapToGrid } from "../Resizable/Hooks/useResizeHandlers";
+import {
+  loadDimensions,
+  saveDimensions,
+} from "../Main/hooks/usePersistentDimensions";
+import { PanelDimensions } from "../Main/Context/PanelContextProvider";
+import { handleDimensionsChangeType } from "../Main/hooks/useDimensionManagement";
 
 interface UseResizablePanelOptions {
   id: string;
@@ -22,11 +26,6 @@ interface UseResizablePanelOptions {
   onResize?: (dimensions: PanelDimensions) => void;
 }
 
-export type handleDimensionsChangeType = (
-  dimensions: PanelDimensions,
-  isTemporary: boolean
-) => void;
-
 export function useResizablePanel({
   id,
   defaultWidth,
@@ -36,7 +35,6 @@ export function useResizablePanel({
   minHeight,
   maxHeight,
   snapDimensions,
-  onResize,
 }: UseResizablePanelOptions) {
   const [dimensions, setDimensions] = useState(() =>
     loadDimensions(id, { width: defaultWidth, height: defaultHeight })
@@ -52,7 +50,7 @@ export function useResizablePanel({
     newDimensions,
     isTemporary = false
   ) => {
-    // console.log("handleDimensionsChange", newDimensions);
+    console.log("handleDimensionsChange", newDimensions);
     if (!isTemporary) {
       saveDimensions(id, newDimensions);
     }
@@ -60,7 +58,6 @@ export function useResizablePanel({
       setWasTemporary(isTemporary);
     }
     setDimensions(newDimensions);
-    onResize?.(newDimensions);
   };
 
   useEffect(() => {
@@ -158,6 +155,7 @@ export function useResizablePanel({
           snapToGrid(maxHeight, snapDimensions.height)
         );
       }
+      console.log("handleTouchMove", newDimensions);
       handleDimensionsChange(newDimensions, false);
     };
     const handleTouchEnd = () =>

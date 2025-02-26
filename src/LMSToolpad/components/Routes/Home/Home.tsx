@@ -1,20 +1,20 @@
 /** @format */
 
 import { useEffect } from "react";
-import ResizablePanel from "../../Common/Panel/ResizablePanel";
+import ResizablePanel from "../../Common/Panel/TBR/ResizablePanel";
 import {
   registerPageToolbarAction,
   unregisterPageToolbarAction,
 } from "../../../layout/Toolbars/toolbarRegistry";
 import { CourseListVisibilityMenu } from "../../Courses/CourseListVisibilityMenu";
-import MovablePanel from "../../Common/Panel/MovablePanel/MovablePanel";
+import MovablePanel from "../../Common/Panel/Movable/MovablePanel";
 import CourseList from "../../Courses/CourseList";
-import ToolsContainer from "../../Common/Panel/PanelTools/ToolsContainer";
+import ToolsContainer from "../../Common/Panel/Main/tools/ToolsContainer";
 import Calendar from "../../Courses/Calendar/Calendar";
 import ResizeToggler from "../../Common/Panel/Resizable/Tools/ResizeToggler";
-import MoveToggler from "../../Common/Panel/MovablePanel/MoveToggler";
-import { ResizeContextMindmap } from "../../Courses/Mindmap";
-import { Box } from "@mui/material";
+import MoveToggler from "../../Common/Panel/Movable/MoveToggler";
+import { ContextMindmap } from "../../Courses/Mindmap";
+import Panel from "../../Common/Panel/Main/Panel";
 
 /**
  * Home component with enhanced layout options.
@@ -43,21 +43,25 @@ const Home = () => {
 
   return (
     <MovablePanel id="home-panels">
-      <ResizablePanel
+      <Panel
+        key="home-course-selector"
         id="home-course-selector"
-        tools={panelTools}
-        defaultWidth={600}
-        defaultHeight={400}
-        minWidth={300}
-        maxWidth={1200}
+        additionaltools={[panelTools]}
         minHeight={200}
+        defaultHeight={200}
         maxHeight={800}
+        minWidth={300}
+        defaultWidth={300}
+        maxWidth={1200}
         expandable={true}
+        scrollable={true}
+        resizable={true}
       >
         <CourseList displayMode={"instance"} containerHeight="100%" />
-      </ResizablePanel>
+      </Panel>
 
-      <ResizablePanel
+      <Panel
+        key="home-calendar"
         id="home-calendar"
         defaultWidth={600}
         defaultHeight={400}
@@ -66,22 +70,12 @@ const Home = () => {
         minHeight={200}
         maxHeight={800}
         expandable={true}
+        scrollable={true}
+        resizable={true}
       >
         <Calendar />
-      </ResizablePanel>
-      {/* <Box
-        data-testid="expandable-panel"
-        sx={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          bgcolor: "black", // Just so we can see it
-          top: 0,
-          left: 0,
-          zIndex: 1000, // Make sure it's on top of everything
-        }}
-      > */}
-      <ResizablePanel
+      </Panel>
+      {/* <ResizablePanel
         id="mindmap"
         defaultWidth={600}
         defaultHeight={200}
@@ -91,9 +85,8 @@ const Home = () => {
         maxHeight={800}
         expandable={true}
       >
-        <ResizeContextMindmap />
-      </ResizablePanel>
-      {/* </Box> */}
+        <ContextMindmap />
+      </ResizablePanel> */}
     </MovablePanel>
   );
 };

@@ -1,9 +1,9 @@
 /** @format */
 
 import { IconButton } from "@mui/material";
-import { ToolsContainerWrapper } from "../PanelTools/ToolsContainer";
-import InternalScrolling from "./InternalScrolling";
-import BlurOverlay from "./BlurOverlay";
+import { ToolsContainerWrapper } from "../Main/tools/ToolsContainer";
+import InternalScrolling from "../Scrollable/InternalScrolling";
+import BlurOverlay from "../Main/tools/BlurOverlay";
 import ResizeIndicator from "./ResizeIndicator";
 import ResizeHandlers from "./ResizeHandlers";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";

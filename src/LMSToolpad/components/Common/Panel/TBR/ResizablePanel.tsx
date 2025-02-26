@@ -2,37 +2,29 @@
 
 import { Box, useTheme } from "@mui/material";
 import { useRef, useEffect, useState } from "react";
-import { usePanelStore } from "./Resizable/store/usePanelStore";
+import { usePanelStore } from "../Main/store/usePanelStore";
+import { startDragging } from "../Resizable/Hooks/useResizeHandlers";
+import { useResizablePanel } from "./useResizablePanel";
+import { useExpandable } from "../Expandable/hooks/useExpandable";
+import { useDimensionManagement } from "../Main/hooks/useDimensionManagement";
+import { ExpandableContextProvider } from "../Expandable/context/ExpandableContextProvider";
 import {
-  useResizeContext,
-  ResizeProvider,
-} from "./Resizable/Context/ResizeContext";
-import { startDragging } from "./Resizable/Hooks/useResizeHandlers";
-import { useResizablePanel } from "./Resizable/Hooks/useResizablePanel";
-import { useExpandablePanel } from "./Resizable/Hooks/useExpandablePanel";
-import { useDimensionManagement } from "./Resizable/Hooks/useDimensionManagement";
-import PanelContent from "./Resizable/PanelContent";
+  PanelProps,
+  PanelProvider,
+  usePanelContext,
+} from "../Main/Context/PanelContextProvider";
+import { useScrollContext } from "../Scrollable/context/ScrollerContextProvider";
+import PanelContent from "./PanelContent";
 
 interface ResizablePanelProps {
-  id: string;
   children:
     | React.ReactNode
     | ((dimensions: { width: number; height: number }) => React.ReactNode);
-  tools?: React.ReactNode;
-  minHeight?: number;
-  maxHeight?: number;
-  minWidth?: number;
-  maxWidth?: number;
-  defaultHeight?: number;
-  defaultWidth?: number;
-  onResize?: (dimensions: { width: number; height: number }) => void;
-  expandable?: boolean;
 }
 
-const ResizablePanelContent = (props: ResizablePanelProps) => {
+const ResizablePanelContent = ({ children }: ResizablePanelProps) => {
   const {
     id,
-    children,
     tools,
     minHeight = 200,
     maxHeight = 800,
@@ -40,22 +32,13 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     maxWidth = 1200,
     defaultHeight = 200,
     defaultWidth = 900,
-    onResize,
     expandable = false,
-  } = props;
-
-  const theme = useTheme();
-  const { resizeMode } = usePanelStore();
-  const { snapDimensions, setItemCounts } = useResizeContext();
+    dimensions: snapDimensions,
+  } = usePanelContext();
+  const { setItemCounts } = useScrollContext();
   const panelRef = useRef<HTMLDivElement>(null);
-  const [panelLocationAndDimensions, setPanelLocationAndDimensions] = useState({
-    top: 0,
-    left: 0,
-    dimensions: {
-      width: 0,
-      height: 0,
-    },
-  });
+  const { resizeMode } = usePanelStore();
+  const theme = useTheme();
 
   const {
     dimensions,
@@ -72,7 +55,6 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     minHeight,
     maxHeight,
     snapDimensions,
-    onResize,
   });
 
   const {
@@ -180,12 +162,7 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     });
   }, [dimensions, snapDimensions, setItemCounts]);
 
-  const { isExpanded, toggleExpand, expandedPanelId } = useExpandablePanel({
-    id,
-    defaultWidth,
-    defaultHeight,
-    handleDimensionsChange,
-  });
+  const { isExpanded, toggleExpand, expandedPanelId } = useExpandable();
 
   const handleMouseDown = (direction: "vertical" | "horizontal" | "corner") => {
     isUserResizingRef.current = true;
@@ -208,16 +185,6 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     if (isExpanded && panelRef.current) {
       const parent = panelRef.current.offsetParent as HTMLElement;
       if (parent) {
-        // setExpandedStyle({
-        //   position: "absolute",
-        //   top: panelLocationAndDimensions?.top,
-        //   left: panelLocationAndDimensions?.left,
-        //   height: panelLocationAndDimensions.dimensions.height,
-        //   width: panelLocationAndDimensions.dimensions.width,
-        //   transition: "all 0.3s ease-in-out",
-        // });
-        // toggleExpand();
-
         // On next render (using a short timeout), trigger the animation.
         setTimeout(() => {
           setAnimateExpansion(true);
@@ -300,11 +267,6 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
     };
   }, [isExpanded]);
 
-  //If something is expanded and its not this, collapse it
-  // if (expandedPanelId && expandedPanelId !== id) {
-  //   return null;
-  // }
-
   const handleToggleExpand = () => {
     //Save the location of the panel
     if (panelRef.current) {
@@ -316,14 +278,6 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
         width: panelRef.current.offsetWidth,
         transition: "all 0.3s ease-in-out",
       });
-      // setPanelLocationAndDimensions({
-      //   top: panelRef.current.offsetTop,
-      //   left: panelRef.current.offsetLeft,
-      //   dimensions: {
-      //     width: panelRef.current.offsetWidth,
-      //     height: panelRef.current.offsetHeight,
-      //   },
-      // });
     }
     toggleExpand();
   };
@@ -373,11 +327,13 @@ const ResizablePanelContent = (props: ResizablePanelProps) => {
   );
 };
 
-const ResizablePanel = (props: ResizablePanelProps) => {
+const ResizablePanel = (props: PanelProps) => {
   return (
-    <ResizeProvider>
-      <ResizablePanelContent {...props} />
-    </ResizeProvider>
+    <PanelProvider {...props}>
+      <ExpandableContextProvider>
+        <ResizablePanelContent {...props} />
+      </ExpandableContextProvider>
+    </PanelProvider>
   );
 };
 

@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material";
 import React, { useState, useRef, useEffect } from "react";
-import { usePanelStore } from "../Resizable/store/usePanelStore";
+import { usePanelStore } from "../Main/store/usePanelStore";
 import {
   DndContext,
   DragOverlay,
@@ -22,7 +22,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { loadPanelOrder, savePanelOrder } from "./hooks/usePersistentOrder";
-import { ToolsContainerWrapper } from "../PanelTools/ToolsContainer";
+import { ToolsContainerWrapper } from "../Main/tools/ToolsContainer";
 
 interface SortableItemProps {
   id: number;

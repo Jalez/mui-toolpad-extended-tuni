@@ -12,11 +12,11 @@ export function loadDimensions(
   defaultDimensions: { width: number; height: number }
 ) {
   try {
-    console.log("loadDimensions", STORAGE_KEY_PREFIX + id);
+    console.log("Loading dimensions for ID:", id);
     const stored = localStorage.getItem(STORAGE_KEY_PREFIX + id);
-    console.log("stored", stored);
     return stored ? JSON.parse(stored) : defaultDimensions;
-  } catch {
+  } catch (error) {
+    console.warn("Failed to load panel dimensions:", error);
     return defaultDimensions;
   }
 }
@@ -31,7 +31,7 @@ export function saveDimensions(
   dimensions: { width: number; height: number }
 ) {
   try {
-    console.log("saveDimensions", dimensions, STORAGE_KEY_PREFIX + id);
+    console.log("Saving dimensions for ID:", id);
     localStorage.setItem(STORAGE_KEY_PREFIX + id, JSON.stringify(dimensions));
   } catch (error) {
     console.warn("Failed to save panel dimensions:", error);

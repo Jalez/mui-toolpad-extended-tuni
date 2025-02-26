@@ -2,10 +2,10 @@
 import useCourseStore, { Course } from "./store/useCourseStore";
 import CourseItem from "./CourseItem/CourseItem";
 import { useUserStore } from "../../store/useUserStore";
-import Scroller from "../Common/Panel/Scroller"; // Our unified scroller
+import Scroller from "../Common/Panel/Scrollable/Scroller"; // Our unified scroller
 import { useNavigate } from "react-router-dom";
-import { useEffect } from "react";
-import { useResizeContext } from "../Common/Panel/Resizable/Context/ResizeContext";
+
+import { usePanelContext } from "../Common/Panel/Main/Context/PanelContextProvider";
 
 export type priority = "high" | "low" | "normal";
 
@@ -28,18 +28,8 @@ const CourseList = ({
   } = useCourseStore();
   const navigate = useNavigate();
   const { user } = useUserStore();
-  const { setSnapDimensions } = useResizeContext();
+  const { minHeight, minWidth } = usePanelContext();
   const visibleLists = user?.preferences.visibleCourseLists;
-
-  const itemReelHeight = 200;
-  const itemReelWidth = 300;
-
-  useEffect(() => {
-    setSnapDimensions({
-      width: itemReelWidth, // Account for padding/margins if needed
-      height: itemReelHeight,
-    });
-  }, [itemReelWidth, itemReelHeight, setSnapDimensions]);
 
   const handleCourseClick = (course: Course) => {
     navigate(`/${course.code}/${course.instance}`);
@@ -54,8 +44,8 @@ const CourseList = ({
     return (
       <Scroller
         direction="horizontal"
-        itemSize={itemReelWidth}
-        containerSize={itemReelHeight}
+        itemSize={minWidth}
+        containerSize={minHeight}
         title={title}
         priority={prio}
       >
@@ -75,7 +65,7 @@ const CourseList = ({
   return (
     <Scroller
       direction="vertical"
-      itemSize={itemReelHeight}
+      itemSize={minHeight}
       containerSize={containerHeight}
     >
       {visibleLists?.isStudent &&

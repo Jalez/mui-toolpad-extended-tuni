@@ -11,7 +11,6 @@ type InternalScrollingProps = {
 const InternalScrolling = ({
   children,
   dimensions,
-  isExpanded = false,
 }: InternalScrollingProps) => {
   const theme = useTheme();
   return (
@@ -19,7 +18,7 @@ const InternalScrolling = ({
       sx={{
         overflowX: "hidden",
         overflowY: "hidden",
-        width: isExpanded ? "100%" : dimensions.width + 25,
+        width: dimensions.width + 25,
         height: dimensions.height,
         pointerEvents: "auto",
         scrollbarWidth: "thin",

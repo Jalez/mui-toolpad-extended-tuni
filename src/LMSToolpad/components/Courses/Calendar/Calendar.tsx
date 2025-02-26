@@ -10,9 +10,9 @@ import CalendarHeader from "./CalendarHeader";
 import DatePickerPopover from "./DatePickerPopover";
 import CalendarBody from "./CalendarBody";
 import useCourseStore from "../store/useCourseStore";
-import { usePanelStore } from "../../Common/Panel/Resizable/store/usePanelStore";
-import { useResizeContext } from "../../Common/Panel/Resizable/Context/ResizeContext";
+import { usePanelStore } from "../../Common/Panel/Main/store/usePanelStore";
 import { subjectConfig } from "../config/subjectConfig";
+import { usePanelContext } from "../../Common/Panel/Main/Context/PanelContextProvider";
 
 // Helper function remains the same
 function getContrast(hexColor: string): string {
@@ -30,7 +30,7 @@ const Calendar: React.FC = () => {
   const { learningCourses } = useCourseStore();
   const theme = useTheme();
   const { resizeMode } = usePanelStore();
-  const { setSnapDimensions } = useResizeContext();
+  const { setDimensions } = usePanelContext();
   const isCompact = useMediaQuery(theme.breakpoints.down("sm"));
   const isMedium = useMediaQuery(theme.breakpoints.between("sm", "md"));
 
@@ -94,11 +94,11 @@ const Calendar: React.FC = () => {
 
   // Move snap dimensions update to useLayoutEffect
   useLayoutEffect(() => {
-    setSnapDimensions({
+    setDimensions({
       width: itemReelWidth,
       height: itemReelHeight,
     });
-  }, [itemReelWidth, itemReelHeight, setSnapDimensions]);
+  }, [itemReelWidth, itemReelHeight, setDimensions]);
 
   // Adjust view based on container width unless manually overridden
   useLayoutEffect(() => {

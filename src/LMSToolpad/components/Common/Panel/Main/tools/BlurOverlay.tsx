@@ -20,7 +20,7 @@ const BlurOverlay = ({ children }: BlurOverlayProps) => (
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      zIndex: 1,
+      zIndex: 100,
     }}
   >
     {children}
