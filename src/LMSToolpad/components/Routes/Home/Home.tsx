@@ -1,19 +1,18 @@
 /** @format */
 
 import { useEffect } from "react";
-import ResizablePanel from "../../Common/Panel/TBR/ResizablePanel";
 import {
   registerPageToolbarAction,
   unregisterPageToolbarAction,
 } from "../../../layout/Toolbars/toolbarRegistry";
 import { CourseListVisibilityMenu } from "../../Courses/CourseListVisibilityMenu";
-import MovablePanel from "../../Common/Panel/Movable/MovablePanel";
 import CourseList from "../../Courses/CourseList";
 import ToolsContainer from "../../Common/Panel/Main/tools/ToolsContainer";
 import Calendar from "../../Courses/Calendar/Calendar";
 import ResizeToggler from "../../Common/Panel/Resizable/Tools/ResizeToggler";
 import MoveToggler from "../../Common/Panel/Movable/MoveToggler";
 import { ContextMindmap } from "../../Courses/Mindmap";
+import Panels from "../../Common/Panel/Movable/MovablePanel";
 import Panel from "../../Common/Panel/Main/Panel";
 
 /**
@@ -42,7 +41,7 @@ const Home = () => {
   );
 
   return (
-    <MovablePanel id="home-panels">
+    <Panels id="home-panels">
       <Panel
         key="home-course-selector"
         id="home-course-selector"
@@ -87,7 +86,7 @@ const Home = () => {
       >
         <ContextMindmap />
       </ResizablePanel> */}
-    </MovablePanel>
+    </Panels>
   );
 };
 

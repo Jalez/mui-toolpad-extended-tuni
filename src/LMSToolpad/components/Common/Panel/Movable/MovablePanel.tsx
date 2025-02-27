@@ -23,6 +23,10 @@ import { CSS } from "@dnd-kit/utilities";
 import { restrictToWindowEdges } from "@dnd-kit/modifiers";
 import { loadPanelOrder, savePanelOrder } from "./hooks/usePersistentOrder";
 import { ToolsContainerWrapper } from "../Main/tools/ToolsContainer";
+import {
+  MovableContextProvider,
+  useMovableContext,
+} from "./context/MovableContextProvider";
 
 interface SortableItemProps {
   id: number;
@@ -61,9 +65,10 @@ interface MovablePanelProps {
   gap?: number;
 }
 
-const MovablePanel = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
+const Movable = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
   const { moveMode } = usePanelStore();
   // Store original children reference
+  const { parentRef } = useMovableContext();
   const childrenRef = useRef<React.ReactNode[]>([]);
 
   // Update children ref only on mount or when children array length changes
@@ -125,9 +130,12 @@ const MovablePanel = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
       modifiers={[restrictToWindowEdges]}
     >
       <Box
-        // position="relative" // Add position relative for tools
+        data-testid="movable-panel"
+        ref={parentRef}
         width="100%"
-        sx={{ minHeight: "500px" }}
+        height="100%"
+        // position="relative"
+        data-panel-id={id}
       >
         {tools && (
           <ToolsContainerWrapper position="bottom-right">
@@ -139,11 +147,14 @@ const MovablePanel = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
           flexDirection="row"
           flexWrap="wrap"
           justifyContent="center"
-          gap={gap}
+          alignContent={"flex-start"}
+          gap={1}
           sx={{
+            position: "relative",
+            // bgcolor: "black",
             width: "100%",
-            minHeight: "500px",
-            p: 1,
+            height: "100%",
+            //No flexgrow for children
           }}
         >
           <SortableContext
@@ -176,4 +187,10 @@ const MovablePanel = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
   );
 };
 
-export default React.memo(MovablePanel);
+const Panels = (props: MovablePanelProps) => (
+  <MovableContextProvider>
+    <Movable {...props}>{props.children}</Movable>
+  </MovableContextProvider>
+);
+
+export default Panels;

@@ -9,17 +9,15 @@ import {
   usePanelContext,
 } from "./Context/PanelContextProvider";
 
-import { ExpandableContextProvider } from "../Expandable/context/ExpandableContextProvider";
+import { usePanelStore } from "./store/usePanelStore";
+
+import { ToolsContainerWrapper } from "./tools/ToolsContainer";
 import Scrollable from "../Scrollable/Scrollable";
 import Expandable from "../Expandable/Expandable";
 import Resizable from "../Resizable/Resizable";
-import { ToolsContainerWrapper } from "./tools/ToolsContainer";
 
-import { usePanelStore } from "./store/usePanelStore";
-import {
-  ResizableContextProvider,
-  useResizableContext,
-} from "../Resizable/Context/ResizableContextProvider";
+import { ExpandableContextProvider } from "../Expandable/context/ExpandableContextProvider";
+import { ResizableContextProvider } from "../Resizable/Context/ResizableContextProvider";
 
 const PanelContainer = ({ children }: { children: React.ReactNode }) => {
   const theme = useTheme();
@@ -31,51 +29,64 @@ const PanelContainer = ({ children }: { children: React.ReactNode }) => {
     dimensions,
     extendedStyle,
     panelRef,
+    panelContentRef,
     resizable,
     scrollable,
+    extendedContainerStyle,
   } = usePanelContext();
+
   return (
     <Box
       data-panel-id={id}
       ref={panelRef}
+      data-testid="panel-container"
       sx={{
-        position: "relative",
         boxSizing: "border-box",
         maxWidth: "100%",
-        // Zero height only for collapsed panels, not for all non-expanded panels
         height: dimensions.height,
         width: dimensions.width + 25,
-        backgroundColor: theme.palette.background.default,
-        borderRadius: 1,
         outline: resizeMode
           ? `0.1em dashed ${theme.palette.primary.main}`
           : "none",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "hidden",
-        // transition: "all 0.3s ease-in-out",
-        willChange: "width, height, margin, position, top, left",
-        ...extendedStyle,
+        ...extendedContainerStyle,
       }}
     >
-      {tools && (
-        <ToolsContainerWrapper key="tools" position="bottom-right">
-          {tools}
-        </ToolsContainerWrapper>
-      )}
-      {resizable && <Resizable key="resizable" />}
-      {expandable && <Expandable key="expandable" />}
-      {scrollable ? (
-        <Scrollable key="scrollable">{children}</Scrollable>
-      ) : (
-        React.Children.map(children, (child, index) =>
-          React.isValidElement(child)
-            ? React.cloneElement(child, {
-                key: child.key || `panel-child-${index}`,
-              })
-            : child
-        )
-      )}
+      <Box
+        data-testid="panel-content"
+        ref={panelContentRef}
+        sx={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+          backgroundColor: theme.palette.background.default,
+          borderRadius: 1,
+          transition: "all 0.3s ease-in-out",
+
+          position: "absolute",
+          ...extendedStyle,
+        }}
+      >
+        {tools && (
+          <ToolsContainerWrapper key="tools" position="bottom-right">
+            {tools}
+          </ToolsContainerWrapper>
+        )}
+        {resizable && <Resizable key="resizable" />}
+        {expandable && <Expandable key="expandable" />}
+        {scrollable ? (
+          <Scrollable key="scrollable">{children}</Scrollable>
+        ) : (
+          React.Children.map(children, (child, index) =>
+            React.isValidElement(child)
+              ? React.cloneElement(child, {
+                  key: child.key || `panel-child-${index}`,
+                })
+              : child
+          )
+        )}
+      </Box>
     </Box>
   );
 };

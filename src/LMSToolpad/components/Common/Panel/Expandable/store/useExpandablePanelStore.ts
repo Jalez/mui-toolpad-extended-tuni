@@ -7,7 +7,8 @@ interface ExpandablePanelState {
   setExpandedPanelId: (id: string | null) => void;
 }
 
+// Using zustand to create a global store that's accessible from anywhere
 export const useExpandablePanelStore = create<ExpandablePanelState>((set) => ({
   expandedPanelId: null,
-  setExpandedPanelId: (id) => set({ expandedPanelId: id }),
+  setExpandedPanelId: (id: string | null) => set({ expandedPanelId: id }),
 }));

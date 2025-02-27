@@ -5,6 +5,7 @@ import {
   loadDimensions,
   saveDimensions,
 } from "../hooks/usePersistentDimensions";
+import { PanelRef } from "../../types";
 
 export interface PanelDimensions {
   width: number;
@@ -13,6 +14,8 @@ export interface PanelDimensions {
 
 interface PanelContextType {
   id: string;
+  panelRef: PanelRef;
+  panelContentRef: PanelRef;
   defaultWidth: number;
   defaultHeight: number;
   minWidth: number;
@@ -22,7 +25,6 @@ interface PanelContextType {
   expandable?: boolean;
   resizable?: boolean;
   scrollable?: boolean;
-  panelRef: React.RefObject<HTMLDivElement | null>;
   extendedStyle: React.CSSProperties;
   setExtendedStyle: (style: React.CSSProperties) => void;
   tools: React.ReactNode[];
@@ -36,17 +38,20 @@ interface PanelContextType {
     isTemporary?: boolean
   ) => void;
   dimensionsWereTemporary: boolean;
+  extendedContainerStyle: React.CSSProperties;
+  setExtendedContainerStyle: (style: React.CSSProperties) => void;
 }
 
 export const PanelContext = createContext<PanelContextType>({
   id: "",
+  panelRef: { current: null },
+  panelContentRef: { current: null },
   defaultWidth: 200,
   defaultHeight: 200,
   minWidth: 100,
   maxWidth: 500,
   minHeight: 100,
   maxHeight: 500,
-  panelRef: { current: null },
   extendedStyle: {},
   setExtendedStyle: () => {},
   tools: [],
@@ -57,6 +62,8 @@ export const PanelContext = createContext<PanelContextType>({
   setDimensions: () => {},
   handleDimensionsChange: () => {},
   dimensionsWereTemporary: false,
+  extendedContainerStyle: { position: "relative" },
+  setExtendedContainerStyle: () => {},
 });
 
 export interface PanelProps {
@@ -74,7 +81,7 @@ export interface PanelProps {
   scrollable?: boolean;
 }
 
-export const PanelProvider = ({
+export const PanelProvider: React.FC<PanelProps> = ({
   children,
   id,
   additionaltools,
@@ -89,6 +96,8 @@ export const PanelProvider = ({
   scrollable,
 }: PanelProps) => {
   const panelRef = useRef<HTMLDivElement>(null);
+  const panelContentRef = useRef<HTMLDivElement>(null);
+
   const [extendedStyle, setExtendedStyle] = useState<React.CSSProperties>({});
   const [tools, setTools] = useState<React.ReactNode[]>(additionaltools || []);
 
@@ -102,6 +111,11 @@ export const PanelProvider = ({
   });
   const [dimensionsWereTemporary, setDimensionsWereTemporary] =
     useState<boolean>(false);
+
+  const [extendedContainerStyle, setExtendedContainerStyle] =
+    useState<React.CSSProperties>({
+      position: "relative", // default positioning context
+    });
 
   const addTool = (tool: React.ReactNode) => {
     setTools((prevTools) => [...prevTools, tool]);
@@ -139,6 +153,8 @@ export const PanelProvider = ({
     <PanelContext.Provider
       value={{
         id,
+        panelRef,
+        panelContentRef,
         defaultWidth,
         defaultHeight,
         minWidth,
@@ -148,7 +164,6 @@ export const PanelProvider = ({
         expandable,
         resizable,
         scrollable,
-        panelRef,
         extendedStyle,
         setExtendedStyle,
         tools,
@@ -159,6 +174,8 @@ export const PanelProvider = ({
         setDimensions,
         handleDimensionsChange,
         dimensionsWereTemporary,
+        extendedContainerStyle,
+        setExtendedContainerStyle,
       }}
     >
       {children}

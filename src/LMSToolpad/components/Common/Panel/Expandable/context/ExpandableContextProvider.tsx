@@ -1,10 +1,8 @@
-import { createContext, useContext, useState, ReactNode } from "react";
-
-// ...existing code if any...
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface ExpandableContextType {
   isExpanded: boolean;
-  setIsExpanded: (isExpanded: boolean) => void;
+  setIsExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ExpandableContext = createContext<ExpandableContextType | undefined>(
@@ -16,7 +14,7 @@ export const ExpandableContextProvider = ({
 }: {
   children: ReactNode;
 }) => {
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   return (
     <ExpandableContext.Provider value={{ isExpanded, setIsExpanded }}>
