@@ -30,7 +30,7 @@
   },
   "include": [
     "src",
-    "src/LMSToolpad/components/Common/Panel/Resizable/Tools/ResizeToggler.tsx"
+    "src/LMSToolpad/components/Common/GridLayout/Tools/ResizeToggler.tsx"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

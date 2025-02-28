@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material";
 import React, { useState, useRef, useEffect } from "react";
-import { usePanelStore } from "../Main/store/usePanelStore";
+import { usePanelStore } from "../../GridLayout/store/usePanelStore";
 import {
   DndContext,
   DragOverlay,

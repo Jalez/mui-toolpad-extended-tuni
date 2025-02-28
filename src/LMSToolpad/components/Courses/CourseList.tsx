@@ -28,7 +28,9 @@ const CourseList = ({
   } = useCourseStore();
   const navigate = useNavigate();
   const { user } = useUserStore();
-  const { minHeight, minWidth } = usePanelContext();
+  // const { minHeight, minWidth } = usePanelContext();
+  const minHeight = 200;
+  const minWidth = 300;
   const visibleLists = user?.preferences.visibleCourseLists;
 
   const handleCourseClick = (course: Course) => {
@@ -61,6 +63,10 @@ const CourseList = ({
       </Scroller>
     );
   };
+
+  //  <ToolsContainer>
+  //       <CourseListVisibilityMenu />
+  //     </ToolsContainer>
 
   return (
     <Scroller

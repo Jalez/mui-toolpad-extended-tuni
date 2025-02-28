@@ -5,88 +5,69 @@ import {
   registerPageToolbarAction,
   unregisterPageToolbarAction,
 } from "../../../layout/Toolbars/toolbarRegistry";
-import { CourseListVisibilityMenu } from "../../Courses/CourseListVisibilityMenu";
 import CourseList from "../../Courses/CourseList";
-import ToolsContainer from "../../Common/Panel/Main/tools/ToolsContainer";
 import Calendar from "../../Courses/Calendar/Calendar";
-import ResizeToggler from "../../Common/Panel/Resizable/Tools/ResizeToggler";
-import MoveToggler from "../../Common/Panel/Movable/MoveToggler";
-import { ContextMindmap } from "../../Courses/Mindmap";
-import Panels from "../../Common/Panel/Movable/MovablePanel";
-import Panel from "../../Common/Panel/Main/Panel";
+import EditModeToggler from "../../Common/GridLayout/Tools/EditModeToggler";
+import { Box } from "@mui/material";
+import { ResponsiveGridLayout, createGridItem } from "../../Common/GridLayout";
 
-/**
- * Home component with enhanced layout options.
- *
- * @version 2.1.0
- * @updates
- * - Replaced dummy events with course events
- */
+const STORAGE_KEY = "home-layout-v2";
+
+// Use smaller minimum constraints to allow more flexibility
+const baseConstraints = {
+  minW: 1, // Allow smaller width (1 column)
+  minH: 1, // Allow smaller height (1 row)
+  maxW: 12, // Maximum width (12 columns)
+  maxH: 12, // Maximum height (12 rows)
+};
+
+const layouts = {
+  lg: [
+    createGridItem("course-list", 0, 0, 1, 1, baseConstraints),
+    createGridItem("calendar", 1, 0, 1, 1, baseConstraints),
+  ],
+  md: [
+    createGridItem("course-list", 0, 0, 1, 1, baseConstraints),
+    createGridItem("calendar", 6, 0, 6, 8, baseConstraints),
+  ],
+  sm: [
+    createGridItem("course-list", 0, 0, 1, 1, baseConstraints),
+    createGridItem("calendar", 0, 6, 12, 8, baseConstraints),
+  ],
+  xs: [
+    createGridItem("course-list", 0, 0, 1, 1, baseConstraints),
+    createGridItem("calendar", 0, 6, 12, 8, baseConstraints),
+  ],
+};
+
 const Home = () => {
   useEffect(() => {
-    // Unregister actions when component unmounts
-    // Register individual actions for the home page
-    registerPageToolbarAction("/", MoveToggler);
-    registerPageToolbarAction("/", ResizeToggler);
+    // Register the single EditModeToggler instead of separate togglers
+    registerPageToolbarAction("/", EditModeToggler);
     return () => {
-      unregisterPageToolbarAction("/", MoveToggler);
-      unregisterPageToolbarAction("/", ResizeToggler);
+      unregisterPageToolbarAction("/", EditModeToggler);
     };
   }, []);
 
-  const panelTools = (
-    <ToolsContainer>
-      <CourseListVisibilityMenu />
-    </ToolsContainer>
-  );
+  const gridItems = [
+    {
+      id: "course-list",
+      content: <CourseList displayMode="instance" containerHeight="100%" />,
+    },
+    {
+      id: "calendar",
+      content: <Calendar />,
+    },
+  ];
 
   return (
-    <Panels id="home-panels">
-      <Panel
-        key="home-course-selector"
-        id="home-course-selector"
-        additionaltools={[panelTools]}
-        minHeight={200}
-        defaultHeight={200}
-        maxHeight={800}
-        minWidth={300}
-        defaultWidth={300}
-        maxWidth={1200}
-        expandable={true}
-        scrollable={true}
-        resizable={true}
-      >
-        <CourseList displayMode={"instance"} containerHeight="100%" />
-      </Panel>
-
-      <Panel
-        key="home-calendar"
-        id="home-calendar"
-        defaultWidth={600}
-        defaultHeight={400}
-        minWidth={300}
-        maxWidth={1200}
-        minHeight={200}
-        maxHeight={800}
-        expandable={true}
-        scrollable={true}
-        resizable={true}
-      >
-        <Calendar />
-      </Panel>
-      {/* <ResizablePanel
-        id="mindmap"
-        defaultWidth={600}
-        defaultHeight={200}
-        minWidth={300}
-        maxWidth={1200}
-        minHeight={200}
-        maxHeight={800}
-        expandable={true}
-      >
-        <ContextMindmap />
-      </ResizablePanel> */}
-    </Panels>
+    <Box sx={{ width: "100%", height: "100%", p: 1 }}>
+      <ResponsiveGridLayout
+        items={gridItems}
+        storageKey={STORAGE_KEY}
+        defaultLayouts={layouts}
+      />
+    </Box>
   );
 };
 

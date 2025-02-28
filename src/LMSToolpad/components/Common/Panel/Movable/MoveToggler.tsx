@@ -1,7 +1,7 @@
 /** @format */
 
 import { IconButton, Tooltip } from "@mui/material";
-import { usePanelStore } from "../Main/store/usePanelStore";
+import { usePanelStore } from "../../GridLayout/store/usePanelStore";
 import CompareArrowsIcon from "@mui/icons-material/CompareArrows";
 
 const MoveToggler = () => {

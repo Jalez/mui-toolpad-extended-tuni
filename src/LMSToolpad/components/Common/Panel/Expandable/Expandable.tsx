@@ -5,7 +5,7 @@ import { useEffect } from "react";
 
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
-import { usePanelStore } from "../Main/store/usePanelStore";
+import { usePanelStore } from "../../GridLayout/store/usePanelStore";
 import { usePanelContext } from "../Main/Context/PanelContextProvider";
 import { useExpandablePanelStore } from "./store/useExpandablePanelStore";
 import { useExpandableContext } from "./context/ExpandableContextProvider";

@@ -9,7 +9,7 @@ import {
   usePanelContext,
 } from "./Context/PanelContextProvider";
 
-import { usePanelStore } from "./store/usePanelStore";
+import { usePanelStore } from "../../GridLayout/store/usePanelStore";
 
 import { ToolsContainerWrapper } from "./tools/ToolsContainer";
 import Scrollable from "../Scrollable/Scrollable";

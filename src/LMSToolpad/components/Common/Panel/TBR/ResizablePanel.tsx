@@ -2,7 +2,7 @@
 
 import { Box, useTheme } from "@mui/material";
 import { useRef, useEffect, useState } from "react";
-import { usePanelStore } from "../Main/store/usePanelStore";
+import { usePanelStore } from "../../GridLayout/store/usePanelStore";
 import { startDragging } from "../Resizable/Hooks/useResizeHandlers";
 import { useResizablePanel } from "./useResizablePanel";
 import { useExpandable } from "../Expandable/hooks/useExpandable";

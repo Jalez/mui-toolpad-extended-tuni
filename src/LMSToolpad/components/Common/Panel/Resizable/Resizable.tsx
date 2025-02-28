@@ -1,7 +1,7 @@
 /** @format */
 
 import { useEffect } from "react";
-import { usePanelStore } from "../Main/store/usePanelStore";
+import { usePanelStore } from "../../GridLayout/store/usePanelStore";
 import { startDragging } from "./Hooks/useResizeHandlers";
 import { useDimensionManagement } from "../Main/hooks/useDimensionManagement";
 import BlurOverlay from "../Main/tools/BlurOverlay";

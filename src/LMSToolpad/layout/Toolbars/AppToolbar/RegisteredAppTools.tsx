@@ -10,7 +10,7 @@ import {
 } from "../toolbarRegistry";
 import { getAppToolbarActions } from "../toolbarRegistry";
 import { CollapsibleMenu } from "./CollapsibleMenu";
-import { ThemeSwitcher } from "@toolpad/core";
+// import { ThemeSwitcher } from "@toolpad/core";
 
 // A simple AppToolbar rendering actions registered under a fixed "global" key,
 // or you can use location.pathname for route-specific app actions.
@@ -41,7 +41,7 @@ const RegisteredAppTools = () => {
         p: 1,
       }}
     >
-      <ThemeSwitcher />
+      {/* <ThemeSwitcher /> */}
 
       {actions.map((Action, index) => (
         <Action key={`${version}-${index}`} />
