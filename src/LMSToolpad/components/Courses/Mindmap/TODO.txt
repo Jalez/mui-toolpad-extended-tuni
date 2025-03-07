@@ -18,12 +18,12 @@ Mindmap Component TODOs:
     - Keyboard shortcuts for common actions
     - Improved pan and zoom controls for touch devices
 
-[ ] 4. Layout improvements:
-    - Auto-arrange nodes to prevent overlapping
-    - Different layout algorithms (hierarchical, radial, force-directed)
-    - Snap-to-grid option
-    - Ability to group nodes into collapsible clusters
-    - Add visible grid and other visual elements
+[x] 4. Layout improvements:
+    - Auto-arrange nodes to prevent overlapping ✓
+    - Different layout algorithms (hierarchical, radial, force-directed) ✓
+    - Snap-to-grid option ✓
+    - Ability to group nodes into collapsible clusters ✓
+    - Add visible grid and other visual elements ✓
 
 [ ] 5. Enhanced node content:
     - Rich text formatting in node details

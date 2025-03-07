@@ -1,5 +1,12 @@
 /** @format */
-import { forceSimulation, forceManyBody, forceCollide } from "d3-force";
+import {
+  forceSimulation,
+  forceManyBody,
+  forceCollide,
+  forceLink,
+  forceCenter,
+  forceRadial,
+} from "d3-force";
 import { Node } from "reactflow";
 import { NodeData, MySimNode } from "./types";
 
@@ -140,74 +147,136 @@ export const initializeEdges = () =>
       target: node.id,
     }));
 
-// Custom forces for the simulation
-const forceLevelAlignment = (alpha: number, simulationNodes: MySimNode[]) => {
-  simulationNodes.forEach((d) => {
-    const node = nodesData.find((n) => n.id === d.id);
-    if (node && typeof d.x === "number") {
-      const targetX = 200 + node.data.level * 400;
-      const dx = targetX - d.x;
-      if (d.vx !== undefined) {
-        d.vx += dx * alpha * 0.5;
-      }
-    }
-  });
-};
-
-const forceRadialFromParent = (alpha: number, simulationNodes: MySimNode[]) => {
-  simulationNodes.forEach((d) => {
-    const parentId = parentMap[d.id];
-    if (parentId) {
-      const parent = simulationNodes.find((p) => p.id === parentId);
-      if (
-        parent &&
-        typeof parent.x === "number" &&
-        typeof parent.y === "number"
-      ) {
-        const desiredRadius = 80;
-        const dx = d.x! - parent.x;
-        const dy = d.y! - parent.y;
-        const currentRadius = Math.sqrt(dx * dx + dy * dy) || 1;
-        const delta = desiredRadius - currentRadius;
-        const k = 0.1 * alpha;
-        if (d.vx !== undefined && d.vy !== undefined) {
-          d.vx += (dx / currentRadius) * delta * k;
-          d.vy += (dy / currentRadius) * delta * k;
-        }
-      }
-    }
-  });
-};
-
-// Run force simulation on nodes
-export const runForceSimulation = (nodes: Node[]) => {
+// Enhanced force simulation with better node spacing
+export const runForceSimulation = (
+  nodes: Node[],
+  layoutType: "default" | "horizontal" | "vertical" | "radial" = "default"
+) => {
   const simulationNodes: MySimNode[] = nodes.map((n) => ({
     id: n.id,
     x: n.position.x,
     y: n.position.y,
-    r: 80, // Reduced collision radius
+    r: 80,
   }));
 
+  // Create links based on parent-child relationships
+  const links = nodes
+    .filter((node) => node.data.parent)
+    .map((node) => ({
+      source: node.data.parent!,
+      target: node.id,
+      distance: 200,
+    }));
+
   const simulation = forceSimulation(simulationNodes)
-    .force("charge", forceManyBody().strength(-400)) // Reduced strength
-    .force("levelAlign", (alpha) =>
-      forceLevelAlignment(alpha * 0.5, simulationNodes)
-    ) // Reduced alpha
+    .force("charge", forceManyBody().strength(-800))
     .force(
       "collide",
       forceCollide<MySimNode>()
         .radius((d) => d.r)
-        .strength(0.5) // Reduced collision strength
-        .iterations(2) // Reduced iterations
+        .strength(0.8)
     )
+    .force("center", forceCenter(0, 0).strength(0.05))
     .force(
-      "radialFromParent",
-      (alpha) => forceRadialFromParent(alpha * 0.3, simulationNodes) // Reduced alpha
-    )
-    .stop();
+      "link",
+      forceLink(links)
+        .id((d: any) => d.id)
+        .distance((d: any) => d.distance)
+        .strength(1)
+    );
 
-  // Reduced simulation ticks
-  simulation.tick(100);
+  // Add layout-specific forces
+  switch (layoutType) {
+    case "horizontal":
+      simulation.force("x", (alpha: number) => {
+        simulationNodes.forEach((d) => {
+          const node = nodes.find((n) => n.id === d.id);
+          if (node && typeof d.x === "number" && d.vx !== undefined) {
+            const targetX = (node.data.level || 0) * 300;
+            d.vx += (targetX - d.x) * alpha;
+          }
+        });
+      });
+      break;
+    case "vertical":
+      simulation.force("y", (alpha: number) => {
+        simulationNodes.forEach((d) => {
+          const node = nodes.find((n) => n.id === d.id);
+          if (node && typeof d.y === "number" && d.vy !== undefined) {
+            const targetY = (node.data.level || 0) * 300;
+            d.vy += (targetY - d.y) * alpha;
+          }
+        });
+      });
+      break;
+    case "radial":
+      simulation.force(
+        "radial",
+        forceRadial<MySimNode>(
+          (d) => {
+            const node = nodes.find((n) => n.id === d.id);
+            return ((node?.data.level || 0) + 1) * 200;
+          },
+          0,
+          0
+        ).strength(1)
+      );
+      break;
+  }
+
+  // Run simulation
+  simulation.tick(300);
 
   return simulationNodes;
+};
+
+// Add utility function to find node clusters
+export const findNodeClusters = (nodes: Node[]) => {
+  const clusters: { [key: string]: string[] } = {};
+
+  nodes.forEach((node) => {
+    const parentId = node.data.parent || "root";
+    if (!clusters[parentId]) {
+      clusters[parentId] = [];
+    }
+    clusters[parentId].push(node.id);
+  });
+
+  return clusters;
+};
+
+// Add automatic overlap detection and resolution
+export const resolveNodeOverlap = (nodes: Node[], padding: number = 20) => {
+  const nodesCopy = [...nodes];
+  let hasOverlap = true;
+  const iterations = 0;
+  const maxIterations = 100;
+
+  while (hasOverlap && iterations < maxIterations) {
+    hasOverlap = false;
+    for (let i = 0; i < nodesCopy.length; i++) {
+      for (let j = i + 1; j < nodesCopy.length; j++) {
+        const nodeA = nodesCopy[i];
+        const nodeB = nodesCopy[j];
+
+        const dx = nodeB.position.x - nodeA.position.x;
+        const dy = nodeB.position.y - nodeA.position.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < 160 + padding) {
+          // 160 is approximate node width
+          hasOverlap = true;
+          const angle = Math.atan2(dy, dx);
+          const moveDistance = (160 + padding - distance) / 2;
+
+          nodeB.position.x += Math.cos(angle) * moveDistance;
+          nodeB.position.y += Math.sin(angle) * moveDistance;
+          nodeA.position.x -= Math.cos(angle) * moveDistance;
+          nodeA.position.y -= Math.sin(angle) * moveDistance;
+        }
+      }
+    }
+  }
+
+  return nodesCopy;
 };

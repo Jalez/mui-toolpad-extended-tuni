@@ -11,6 +11,7 @@ import { subjectConfig } from "../config/subjectConfig";
 const CustomNode = memo(
   ({
     data,
+    selected,
   }: {
     data: NodeData & {
       isExpanded: boolean;
@@ -19,6 +20,7 @@ const CustomNode = memo(
       onAddChild?: () => void;
       onAddParent?: () => void;
     };
+    selected: boolean;
   }) => {
     const theme = useTheme();
     const subject = data.subject || "COMP.CS";
@@ -51,13 +53,21 @@ const CustomNode = memo(
             backgroundColor: theme.palette.background.paper,
             borderLeft: `4px solid ${courseColor}`,
             overflow: "visible",
+            boxShadow: selected
+              ? `0 0 0 2px ${theme.palette.primary.main}, 0 0 10px 2px ${theme.palette.primary.main}`
+              : data.isExpanded
+                ? theme.shadows[2]
+                : "none",
             "&:hover": {
-              boxShadow: theme.shadows[4],
+              boxShadow: selected
+                ? `0 0 0 2px ${theme.palette.primary.main}, 0 0 10px 2px ${theme.palette.primary.main}`
+                : theme.shadows[4],
               "& .react-flow__handle": {
                 opacity: 1,
                 backgroundColor: theme.palette.primary.main,
               },
             },
+            transition: "box-shadow 0.3s ease",
             userSelect: "none",
             cursor: "grab",
             "&:active": {
@@ -69,12 +79,13 @@ const CustomNode = memo(
         >
           <Accordion
             expanded={data.isExpanded ?? false}
-            onChange={(_, isExpanded) => data.onToggleExpand()}
-            onClick={(e) => e.stopPropagation()}
+            onChange={(e, expanded) => {
+              e.stopPropagation();
+              data.onToggleExpand();
+            }}
             disableGutters
             sx={{
               background: "transparent",
-              // boxShadow: "none",
               "&:before": { display: "none" },
               "& .MuiAccordionSummary-root": {
                 minHeight: 0,
@@ -82,9 +93,16 @@ const CustomNode = memo(
               },
               "& .MuiAccordionSummary-content": {
                 margin: "8px 0",
+                pointerEvents: "none",
+              },
+              "& .MuiAccordionSummary-expandIconWrapper": {
+                pointerEvents: "auto",
+                zIndex: 1,
+                position: "relative",
               },
               "& .MuiAccordionDetails-root": {
                 padding: "0 8px 8px 8px",
+                pointerEvents: "none",
               },
             }}
           >
@@ -98,13 +116,14 @@ const CustomNode = memo(
                   />
                 ) : null
               }
-              onClick={(e) => e.stopPropagation()}
               sx={{
                 padding: 1,
                 backgroundColor: data.isExpanded
                   ? `${courseColor}08`
-                  : "transparent",
-                transition: theme.transitions.create("background-color"),
+                  : selected
+                    ? `${courseColor}20`
+                    : "transparent",
+                transition: theme.transitions.create(["background-color"]),
                 "&:hover": {
                   backgroundColor: `${courseColor}15`,
                 },
@@ -131,33 +150,16 @@ const CustomNode = memo(
                     sx={{
                       fontWeight: theme.typography.fontWeightMedium,
                       color: theme.palette.text.primary,
-                      fontSize: "1.5rem",
                     }}
                   >
                     {data.label}
                   </Typography>
-                  {/* <Box
-                    sx={{
-                      // position: "absolute",
-                      top: 4,
-                      right: 4,
-                      zIndex: 5,
-                      pointerEvents: "auto",
-                    }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      data.onEdit && data.onEdit();
-                    }}
-                  >
-                    <Tooltip title="Edit Node">
-                      <EditIcon sx={{ cursor: "pointer" }} />
-                    </Tooltip>
-                  </Box> */}
                 </Box>
               </Box>
             </AccordionSummary>
             {data.details && (
               <AccordionDetails
+                onClick={(e) => e.stopPropagation()}
                 sx={{
                   display: "flex",
                   flexDirection: "column",
@@ -170,7 +172,6 @@ const CustomNode = memo(
                   sx={{
                     borderTop: `1px solid ${theme.palette.divider}`,
                     pt: 1,
-                    fontSize: "1.2rem",
                   }}
                 >
                   {data.details}
@@ -215,12 +216,12 @@ const CustomNode = memo(
     );
   },
   (prev, next) => {
-    // Custom comparison to prevent unnecessary re-renders
     return (
       prev.data.isExpanded === next.data.isExpanded &&
       prev.data.label === next.data.label &&
       prev.data.details === next.data.details &&
-      prev.data.nodeLevel === next.data.nodeLevel
+      prev.data.nodeLevel === next.data.nodeLevel &&
+      prev.selected === next.selected
     );
   }
 );

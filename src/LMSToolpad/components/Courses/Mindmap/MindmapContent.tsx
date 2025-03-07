@@ -1,5 +1,12 @@
 /** @format */
-import { useEffect, useCallback, useRef, useMemo } from "react";
+import {
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo,
+  useState,
+  useLayoutEffect,
+} from "react";
 import ReactFlow, {
   useEdgesState,
   useNodesState,
@@ -12,10 +19,15 @@ import ReactFlow, {
   Node,
   useReactFlow,
   MarkerType,
+  Background,
+  BackgroundVariant,
+  Viewport,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { Box } from "@mui/material";
+import { Box, IconButton, Tooltip, Menu, MenuItem } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
+import GridOnIcon from "@mui/icons-material/GridOn";
+import ViewQuiltIcon from "@mui/icons-material/ViewQuilt";
 import { EditNodeDialog } from "./EditNodeDialog";
 import { CustomNode } from "./CustomNode";
 import {
@@ -24,49 +36,231 @@ import {
   runForceSimulation,
 } from "./mindmapUtils";
 import { useMindmapStore } from "./store";
-import { useState } from "react";
+
+// Debounce utility function
+function debounce<F extends (...args: any[]) => any>(fn: F, delay: number) {
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return function (...args: Parameters<F>) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
+}
 
 export function MindmapContent() {
   const theme = useTheme();
-  const [nodes, setNodes] = useNodesState(initializeNodes());
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initializeEdges());
+  const {
+    expandedNodes,
+    toggleNodeExpansion,
+    updateNodeData,
+    viewport,
+    setViewport,
+    nodes: storedNodes,
+    setNodes: setStoredNodes,
+    edges: storedEdges,
+    setEdges: setStoredEdges,
+    selectedNodeId,
+    setSelectedNodeId,
+  } = useMindmapStore();
+
+  // Initialize with stored nodes or default nodes if store is empty
+  const [nodes, setNodes] = useNodesState(() => {
+    if (storedNodes && storedNodes.length > 0) {
+      return storedNodes;
+    }
+    return initializeNodes();
+  });
+
+  // Initialize with stored edges or default edges if store is empty
+  const [edges, setEdges, onEdgesChange] = useEdgesState(() => {
+    if (storedEdges && storedEdges.length > 0) {
+      return storedEdges;
+    }
+    return initializeEdges();
+  });
+
   const reactFlowInstance = useReactFlow();
   const [editNode, setEditNode] = useState<Node | null>(null);
   const flowWrapper = useRef<HTMLDivElement>(null);
+  const [showGrid, setShowGrid] = useState(true);
+  const [snapToGrid, setSnapToGrid] = useState(true);
+  const [layoutMenuAnchor, setLayoutMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
+  const [currentLayout, setCurrentLayout] = useState<
+    "default" | "horizontal" | "vertical" | "radial"
+  >("default");
+  const [initialRender, setInitialRender] = useState(true);
+  const initialViewportSet = useRef(false);
 
-  // Use mindmap store for expansion state
-  const { expandedNodes, toggleNodeExpansion, updateNodeData } =
-    useMindmapStore();
-
-  // Set initial snap dimensions for the panel
-
-  // Handle resize and reflow with better padding
+  // Sync nodes with store whenever they change
   useEffect(() => {
-    const resizeObserver = new ResizeObserver(() => {
-      if (reactFlowInstance) {
-        requestAnimationFrame(() => {
-          reactFlowInstance.fitView({
-            padding: 0.5, // Increased padding
-            duration: 300,
-            includeHiddenNodes: false,
-          });
-        });
+    setStoredNodes(nodes);
+  }, [nodes, setStoredNodes]);
+
+  // Sync edges with store whenever they change
+  useEffect(() => {
+    setStoredEdges(edges);
+  }, [edges, setStoredEdges]);
+
+  // Set up viewport on initial render and focus on selected node if one exists
+  useLayoutEffect(() => {
+    if (initialRender && !initialViewportSet.current) {
+      if (selectedNodeId) {
+        const selectedNode = nodes.find((node) => node.id === selectedNodeId);
+        if (selectedNode) {
+          // Set viewport directly without animation
+          const newViewport = {
+            x:
+              -(selectedNode.position.x * viewport.zoom) +
+              (flowWrapper.current?.clientWidth || 0) / 2,
+            y:
+              -(selectedNode.position.y * viewport.zoom) +
+              (flowWrapper.current?.clientHeight || 0) / 2,
+            zoom: viewport.zoom,
+          };
+          reactFlowInstance.setViewport(newViewport, { duration: 0 });
+          setViewport(newViewport);
+        }
+      } else {
+        // If no selected node, just set the stored viewport
+        reactFlowInstance.setViewport(viewport, { duration: 0 });
       }
-    });
-
-    if (flowWrapper.current) {
-      resizeObserver.observe(flowWrapper.current);
+      initialViewportSet.current = true;
+      setInitialRender(false);
     }
+  }, [
+    initialRender,
+    viewport,
+    selectedNodeId,
+    nodes,
+    reactFlowInstance,
+    setViewport,
+  ]);
 
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, [reactFlowInstance]);
+  // Handle node selection
+  const onNodeClick = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      // Only prevent selection if clicking directly on a handle
+      if (
+        (event.target as HTMLElement).classList.contains("react-flow__handle")
+      ) {
+        return;
+      }
+
+      // Set as selected node in store
+      setSelectedNodeId(node.id);
+
+      // Center on the selected node
+      reactFlowInstance.setCenter(node.position.x, node.position.y, {
+        duration: 800,
+        zoom: reactFlowInstance.getZoom(),
+      });
+    },
+    [setSelectedNodeId, reactFlowInstance]
+  );
+
+  // Handle viewport change with debounce to avoid too many updates
+  const handleViewportChange = useCallback(
+    debounce((viewport: Viewport) => {
+      if (!initialRender) {
+        setViewport(viewport);
+      }
+    }, 200),
+    [setViewport, initialRender]
+  );
+
+  // Better wheel handling for zoom
+  const handleWheel = useCallback(
+    (event: React.WheelEvent) => {
+      // Check if ctrl/cmd key is pressed for zoom behavior
+      if (event.ctrlKey || event.metaKey) {
+        event.preventDefault();
+
+        // Get the current viewport
+        const { zoom, x, y } = reactFlowInstance.getViewport();
+
+        // Calculate the position where the mouse is pointing in the viewport
+        const rect = event.currentTarget.getBoundingClientRect();
+        const clientX = event.clientX - rect.left;
+        const clientY = event.clientY - rect.top;
+
+        // Calculate the point in the canvas where the mouse is
+        const pointInCanvas = {
+          x: (clientX - x) / zoom,
+          y: (clientY - y) / zoom,
+        };
+
+        // Calculate new zoom level
+        const zoomFactor = event.deltaY > 0 ? 0.9 : 1.1;
+        const newZoom = Math.min(4, Math.max(0.1, zoom * zoomFactor));
+
+        // Calculate new position to keep the point under the mouse
+        const newX = clientX - pointInCanvas.x * newZoom;
+        const newY = clientY - pointInCanvas.y * newZoom;
+
+        // Set the new viewport
+        reactFlowInstance.setViewport(
+          { x: newX, y: newY, zoom: newZoom },
+          { duration: 0 }
+        );
+
+        // Update the viewport in store for persistence
+        setViewport({ x: newX, y: newY, zoom: newZoom });
+      } else {
+        // Regular scrolling behavior - pan vertically
+        const { zoom, x, y } = reactFlowInstance.getViewport();
+        reactFlowInstance.setViewport(
+          { x, y: y - event.deltaY, zoom },
+          { duration: 0 }
+        );
+        setViewport({ x, y: y - event.deltaY, zoom });
+      }
+    },
+    [reactFlowInstance, setViewport]
+  );
+
+  // Use force simulation only on initial empty state
+  useEffect(() => {
+    if (storedNodes.length === 0 && nodes.length > 0) {
+      const simulationNodes = runForceSimulation(nodes);
+      setNodes((prevNodes) =>
+        prevNodes.map((n) => {
+          const simNode = simulationNodes.find((s) => s.id === n.id)!;
+          return {
+            ...n,
+            position: {
+              x: simNode?.x ?? n.position.x,
+              y: simNode?.y ?? n.position.y,
+            },
+          };
+        })
+      );
+    }
+  }, []);
+
+  // Persist node positions on drag end
+  const onNodeDragStop = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      setNodes((nds) => {
+        return nds.map((n) => {
+          if (n.id === node.id) {
+            return {
+              ...n,
+              position: node.position,
+            };
+          }
+          return n;
+        });
+      });
+    },
+    [setNodes]
+  );
 
   // Progressive disclosure: visible nodes
   const visibleEnhancedNodes = nodes
     .map((n) => ({
       ...n,
+      selected: selectedNodeId === n.id,
       data: {
         ...n.data,
         isExpanded: expandedNodes[n.id] ?? false,
@@ -249,9 +443,23 @@ export function MindmapContent() {
   // Handle node changes
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
+      if (snapToGrid) {
+        changes = changes.map((change) => {
+          if (change.type === "position" && change.position) {
+            return {
+              ...change,
+              position: {
+                x: Math.round(change.position.x / 20) * 20,
+                y: Math.round(change.position.y / 20) * 20,
+              },
+            };
+          }
+          return change;
+        });
+      }
       setNodes((nds) => applyNodeChanges(changes, nds));
     },
-    [setNodes]
+    [setNodes, snapToGrid]
   );
 
   // Handle new connections
@@ -273,34 +481,60 @@ export function MindmapContent() {
     [setEdges, theme.palette.primary.main]
   );
 
-  // Run force simulation
-  useEffect(() => {
-    const simulationNodes = runForceSimulation(nodes);
-    setNodes((prevNodes) =>
-      prevNodes.map((n) => {
-        const simNode = simulationNodes.find((s) => s.id === n.id)!;
-        return {
-          ...n,
-          position: {
-            x: simNode.x!,
-            y: simNode.y!,
-          },
-        };
-      })
-    );
-  }, []);
+  // Add layout management functions
+  const applyLayout = useCallback(
+    (layoutType: "default" | "horizontal" | "vertical" | "radial") => {
+      setCurrentLayout(layoutType);
+      const nodeSpacing = 200;
+      const levelSpacing = 200;
 
-  // Handle keyboard shortcuts
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && editNode) {
-        setEditNode(null);
-      }
-    };
+      setNodes((nds) => {
+        return nds.map((node) => {
+          const level = node.data.level || 0;
+          const nodesAtLevel = nds.filter((n) => n.data.level === level).length;
+          const nodeIndex = nds
+            .filter((n) => n.data.level === level)
+            .findIndex((n) => n.id === node.id);
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [editNode]);
+          let x = 0;
+          let y = 0;
+
+          switch (layoutType) {
+            case "horizontal":
+              x = level * levelSpacing;
+              y = (nodeIndex - (nodesAtLevel - 1) / 2) * nodeSpacing;
+              break;
+            case "vertical":
+              x = (nodeIndex - (nodesAtLevel - 1) / 2) * nodeSpacing;
+              y = level * levelSpacing;
+              break;
+            case "radial":
+              const angle = (2 * Math.PI * nodeIndex) / nodesAtLevel;
+              const radius = level * levelSpacing;
+              x = Math.cos(angle) * radius;
+              y = Math.sin(angle) * radius;
+              break;
+            default:
+              // Use force-directed layout (handled by existing simulation)
+              return node;
+          }
+
+          return {
+            ...node,
+            position: { x, y },
+          };
+        });
+      });
+
+      // Fit view after layout change
+      setTimeout(() => {
+        reactFlowInstance.fitView({ padding: 0.5, duration: 800 });
+      }, 50);
+
+      setLayoutMenuAnchor(null);
+    },
+    [reactFlowInstance, setNodes]
+  );
 
   const nodeTypes = useMemo(() => ({ custom: CustomNode }), []);
 
@@ -356,6 +590,7 @@ export function MindmapContent() {
           padding: 1,
         },
       }}
+      onWheel={handleWheel}
     >
       <ReactFlow
         nodes={visibleEnhancedNodes}
@@ -363,6 +598,13 @@ export function MindmapContent() {
         onNodesChange={handleNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onNodeDragStop={onNodeDragStop}
+        onNodeClick={onNodeClick}
+        snapToGrid={snapToGrid}
+        snapGrid={[20, 20]}
+        defaultViewport={viewport}
+        onViewportChange={handleViewportChange}
+        fitView={false} // Disable automatic fit view since we're using stored viewport
         defaultEdgeOptions={{
           type: "smoothstep",
           animated: true,
@@ -372,38 +614,75 @@ export function MindmapContent() {
         onEdgeClick={handleEdgeClick}
         onNodeDoubleClick={(_, node) => setEditNode(node)}
         nodeTypes={nodeTypes}
-        fitView
-        fitViewOptions={{
-          padding: 1,
-          duration: 200,
-          includeHiddenNodes: false,
-        }}
-        zoomOnScroll={false}
+        zoomOnScroll={true}
         zoomOnPinch={true}
-        onWheel={(event) => {
-          if (event.ctrlKey || event.metaKey) {
-            event.preventDefault();
-            const delta = event.deltaY;
-            reactFlowInstance.zoomTo(
-              reactFlowInstance.getZoom() * (1 - delta * 0.001),
-              { duration: 100 }
-            );
-          }
-        }}
-        defaultViewport={{ x: 0, y: 0, zoom: 1.5 }}
-        minZoom={0.5}
-        maxZoom={2}
+        minZoom={0.2}
+        maxZoom={4}
         nodesDraggable={true}
         elementsSelectable={true}
         selectNodesOnDrag={false}
         translateExtent={[
-          [-1000, -1000],
-          [2000, 2000],
+          [-2000, -2000],
+          [4000, 4000],
         ]}
       >
-        {/* <Background size={2} gap={20} /> */}
-        <Controls showInteractive={true} />
+        {showGrid && (
+          <Background
+            variant={BackgroundVariant.Dots}
+            gap={20}
+            size={1}
+            color={theme.palette.divider}
+          />
+        )}
+        <Controls showInteractive={true}>
+          <Tooltip title="Toggle Grid">
+            <IconButton
+              onClick={() => setShowGrid(!showGrid)}
+              size="small"
+              sx={{
+                backgroundColor: theme.palette.background.paper,
+                color: showGrid
+                  ? theme.palette.primary.main
+                  : theme.palette.text.secondary,
+              }}
+            >
+              <GridOnIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Change Layout">
+            <IconButton
+              onClick={(e) => setLayoutMenuAnchor(e.currentTarget)}
+              size="small"
+              sx={{
+                backgroundColor: theme.palette.background.paper,
+                color: theme.palette.text.secondary,
+              }}
+            >
+              <ViewQuiltIcon />
+            </IconButton>
+          </Tooltip>
+        </Controls>
       </ReactFlow>
+
+      <Menu
+        anchorEl={layoutMenuAnchor}
+        open={Boolean(layoutMenuAnchor)}
+        onClose={() => setLayoutMenuAnchor(null)}
+      >
+        <MenuItem onClick={() => applyLayout("default")}>
+          Force-Directed
+        </MenuItem>
+        <MenuItem onClick={() => applyLayout("horizontal")}>
+          Horizontal Tree
+        </MenuItem>
+        <MenuItem onClick={() => applyLayout("vertical")}>
+          Vertical Tree
+        </MenuItem>
+        <MenuItem onClick={() => applyLayout("radial")}>Radial</MenuItem>
+        <MenuItem onClick={() => setSnapToGrid(!snapToGrid)}>
+          {snapToGrid ? "✓ Snap to Grid" : "Snap to Grid"}
+        </MenuItem>
+      </Menu>
 
       <EditNodeDialog
         open={Boolean(editNode)}
