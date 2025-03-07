@@ -49,13 +49,15 @@ export const SpeedDialButton = ({
           sx: {
             zIndex: 10,
             border: "none",
-            backgroundColor: theme.palette.background.paper,
+            backgroundColor: "transparent",
             boxShadow: "none",
             color: theme.palette.text.primary,
             width: size,
             height: size,
             "&:hover": {
-              backgroundColor: theme.palette.action.hover,
+              zIndex: 100,
+              backgroundColor: "transparent",
+              color: "transparent",
             },
           },
         }}
@@ -71,10 +73,12 @@ export const SpeedDialButton = ({
               : "transparent",
             boxShadow: "none",
             borderRadius: 1,
+            padding: 0,
           },
           "& .MuiSpeedDial-fab": {
             width: size,
             height: size,
+
             boxShadow: "none",
             border: "none",
           },

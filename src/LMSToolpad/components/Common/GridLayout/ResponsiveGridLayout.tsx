@@ -1,77 +1,85 @@
 /** @format */
 
-import React, { useEffect, useState, useCallback, ReactNode } from "react";
-import { Box, useTheme } from "@mui/material";
-import { Responsive, Layout, WidthProvider } from "react-grid-layout";
-import useGridLayout from "./useGridLayout";
+import React, { useEffect, useState, useRef } from "react";
+import { Box, useTheme, GlobalStyles, alpha } from "@mui/material";
+import { Responsive, Layout, WidthProvider, Layouts } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
+import usePanelStore from "./store/usePanelStore";
+import GridItem from "./GridItem";
+import {
+  GRID_BREAKPOINTS,
+  GRID_COLS,
+  GRID_ROW_HEIGHT,
+  GRID_MARGIN,
+  GRID_CONTAINER_PADDING,
+  GRID_RESIZE_HANDLES,
+} from "../../../constants";
 
-//measureBeforeMount as prop to WidthProvider
+// Apply width provider to Responsive componentsss
 const ReactGridLayout = WidthProvider(Responsive);
-export interface GridItem {
-  id: string;
-  content: ReactNode;
-}
 
-export interface GridLayoutProps {
-  items: GridItem[];
-  storageKey: string;
-  defaultLayouts: { [key: string]: Layout[] };
+interface GridLayoutProps {
+  defaultLayouts: Layouts;
+  layouts?: Layouts;
+  onLayoutChange?: (layout: Layout[], allLayouts: Layouts) => void;
+  isEditable?: boolean;
+  previewBreakpoint?: string;
+  onRemoveItem?: (id: string) => void;
 }
 
 const ResponsiveGridLayout: React.FC<GridLayoutProps> = ({
-  items,
-  storageKey,
   defaultLayouts,
+  layouts,
+  onLayoutChange,
+  isEditable = false,
+  previewBreakpoint,
+  onRemoveItem,
 }) => {
-  const panelRef = React.useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const theme = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [currentLayouts, setCurrentLayouts] = useState(defaultLayouts);
-  const [containerWidth, setContainerWidth] = useState(1200);
-  const { editMode } = useGridLayout();
+  const { editMode } = usePanelStore();
+  const [aboutToRemove, setAboutToRemove] = useState(false);
 
-  useEffect(() => {
-    try {
-      const savedLayouts = localStorage.getItem(storageKey);
-      if (savedLayouts) {
-        setCurrentLayouts(JSON.parse(savedLayouts));
-      }
-    } catch (e) {
-      console.error("Failed to load layouts:", e);
-    }
-  }, [storageKey]);
+  const isGridEditable = isEditable || editMode;
+  const currentBreakpoint = previewBreakpoint || "lg";
 
-  const onLayoutChange = useCallback(
-    (_, allLayouts) => {
-      setCurrentLayouts(allLayouts);
-      try {
-        localStorage.setItem(storageKey, JSON.stringify(allLayouts));
-      } catch (e) {
-        console.error("Failed to save layouts:", e);
-      }
-    },
-    [storageKey]
-  );
+  // Memoize values that shouldn't change often
+  const activeLayouts = layouts || defaultLayouts;
+  const currentLayout = activeLayouts[currentBreakpoint] || ([] as Layout[]);
 
+  const handleAboutToRemove = (value: boolean) => {
+    setAboutToRemove(value);
+  };
+
+  // Setup resize observer only once on mount
   useEffect(() => {
     setMounted(true);
-    if (panelRef.current) {
-      //   setContainerWidth(panelRef.current.getBoundingClientRect().width);
-    }
+    return () => setMounted(false);
   }, []);
 
-  if (!mounted) {
-    return null;
-  }
+  if (!mounted) return null;
+
+  // Custom styles for the grid placeholder
+  const placeholderStyles = {
+    ".custom-grid .react-grid-placeholder": {
+      backgroundColor: alpha(theme.palette.primary.main, 0.1),
+      border: `2px dashed ${theme.palette.primary.main}`,
+      borderRadius: theme.shape.borderRadius,
+      transition: theme.transitions.create(["border", "background-color"]),
+      opacity: 1,
+    },
+  };
+
   return (
     <Box
       sx={{ width: "100%", height: "100%", position: "relative" }}
       ref={panelRef}
     >
-      {/* Grid lines overlay when editing */}
-      {editMode && (
+      <GlobalStyles styles={placeholderStyles} />
+
+      {isGridEditable && (
         <Box
           sx={{
             position: "absolute",
@@ -82,51 +90,45 @@ const ResponsiveGridLayout: React.FC<GridLayoutProps> = ({
             zIndex: 0,
             pointerEvents: "none",
             backgroundSize: "30px 30px",
-            backgroundImage:
-              "linear-gradient(to right, rgba(0, 0, 255, 0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(0, 0, 255, 0.05) 1px, transparent 1px)",
+            backgroundImage: `linear-gradient(to right, ${alpha(
+              theme.palette.primary.main,
+              0.05
+            )} 1px, transparent 1px), linear-gradient(to bottom, ${alpha(
+              theme.palette.primary.main,
+              0.05
+            )} 1px, transparent 1px)`,
           }}
         />
       )}
 
       <ReactGridLayout
-        className="layout"
-        layouts={currentLayouts}
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
-        cols={{ lg: 12, md: 12, sm: 12, xs: 12 }}
-        rowHeight={10}
-        // width={containerWidth}
-        margin={[10, 10]}
-        containerPadding={[0, 0]}
-        isResizable={editMode}
-        isDraggable={editMode}
+        className="layout custom-grid"
+        layouts={activeLayouts}
+        breakpoints={GRID_BREAKPOINTS}
+        cols={GRID_COLS}
+        rowHeight={GRID_ROW_HEIGHT}
+        margin={[GRID_MARGIN[0], GRID_MARGIN[1]]}
+        containerPadding={[
+          GRID_CONTAINER_PADDING[0],
+          GRID_CONTAINER_PADDING[1],
+        ]}
+        isResizable={isGridEditable}
+        isDraggable={isGridEditable && !aboutToRemove}
         compactType={null}
         preventCollision={true}
-        useCSSTransforms={mounted}
+        useCSSTransforms={true}
+        resizeHandles={GRID_RESIZE_HANDLES}
+        breakpoint={previewBreakpoint}
         onLayoutChange={onLayoutChange}
-        resizeHandles={["se", "sw", "ne", "nw"]}
       >
-        {items.map((item) => (
-          <Box
-            key={item.id}
-            sx={{
-              bgcolor: theme.palette.background.default,
-              borderRadius: 1,
-              boxShadow: 1,
-              overflow: "hidden",
-              p: 0.5,
-              //   height: "100%",
-              position: "relative",
-              outline: editMode
-                ? `2px dashed ${theme.palette.primary.main}`
-                : "none",
-              "&:hover": {
-                outline: editMode
-                  ? `2px solid ${theme.palette.primary.main}`
-                  : "none",
-              },
-            }}
-          >
-            {item.content}
+        {currentLayout.map((layoutItem) => (
+          <Box key={layoutItem.i}>
+            <GridItem
+              id={layoutItem.i}
+              isEditable={isGridEditable}
+              onRemove={onRemoveItem ? onRemoveItem : undefined}
+              handleAboutToRemove={handleAboutToRemove}
+            />
           </Box>
         ))}
       </ReactGridLayout>
@@ -134,4 +136,4 @@ const ResponsiveGridLayout: React.FC<GridLayoutProps> = ({
   );
 };
 
-export default ResponsiveGridLayout;
+export default React.memo(ResponsiveGridLayout);

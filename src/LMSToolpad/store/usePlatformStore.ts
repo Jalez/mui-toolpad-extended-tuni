@@ -1,10 +1,12 @@
 /** @format */
 
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+import type { Layouts } from "react-grid-layout";
+import { homePresetLayouts } from "../components/Common/GridLayout/presetLayouts";
 
 export interface AuthSettings {
-  allowedAuthMethods: ('local' | 'google' | 'microsoft' | 'shibboleth')[];
+  allowedAuthMethods: ("local" | "google" | "microsoft" | "shibboleth")[];
   minimumPasswordLength: number;
   requireEmailVerification: boolean;
   allowSelfRegistration: boolean;
@@ -12,14 +14,14 @@ export interface AuthSettings {
 }
 
 export type PlatformRole =
-  | 'admin'
-  | 'developer'
-  | 'moderator'
-  | 'creator'
-  | 'user'
-  | 'guest';
+  | "admin"
+  | "developer"
+  | "moderator"
+  | "creator"
+  | "user"
+  | "guest";
 
-export type visibilityMode = 'public' | 'enrolled' | 'private';
+export type visibilityMode = "public" | "enrolled" | "private";
 
 export interface CourseSettings {
   courseCreation: {
@@ -67,7 +69,7 @@ export interface AISettings {
   };
   // Updated: agentConfigurations now has an 'assigned' property.
   agentConfigurations: {
-    agent: 'openai' | 'anthropic' | 'local' | string;
+    agent: "openai" | "anthropic" | "local" | string;
     assigned: string[];
     apiKey?: string;
     modelName?: string;
@@ -159,8 +161,7 @@ export interface Platform {
     };
   };
   interface: {
-    // Remove resizeMode
-    // Add other interface settings here
+    layout: Layouts;
   };
 }
 
@@ -174,46 +175,46 @@ interface PlatformSettingsStore {
 }
 
 const DEFAULT_SETTINGS: Platform = {
-  name: 'LMS Platform',
-  description: 'AI-Enhanced Learning Management System',
-  contactEmail: 'admin@example.com',
-  supportUrl: 'https://support.example.com',
+  name: "LMS Platform",
+  description: "AI-Enhanced Learning Management System",
+  contactEmail: "admin@example.com",
+  supportUrl: "https://support.example.com",
   darkMode: {
     enabled: false,
     default: false,
   },
   auth: {
-    allowedAuthMethods: ['local', 'google'],
+    allowedAuthMethods: ["local", "google"],
     minimumPasswordLength: 8,
     requireEmailVerification: true,
     allowSelfRegistration: true,
-    defaultUserRole: 'user',
+    defaultUserRole: "user",
   },
   courses: {
     courseCreation: {
-      requiredRoles: ['admin', 'creator'],
+      requiredRoles: ["admin", "creator"],
       requireApproval: true,
     },
-    defaultCourseVisibility: 'enrolled',
+    defaultCourseVisibility: "enrolled",
     defaultEnrollmentDuration: 180,
-    courseCategories: ['Computer Science', 'Mathematics', 'Physics'],
+    courseCategories: ["Computer Science", "Mathematics", "Physics"],
   },
   ai: {
     enabled: true,
     providers: {
       openai: {
         enabled: true,
-        modelName: 'gpt-4',
+        modelName: "gpt-4",
         maxTokens: 2000,
         temperature: 0.7,
       },
       anthropic: {
         enabled: false,
-        modelName: 'claude-2',
+        modelName: "claude-2",
       },
       local: {
         enabled: false,
-        endpoint: 'http://localhost:3000/ai',
+        endpoint: "http://localhost:3000/ai",
       },
     },
     features: {
@@ -240,11 +241,11 @@ const DEFAULT_SETTINGS: Platform = {
   },
   maintenance: {
     enabled: false,
-    message: 'System is under maintenance',
+    message: "System is under maintenance",
   },
   storage: {
     maxFileSize: 50,
-    allowedFileTypes: ['.pdf', '.doc', '.docx', '.jpg', '.png'],
+    allowedFileTypes: [".pdf", ".doc", ".docx", ".jpg", ".png"],
     totalStorageLimit: 100,
   },
   features: {
@@ -256,7 +257,7 @@ const DEFAULT_SETTINGS: Platform = {
     gamification: true,
   },
   admins: {
-    emails: ['admin@example.com'],
+    emails: ["admin@example.com"],
     invitePending: [],
   },
   privacy: {
@@ -269,9 +270,9 @@ const DEFAULT_SETTINGS: Platform = {
       allowThirdPartySharing: false,
     },
     privacyPolicy: {
-      url: 'https://example.com/privacy',
+      url: "https://example.com/privacy",
       lastUpdated: new Date().toISOString(),
-      version: '1.0.0',
+      version: "1.0.0",
     },
     cookieSettings: {
       necessary: true,
@@ -285,31 +286,36 @@ const DEFAULT_SETTINGS: Platform = {
     },
   },
   interface: {
-    // Remove resizeMode: false,
+    layout: homePresetLayouts.default,
   },
 };
 
 export const usePlatformStore = create<PlatformSettingsStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       platform: DEFAULT_SETTINGS,
       platformToUpdate: null,
-      updatePlatform: (newSettings) =>
-        set(() => ({
-          platform: newSettings,
-        })),
-      updateAISettings: (newAISettings) =>
-        set((state) => ({
+      updatePlatform: (newSettings) => {
+        const current = get().platform;
+        // Only update if there are actual changes
+        if (JSON.stringify(current) !== JSON.stringify(newSettings)) {
+          set({ platform: newSettings });
+        }
+      },
+      updateAISettings: (newAISettings) => {
+        const current = get().platform;
+        set({
           platform: {
-            ...state.platform,
-            ai: { ...state.platform.ai, ...newAISettings },
+            ...current,
+            ai: { ...current.ai, ...newAISettings },
           },
-        })),
+        });
+      },
       resetToDefaults: () => set({ platform: DEFAULT_SETTINGS }),
-      // Remove toggleResizeMode
     }),
     {
-      name: 'platform-settings',
+      name: "platform-settings",
+      version: 1,
     }
   )
 );

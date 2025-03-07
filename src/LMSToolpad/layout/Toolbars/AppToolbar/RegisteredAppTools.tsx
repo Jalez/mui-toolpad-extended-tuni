@@ -6,17 +6,23 @@ import { useLocation } from "react-router-dom";
 import {
   registerAppToolbarAction,
   unregisterAppToolbarAction,
-  useToolbarStore as useToolbarRegistry,
+  useToolbarRegistryStore,
+  ToolbarEntry,
+  getAppToolbarActions,
 } from "../toolbarRegistry";
-import { getAppToolbarActions } from "../toolbarRegistry";
 import { CollapsibleMenu } from "./CollapsibleMenu";
-// import { ThemeSwitcher } from "@toolpad/core";
 
-// A simple AppToolbar rendering actions registered under a fixed "global" key,
-// or you can use location.pathname for route-specific app actions.
+/**
+ * A component that renders app toolbar actions registered under a fixed "global" key
+ * or using location.pathname for route-specific app actions.
+ *
+ * @version 1.1.0
+ * @updates
+ * - Added support for passing props to toolbar components
+ */
 const RegisteredAppTools = () => {
   const location = useLocation();
-  const version = useToolbarRegistry((state) => state.version);
+  const { version } = useToolbarRegistryStore();
 
   useEffect(() => {
     registerAppToolbarAction("global", CollapsibleMenu);
@@ -24,6 +30,7 @@ const RegisteredAppTools = () => {
       unregisterAppToolbarAction("global", CollapsibleMenu);
     };
   }, []);
+
   // Here we choose a fixed key "global" for app toolbar actions or use location.pathname
   const actions =
     getAppToolbarActions("global") || getAppToolbarActions(location.pathname);
@@ -41,11 +48,11 @@ const RegisteredAppTools = () => {
         p: 1,
       }}
     >
-      {/* <ThemeSwitcher /> */}
-
-      {actions.map((Action, index) => (
-        <Action key={`${version}-${index}`} />
-      ))}
+      {actions.map((entry: ToolbarEntry, index) => {
+        const { Component, props } = entry;
+        // Render with props if available, otherwise render without props
+        return <Component key={`${version}-${index}`} {...(props || {})} />;
+      })}
     </Box>
   );
 };

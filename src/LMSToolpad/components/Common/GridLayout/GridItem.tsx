@@ -1,56 +1,106 @@
-/** @format */
+import { Box, IconButton } from "@mui/material";
 
-import React, { ReactNode } from "react";
-import { Box, useTheme } from "@mui/material";
-import useGridLayout from "./useGridLayout";
+import React from "react";
+import CloseIcon from "@mui/icons-material/Close";
+import { useTheme } from "@mui/material/styles";
+import { getWidget } from "./widgetRegistry";
 
-export interface GridItemProps {
-  children: ReactNode;
-  id: string;
-  isFlexContainer?: boolean;
-}
-
-/**
- * Grid item component that applies consistent styling and resize visual feedback.
- *
- * Features:
- * - Visual indication when in resize or move mode
- * - Consistent styling for all grid items
- * - Optional flex container for content that needs to fill the space
- */
-const GridItem: React.FC<GridItemProps> = ({
-  children,
+// Use React.memo to prevent unnecessary re-renders of grid items
+const GridItem = ({
   id,
-  isFlexContainer = false,
+  isEditable,
+  onRemove,
+  handleAboutToRemove,
+}: {
+  id: string;
+  isEditable: boolean;
+  onRemove?: (id: string) => void;
+  handleAboutToRemove?: (value: boolean) => void;
 }) => {
   const theme = useTheme();
-  const { editMode } = useGridLayout();
+  const widget = getWidget(id);
+
+  if (!widget) {
+    return null;
+  }
+
+  const { Component, props } = widget;
+
+  // Handler for remove button - separated to ensure it gets called
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log("Removing item with id:", id);
+    if (onRemove) onRemove(id);
+    handleAboutToRemove?.(false);
+  };
 
   return (
-    <Box
-      data-grid-item-id={id}
-      sx={{
-        bgcolor: theme.palette.background.default,
-        borderRadius: 1,
-        boxShadow: 1,
-        overflow: "hidden",
-        p: 1,
-        // height: "100%",
-        display: isFlexContainer ? "flex" : "block",
-        flexDirection: isFlexContainer ? "column" : "initial",
-        // Add visual indication when in edit mode
-        outline: editMode ? `2px dashed ${theme.palette.primary.main}` : "none",
-        transition: "outline 0.2s ease-in-out",
-        position: "relative", // For proper positioning of tools
-        "&:hover": {
-          outline: editMode
-            ? `2px solid ${theme.palette.primary.main}`
+    <>
+      {isEditable && onRemove && (
+        <IconButton
+          onClick={handleRemove}
+          onMouseEnter={() => {
+            handleAboutToRemove?.(true);
+          }}
+          onMouseLeave={() => {
+            handleAboutToRemove?.(false);
+          }}
+          sx={{
+            position: "absolute",
+            top: 5,
+            right: 5,
+            zIndex: 9999,
+            bgcolor: "background.paper",
+            borderRadius: "50%",
+            width: 24,
+            height: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            pointerEvents: "auto", // This is critical - allows click events
+            "&:hover": {
+              bgcolor: "error.light",
+              color: "error.contrastText",
+            },
+          }}
+        >
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      )}
+      <Box
+        sx={{
+          bgcolor: theme.palette.background.default,
+          borderRadius: 1,
+          overflow: "hidden",
+          position: "relative",
+          outline: isEditable
+            ? `2px dashed ${theme.palette.primary.main}`
             : "none",
-        },
-      }}
-    >
-      {children}
-    </Box>
+          "&:hover": {
+            outline: isEditable
+              ? `2px solid ${theme.palette.primary.main}`
+              : "none",
+          },
+          height: "100%",
+          width: "100%",
+        }}
+      >
+        <Box
+          sx={{
+            p: 0,
+            m: 0,
+            height: "100%",
+            overflow: "hidden",
+            userSelect: isEditable ? "none" : "auto",
+            pointerEvents: isEditable ? "none" : "auto",
+          }}
+        >
+          <Component {...props} />
+        </Box>
+      </Box>
+    </>
   );
 };
 

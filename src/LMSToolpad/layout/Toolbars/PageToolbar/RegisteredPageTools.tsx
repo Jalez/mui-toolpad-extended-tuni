@@ -5,14 +5,15 @@ import { useLocation } from "react-router-dom";
 import { PageHeader, PageHeaderToolbar, useActivePage } from "@toolpad/core";
 import useToolbarStore from "../../../store/useToolbarStore";
 import {
-  useToolbarStore as useToolbarRegistry,
+  useToolbarRegistryStore,
   getPageToolbarActions,
+  ToolbarEntry,
 } from "../toolbarRegistry";
 
 /**
  * PageToolbar Component
  *
- * @version 3.0.0
+ * @version 3.1.0
  *
  * A dynamic toolbar component that renders actions based on the current route.
  * Automatically updates when actions are registered or unregistered.
@@ -22,6 +23,7 @@ import {
  * - Dynamic action registration/unregistration
  * - Automatic re-rendering on changes
  * - Support for custom toolbar overrides
+ * - Support for passing props to toolbar components
  *
  * @example
  * ```tsx
@@ -36,13 +38,16 @@ import {
  *   registerToolbarAction('/my-route', MyAction);
  *   return () => unregisterToolbarAction('/my-route', MyAction);
  * }, []);
+ *
+ * // Register with props
+ * registerPageToolbarAction('/my-route', MyAction, { data: 'some-data' });
  * ```
  */
 const RegisteredPageTools = () => {
   const location = useLocation();
   const { currentToolbar } = useToolbarStore();
   // Subscribe to version changes to trigger re-renders
-  const version = useToolbarRegistry((state) => state.version);
+  const { version } = useToolbarRegistryStore();
 
   const actions = currentToolbar
     ? getPageToolbarActions(currentToolbar)
@@ -65,9 +70,11 @@ const RegisteredPageTools = () => {
           bgcolor: "transparent",
         }}
       >
-        {actions.map((Action, index) => (
-          <Action key={`${version}-${index}`} />
-        ))}
+        {actions.map((entry: ToolbarEntry, index) => {
+          const { Component, props } = entry;
+          // Render with props if available, otherwise render without props
+          return <Component key={`${version}-${index}`} {...(props || {})} />;
+        })}
       </Box>
     </PageHeaderToolbar>
   );
