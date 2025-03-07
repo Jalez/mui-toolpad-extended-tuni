@@ -13,7 +13,7 @@ import ToolDisplayer from "../Tool/ToolDisplayer";
 import Home from "../Routes/Home/Home";
 import React, { useEffect } from "react";
 import { VisitedCoursesNavigationAdapter } from "../Courses/Navigation/VisitedCoursesNavigationAdapter";
-import Mindmap from "../Courses/Mindmap";
+import { useWidgetRoutes } from "../../hooks/useWidgetRoutes";
 
 /**
  * Core component for handling microservices and course-related routing.
@@ -30,6 +30,9 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
     sections,
   } = useNavigationStore();
 
+  // Get dynamic widget routes
+  const widgetRoutes = useWidgetRoutes();
+
   useEffect(() => {
     updateMicroserviceNavigationForSections();
   }, [
@@ -44,7 +47,8 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
       {children}
       <Routes>
         <Route path="" element={<Home />} index />
-        <Route path="mindmap" element={<Mindmap />} />
+        {/* Dynamic widget routes */}
+        {widgetRoutes}
         <Route path="help" element={<div>Help</div>} />
         <Route path="contact" element={<div>Contact</div>} />
         <Route path=":code" element={<CourseCodeLoader />}>

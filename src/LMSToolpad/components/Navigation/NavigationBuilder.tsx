@@ -1,5 +1,5 @@
 /** @format */
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   useNavigationStore,
   addSectionProps,
@@ -9,6 +9,7 @@ import {
   unregisterAppToolbarAction,
 } from "../../layout/Toolbars/toolbarRegistry";
 import { NavigationFilter } from "./NavigationFilter";
+import { isEqual } from "lodash"; // Add lodash dependency for deep equality check
 
 type NavigationSectionBuilderProps = {
   sections: addSectionProps[];
@@ -18,6 +19,7 @@ export const NavigationSectionBuilder: React.FC<
   NavigationSectionBuilderProps
 > = ({ sections }) => {
   const { addSection, recalculateNavigation } = useNavigationStore();
+  const prevSectionsRef = useRef<addSectionProps[]>([]);
 
   // Improved memoization that only considers necessary properties
   const memoizedSections = useMemo(
@@ -37,6 +39,7 @@ export const NavigationSectionBuilder: React.FC<
     [sections]
   );
 
+  // Register filter in app toolbar
   useEffect(() => {
     registerAppToolbarAction("global", NavigationFilter);
     return () => {
@@ -44,11 +47,22 @@ export const NavigationSectionBuilder: React.FC<
     };
   }, []);
 
+  // Update navigation only when sections change
   useEffect(() => {
+    // Skip if the sections are the same as before to prevent infinite loops
+    if (isEqual(prevSectionsRef.current, memoizedSections)) {
+      return;
+    }
+
+    // Update sections and recalculate navigation
     memoizedSections.forEach((section) => {
       addSection(section);
     });
+
     recalculateNavigation();
+
+    // Save current sections for next comparison
+    prevSectionsRef.current = memoizedSections;
   }, [memoizedSections, addSection, recalculateNavigation]);
 
   return null;

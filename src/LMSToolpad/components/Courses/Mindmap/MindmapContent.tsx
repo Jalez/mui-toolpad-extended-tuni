@@ -308,6 +308,9 @@ export function MindmapContent() {
     <Box
       ref={flowWrapper}
       sx={{
+        bgcolor: theme.palette.background.default,
+        border: `0.5em solid ${theme.palette.divider}`,
+
         height: "100%",
         width: "100%",
         position: "relative",

@@ -6,7 +6,7 @@
  * @property {Function} addDynamicSection - Adds or updates a section in navigation
  */
 
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigationStore } from "../store/useNavigationStore";
 import { useNavigationFilterStore } from "../store/useNavigationFilterStore";
 
@@ -24,8 +24,17 @@ interface DynamicSection {
 }
 
 export const useNavigationSectionManager = () => {
-  const { addSection, recalculateNavigation } = useNavigationStore();
-  const { setFilterOptions } = useNavigationFilterStore();
+  const { addSection, recalculateNavigation, sectionOrder } =
+    useNavigationStore();
+  const { setFilterOptions, initializeFilters } = useNavigationFilterStore();
+
+  // Initialize filters whenever sections change
+  useEffect(() => {
+    if (sectionOrder.length > 0) {
+      initializeFilters();
+      recalculateNavigation();
+    }
+  }, [sectionOrder, initializeFilters, recalculateNavigation]);
 
   const addDynamicSection = useCallback(
     (section: DynamicSection) => {

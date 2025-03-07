@@ -6,6 +6,7 @@ import Scroller from "../Common/Panel/Scrollable/Scroller"; // Our unified scrol
 import { useNavigate } from "react-router-dom";
 
 import { usePanelContext } from "../Common/Panel/Main/Context/PanelContextProvider";
+import { Box, useTheme } from "@mui/material";
 
 export type priority = "high" | "low" | "normal";
 
@@ -28,6 +29,7 @@ const CourseList = ({
   } = useCourseStore();
   const navigate = useNavigate();
   const { user } = useUserStore();
+  const theme = useTheme();
   // const { minHeight, minWidth } = usePanelContext();
   const minHeight = 200;
   const minWidth = 300;
@@ -64,32 +66,41 @@ const CourseList = ({
     );
   };
 
-  //  <ToolsContainer>
-  //       <CourseListVisibilityMenu />
-  //     </ToolsContainer>
-
   return (
-    <Scroller
-      direction="vertical"
-      itemSize={minHeight}
-      containerSize={containerHeight}
+    <Box
+      sx={{
+        bgcolor: theme.palette.background.default,
+        width: "100%",
+        height: containerHeight,
+        border: `0.5em solid ${theme.palette.divider}`,
+      }}
     >
-      {visibleLists?.isStudent &&
-        learningCourses.length !== 0 &&
-        renderCourseSection("My Enrolled Courses", learningCourses, "high")}
-      {visibleLists?.isStudentOld &&
-        learningCoursesOld.length !== 0 &&
-        renderCourseSection("My Completed Courses", learningCoursesOld, "low")}
-      {visibleLists?.isTeacher &&
-        teachingCourses.length !== 0 &&
-        renderCourseSection("My Teaching Courses", teachingCourses, "low")}
-      {visibleLists?.isTeacherOld &&
-        teachingCoursesOld.length !== 0 &&
-        renderCourseSection("My Past Teaching", teachingCoursesOld, "low")}
-      {visibleLists?.available &&
-        availableCourses.length !== 0 &&
-        renderCourseSection("Available Courses", availableCourses, "low")}
-    </Scroller>
+      <Scroller
+        direction="vertical"
+        itemSize={minHeight}
+        containerSize={containerHeight}
+      >
+        {visibleLists?.isStudent &&
+          learningCourses.length !== 0 &&
+          renderCourseSection("My Enrolled Courses", learningCourses, "high")}
+        {visibleLists?.isStudentOld &&
+          learningCoursesOld.length !== 0 &&
+          renderCourseSection(
+            "My Completed Courses",
+            learningCoursesOld,
+            "low"
+          )}
+        {visibleLists?.isTeacher &&
+          teachingCourses.length !== 0 &&
+          renderCourseSection("My Teaching Courses", teachingCourses, "low")}
+        {visibleLists?.isTeacherOld &&
+          teachingCoursesOld.length !== 0 &&
+          renderCourseSection("My Past Teaching", teachingCoursesOld, "low")}
+        {visibleLists?.available &&
+          availableCourses.length !== 0 &&
+          renderCourseSection("Available Courses", availableCourses, "low")}
+      </Scroller>
+    </Box>
   );
 };
 

@@ -27,6 +27,7 @@ import { UserManager } from "./components/UserManager";
 
 import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/RegisteredPageTools";
 import { PageContainer } from "@toolpad/core";
+import { useWidgetNavigation } from "./components/Navigation/hooks/useWidgetNavigation";
 
 export interface LMSProviderProps {
   children?: ReactNode;
@@ -108,6 +109,8 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
     }),
     [getUser, logout]
   );
+
+  useWidgetNavigation(); // Add persistent widget navigation
 
   return (
     <LocalizationProvider dateAdapter={AdapterLuxon}>

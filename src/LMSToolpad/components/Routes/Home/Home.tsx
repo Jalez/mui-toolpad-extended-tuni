@@ -10,16 +10,9 @@ import { Box } from "@mui/material";
 import { ResponsiveGridLayout } from "../../Common/GridLayout";
 import { homePresetLayouts } from "../../Common/GridLayout/presetLayouts";
 import { useGridLayoutManagement } from "../../Common/GridLayout/hooks/useGridLayoutManagement";
-import {
-  registerWidget,
-  unregisterWidget,
-  getAllWidgets,
-} from "../../Common/GridLayout/widgetRegistry";
+import { getAllWidgets } from "../../Common/GridLayout/WidgetRegistry";
 import { usePlatformStore } from "../../../store/usePlatformStore";
 import type { Layouts } from "react-grid-layout";
-import CourseList from "../../Courses/CourseList";
-import Calendar from "../../Courses/Calendar/Calendar";
-import Mindmap from "../../Courses/Mindmap";
 import usePanelStore from "../../Common/GridLayout/store/usePanelStore";
 import { createGridItem } from "../../Common/GridLayout/layoutUtils";
 import WidgetSelector from "../../Common/GridLayout/WidgetSelector";
@@ -130,52 +123,6 @@ const Home = () => {
     // Update layouts
     applyLayout(updatedLayouts);
   };
-
-  // Register widgets only once on mount
-  useEffect(() => {
-    const widgetsToRegister = [
-      {
-        id: "course-list",
-        component: CourseList,
-        options: {
-          name: "Course List",
-          description:
-            "Displays a list of courses with filtering and sorting options",
-          category: "academic",
-          props: { displayMode: "instance", containerHeight: "100%" },
-        },
-      },
-      {
-        id: "calendar",
-        component: Calendar,
-        options: {
-          name: "Calendar",
-          description: "Shows course events and deadlines in a calendar view",
-          category: "planning",
-        },
-      },
-      {
-        id: "mindmap",
-        component: Mindmap,
-        options: {
-          name: "Mindmap",
-          description:
-            "Visual representation of course relationships and topics",
-          category: "visualization",
-        },
-      },
-    ];
-
-    widgetsToRegister.forEach(({ id, component, options }) => {
-      registerWidget(id, component, options);
-    });
-
-    return () => {
-      widgetsToRegister.forEach(({ id }) => {
-        unregisterWidget(id);
-      });
-    };
-  }, []);
 
   // Register toolbar actions
   useEffect(() => {

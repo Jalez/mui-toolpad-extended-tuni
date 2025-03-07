@@ -8,10 +8,11 @@ import {
   Box,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "@mui/material/styles";
 import { useNavigationStore } from "./store/useNavigationStore";
 import { useNavigationFilterStore } from "./store/useNavigationFilterStore";
+import { isEqual } from "lodash";
 
 export const NavigationFilter = () => {
   const theme = useTheme();
@@ -23,9 +24,14 @@ export const NavigationFilter = () => {
 
   // Get filter options from the shared filter store
   const { filterOptions, setFilterOptions } = useNavigationFilterStore();
-  const [localFilterOptions, setLocalFilterOptions] = useState(filterOptions);
+
+  // Use memoization to prevent unnecessary state updates
+  const localFilterOptions = useMemo(() => {
+    return { ...filterOptions };
+  }, [filterOptions]);
 
   // When sectionOrder changes, initialize missing sections to visible (true)
+  // but only do this once when sectionOrder or filterOptions change
   useEffect(() => {
     const newFilters = { ...filterOptions };
     let hasChanges = false;
@@ -37,19 +43,11 @@ export const NavigationFilter = () => {
       }
     });
 
-    setLocalFilterOptions(newFilters);
+    // Only update if there are actual changes
     if (hasChanges) {
       setVisibleSections(newFilters);
     }
-  }, [sectionOrder, filterOptions, setLocalFilterOptions, setVisibleSections]);
-
-  // Update navigation when filter options change
-  useEffect(() => {
-    if (Object.keys(localFilterOptions).length > 0) {
-      setVisibleSections(localFilterOptions);
-      recalculateNavigation();
-    }
-  }, [localFilterOptions]);
+  }, [sectionOrder, filterOptions, setVisibleSections]);
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
@@ -73,20 +71,16 @@ export const NavigationFilter = () => {
       }
 
       const newOptions = {
-        ...localFilterOptions,
-        [option]: !localFilterOptions[option],
+        ...filterOptions,
+        [option]: !filterOptions[option],
       };
+
+      // Batch updates by doing both operations in one go
       setFilterOptions(newOptions);
-      // Update the navigation store so that recalcNavigation will filter sections.
       setVisibleSections(newOptions);
       recalculateNavigation();
     },
-    [
-      localFilterOptions,
-      setFilterOptions,
-      setVisibleSections,
-      recalculateNavigation,
-    ]
+    [filterOptions, setFilterOptions, setVisibleSections, recalculateNavigation]
   );
 
   if (Object.keys(localFilterOptions).length === 0) {

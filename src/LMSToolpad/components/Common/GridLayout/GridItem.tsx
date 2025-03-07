@@ -1,22 +1,22 @@
 import { Box, IconButton } from "@mui/material";
-
-import React from "react";
+import React, { memo, useCallback } from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
-import { getWidget } from "./widgetRegistry";
+import { getWidget } from "./WidgetRegistry";
 
-// Use React.memo to prevent unnecessary re-renders of grid items
+interface GridItemProps {
+  id: string;
+  isEditable: boolean;
+  onRemove?: (id: string) => void;
+  handleAboutToRemove?: (value: boolean) => void;
+}
+
 const GridItem = ({
   id,
   isEditable,
   onRemove,
   handleAboutToRemove,
-}: {
-  id: string;
-  isEditable: boolean;
-  onRemove?: (id: string) => void;
-  handleAboutToRemove?: (value: boolean) => void;
-}) => {
+}: GridItemProps) => {
   const theme = useTheme();
   const widget = getWidget(id);
 
@@ -26,26 +26,33 @@ const GridItem = ({
 
   const { Component, props } = widget;
 
-  // Handler for remove button - separated to ensure it gets called
-  const handleRemove = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    console.log("Removing item with id:", id);
-    if (onRemove) onRemove(id);
-    handleAboutToRemove?.(false);
-  };
+  // Handler for remove button - memoize to prevent recreation on every render
+  const handleRemove = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+      if (onRemove) onRemove(id);
+      if (handleAboutToRemove) handleAboutToRemove(false);
+    },
+    [id, onRemove, handleAboutToRemove]
+  );
+
+  const handleMouseEnter = useCallback(() => {
+    if (handleAboutToRemove) handleAboutToRemove(true);
+  }, [handleAboutToRemove]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (handleAboutToRemove) handleAboutToRemove(false);
+  }, [handleAboutToRemove]);
 
   return (
     <>
       {isEditable && onRemove && (
         <IconButton
           onClick={handleRemove}
-          onMouseEnter={() => {
-            handleAboutToRemove?.(true);
-          }}
-          onMouseLeave={() => {
-            handleAboutToRemove?.(false);
-          }}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          size="small"
           sx={{
             position: "absolute",
             top: 5,
@@ -71,7 +78,7 @@ const GridItem = ({
       )}
       <Box
         sx={{
-          bgcolor: theme.palette.background.default,
+
           borderRadius: 1,
           overflow: "hidden",
           position: "relative",
@@ -104,4 +111,4 @@ const GridItem = ({
   );
 };
 
-export default GridItem;
+export default memo(GridItem);
