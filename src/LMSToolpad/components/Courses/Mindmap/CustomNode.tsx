@@ -28,6 +28,12 @@ const CustomNode = memo(
     const level = data.nodeLevel || "basic";
     const courseColor = config.levelShades[level];
 
+    // Custom handler to separate expand icon clicks from general header clicks
+    const handleExpandIconClick = (event: React.MouseEvent) => {
+      event.stopPropagation(); // Prevent node selection
+      data.onToggleExpand();
+    };
+
     return (
       <>
         <Handle
@@ -79,10 +85,6 @@ const CustomNode = memo(
         >
           <Accordion
             expanded={data.isExpanded ?? false}
-            onChange={(e, expanded) => {
-              e.stopPropagation();
-              data.onToggleExpand();
-            }}
             disableGutters
             sx={{
               background: "transparent",
@@ -93,27 +95,27 @@ const CustomNode = memo(
               },
               "& .MuiAccordionSummary-content": {
                 margin: "8px 0",
-                pointerEvents: "none",
-              },
-              "& .MuiAccordionSummary-expandIconWrapper": {
-                pointerEvents: "auto",
-                zIndex: 1,
-                position: "relative",
-              },
-              "& .MuiAccordionDetails-root": {
-                padding: "0 8px 8px 8px",
-                pointerEvents: "none",
               },
             }}
           >
             <AccordionSummary
               expandIcon={
                 data.details ? (
-                  <ExpandMoreIcon
+                  <Box
+                    component="div"
+                    onClick={handleExpandIconClick}
                     sx={{
-                      color: courseColor,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}
-                  />
+                  >
+                    <ExpandMoreIcon
+                      sx={{
+                        color: courseColor,
+                      }}
+                    />
+                  </Box>
                 ) : null
               }
               sx={{
@@ -159,7 +161,6 @@ const CustomNode = memo(
             </AccordionSummary>
             {data.details && (
               <AccordionDetails
-                onClick={(e) => e.stopPropagation()}
                 sx={{
                   display: "flex",
                   flexDirection: "column",

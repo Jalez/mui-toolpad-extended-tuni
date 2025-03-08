@@ -17,18 +17,19 @@ function Mindmap() {
 export const ContextMindmap = () => {
   const { setDimensions } = usePanelContext();
 
-  // Match these with the ResizablePanel constraints
-  const itemReelHeight = 200;
-  const itemReelWidth = 300; // Set to minWidth to prevent going smaller
+  // Improved panel dimensions for better visibility
+  const minHeight = 500; // Increased from 200 for better visibility
+  const defaultWidth = 600; // Increased from 300 for better view
 
   useLayoutEffect(() => {
     // Save current dimensions respecting panel constraints
-    const savedWidth = Math.max(300, Math.min(1200, itemReelWidth));
+    const savedWidth = Math.max(400, Math.min(1200, defaultWidth));
     setDimensions({
       width: savedWidth,
-      height: itemReelHeight,
+      height: minHeight,
     });
-  }, [itemReelWidth, itemReelHeight, setDimensions]);
+  }, [defaultWidth, minHeight, setDimensions]);
+
   return <Mindmap />;
 };
 
