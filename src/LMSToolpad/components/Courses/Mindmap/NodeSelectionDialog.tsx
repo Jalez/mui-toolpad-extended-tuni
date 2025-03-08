@@ -34,12 +34,7 @@ export const NodeSelectionDialog = ({
   };
 
   return (
-    <Dialog 
-      open={open} 
-      onClose={onClose} 
-      maxWidth="sm" 
-      fullWidth
-    >
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         {description && (
@@ -50,19 +45,24 @@ export const NodeSelectionDialog = ({
         <List sx={{ pt: 0 }}>
           {nodes.map((node) => (
             <ListItem key={node.id} disablePadding>
-              <ListItemButton 
+              <ListItemButton
                 onClick={() => handleNodeClick(node.id)}
                 sx={{
                   borderRadius: 1,
                   mb: 0.5,
-                  '&:hover': {
-                    backgroundColor: 'action.hover',
-                  }
+                  "&:hover": {
+                    backgroundColor: "action.hover",
+                  },
                 }}
               >
-                <ListItemText 
-                  primary={node.data.label || node.id} 
-                  secondary={node.data.details ? node.data.details.substring(0, 60) + (node.data.details.length > 60 ? '...' : '') : null} 
+                <ListItemText
+                  primary={node.data.label || node.id}
+                  secondary={
+                    node.data.details
+                      ? node.data.details.substring(0, 60) +
+                        (node.data.details.length > 60 ? "..." : "")
+                      : null
+                  }
                 />
               </ListItemButton>
             </ListItem>

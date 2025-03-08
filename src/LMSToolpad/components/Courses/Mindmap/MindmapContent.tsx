@@ -33,20 +33,22 @@ export function MindmapContent() {
   const [editNode, setEditNode] = useState<Node | null>(null);
   const [showGrid, setShowGrid] = useState(true);
   const [snapToGrid, setSnapToGrid] = useState(true);
-  
+
   // States for node selection dialog
   const [nodeSelectionOpen, setNodeSelectionOpen] = useState(false);
   const [nodeSelectionOptions, setNodeSelectionOptions] = useState<Node[]>([]);
-  const [nodeSelectionType, setNodeSelectionType] = useState<'children' | 'parents'>('children');
+  const [nodeSelectionType, setNodeSelectionType] = useState<
+    "children" | "parents"
+  >("children");
   const [edgeForSelection, setEdgeForSelection] = useState<Edge | null>(null);
-  
+
   // Use custom hooks for functionality
   const {
     handleWheel,
     centerOnNode,
     initializeViewport,
     initialRender,
-    viewport
+    viewport,
   } = useViewportManager(flowWrapper);
 
   const {
@@ -60,7 +62,7 @@ export function MindmapContent() {
     getVisibleEdges,
     applyLayout,
     setSelectedNodeId,
-    selectedNodeId
+    selectedNodeId,
   } = useNodeManager();
 
   // Initialize the lastClickedNodeId if not set
@@ -102,25 +104,27 @@ export function MindmapContent() {
 
   // Helper to find connected nodes
   const findConnectedNodes = useCallback(
-    (edge: Edge, direction: 'parents' | 'children'): Node[] => {
+    (edge: Edge, direction: "parents" | "children"): Node[] => {
       const edges = getVisibleEdges();
-      
-      if (direction === 'parents') {
+
+      if (direction === "parents") {
         // Find all nodes that have edges pointing to the target node
         const sourceNodeId = edge.source;
-        const sourceNode = nodes.find(n => n.id === sourceNodeId);
-        
+        const sourceNode = nodes.find((n) => n.id === sourceNodeId);
+
         if (!sourceNode) return [];
-        
+
         // Find all parent nodes that have edges to the sourceNode
-        const parentEdges = edges.filter(e => e.target === sourceNodeId);
-        return parentEdges.map(e => nodes.find(n => n.id === e.source))
+        const parentEdges = edges.filter((e) => e.target === sourceNodeId);
+        return parentEdges
+          .map((e) => nodes.find((n) => n.id === e.source))
           .filter(Boolean) as Node[];
       } else {
         // Find all child nodes that have edges from the source node
         const sourceNodeId = edge.source;
-        const childEdges = edges.filter(e => e.source === sourceNodeId);
-        return childEdges.map(e => nodes.find(n => n.id === e.target))
+        const childEdges = edges.filter((e) => e.source === sourceNodeId);
+        return childEdges
+          .map((e) => nodes.find((n) => n.id === e.target))
           .filter(Boolean) as Node[];
       }
     },
@@ -132,7 +136,7 @@ export function MindmapContent() {
     (nodeId: string) => {
       setSelectedNodeId(nodeId);
       window.lastClickedNodeId = nodeId;
-      const selectedNode = nodes.find(n => n.id === nodeId);
+      const selectedNode = nodes.find((n) => n.id === nodeId);
       if (selectedNode) {
         centerOnNode(selectedNode);
       }
@@ -161,65 +165,76 @@ export function MindmapContent() {
       // Create a local variable to track the currently selected node
       // Use this to work around any state issues
       const currentNode = selectedNodeId || null;
-      
+
       // Initialize lastClickedNodeId if not set
       if (window.lastClickedNodeId === undefined) {
         window.lastClickedNodeId = null;
       }
 
       // Case 1: If no node was previously clicked or neither parent nor target match last clicked
-      if (!currentNode || (window.lastClickedNodeId !== sourceNode.id && window.lastClickedNodeId !== targetNode.id)) {
+      if (
+        !currentNode ||
+        (window.lastClickedNodeId !== sourceNode.id &&
+          window.lastClickedNodeId !== targetNode.id)
+      ) {
         // Check if source node has multiple children
-        const children = findConnectedNodes(edge, 'children');
+        const children = findConnectedNodes(edge, "children");
         if (children.length > 1) {
           setNodeSelectionOptions(children);
-          setNodeSelectionType('children');
+          setNodeSelectionType("children");
           setEdgeForSelection(edge);
           setNodeSelectionOpen(true);
           return;
         }
-        
+
         console.log("Case 1: Selecting child node");
         setSelectedNodeId(targetNode.id);
         window.lastClickedNodeId = targetNode.id;
         centerOnNode(targetNode);
-      } 
+      }
       // Case 2: If target/child was last clicked, select the source/parent
       else if (window.lastClickedNodeId === targetNode.id) {
         // Check if target node has multiple parents
-        const parents = findConnectedNodes(edge, 'parents');
+        const parents = findConnectedNodes(edge, "parents");
         if (parents.length > 1) {
           setNodeSelectionOptions(parents);
-          setNodeSelectionType('parents');
+          setNodeSelectionType("parents");
           setEdgeForSelection(edge);
           setNodeSelectionOpen(true);
           return;
         }
-        
+
         console.log("Case 2: Child was selected, switching to parent");
         setSelectedNodeId(sourceNode.id);
         window.lastClickedNodeId = sourceNode.id;
         centerOnNode(sourceNode);
-      } 
+      }
       // Case 3: If source/parent was last clicked, select the target/child
       else if (window.lastClickedNodeId === sourceNode.id) {
         // Check if source node has multiple children
-        const children = findConnectedNodes(edge, 'children');
+        const children = findConnectedNodes(edge, "children");
         if (children.length > 1) {
           setNodeSelectionOptions(children);
-          setNodeSelectionType('children');
+          setNodeSelectionType("children");
           setEdgeForSelection(edge);
           setNodeSelectionOpen(true);
           return;
         }
-        
+
         console.log("Case 3: Parent was selected, switching to child");
         setSelectedNodeId(targetNode.id);
         window.lastClickedNodeId = targetNode.id;
         centerOnNode(targetNode);
       }
     },
-    [nodes, selectedNodeId, setSelectedNodeId, centerOnNode, getVisibleEdges, findConnectedNodes]
+    [
+      nodes,
+      selectedNodeId,
+      setSelectedNodeId,
+      centerOnNode,
+      getVisibleEdges,
+      findConnectedNodes,
+    ]
   );
 
   // Get visible nodes and edges
@@ -292,14 +307,18 @@ export function MindmapContent() {
           initialDetails={editNode.data.details || ""}
         />
       )}
-      
+
       <NodeSelectionDialog
         open={nodeSelectionOpen}
         onClose={() => setNodeSelectionOpen(false)}
         onSelect={handleNodeSelection}
         nodes={nodeSelectionOptions}
-        title={nodeSelectionType === 'children' ? "Select Child Node" : "Select Parent Node"}
-        description={`Select which ${nodeSelectionType === 'children' ? 'child' : 'parent'} node you want to navigate to.`}
+        title={
+          nodeSelectionType === "children"
+            ? "Select Child Node"
+            : "Select Parent Node"
+        }
+        description={`Select which ${nodeSelectionType === "children" ? "child" : "parent"} node you want to navigate to.`}
       />
     </FlowContainer>
   );
