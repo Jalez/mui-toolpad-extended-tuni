@@ -1,34 +1,37 @@
 /** @format */
-import { ReactFlowProvider } from "reactflow";
-import { MindmapContent } from "./MindmapContent";
-
+import { ReactFlowProvider } from "@xyflow/react";
+import { MindmapContent } from "./MindmapContent/MindmapContent";
 import { useLayoutEffect } from "react";
-
 import { usePanelContext } from "../../Common/Panel/Main/Context/PanelContextProvider";
 
-function Mindmap() {
-  return (
-    <ReactFlowProvider>
-      <MindmapContent />
-    </ReactFlowProvider>
-  );
-}
+// Constants for panel dimensions
+const PANEL_DIMENSIONS = {
+  MIN_WIDTH: 400,
+  MAX_WIDTH: 1200,
+  DEFAULT_WIDTH: 600,
+  MIN_HEIGHT: 500,
+} as const;
+
+const Mindmap = () => (
+  <ReactFlowProvider>
+    <MindmapContent />
+  </ReactFlowProvider>
+);
 
 export const ContextMindmap = () => {
   const { setDimensions } = usePanelContext();
 
-  // Improved panel dimensions for better visibility
-  const minHeight = 500; // Increased from 200 for better visibility
-  const defaultWidth = 600; // Increased from 300 for better view
-
   useLayoutEffect(() => {
-    // Save current dimensions respecting panel constraints
-    const savedWidth = Math.max(400, Math.min(1200, defaultWidth));
+    const width = Math.max(
+      PANEL_DIMENSIONS.MIN_WIDTH,
+      Math.min(PANEL_DIMENSIONS.MAX_WIDTH, PANEL_DIMENSIONS.DEFAULT_WIDTH)
+    );
+
     setDimensions({
-      width: savedWidth,
-      height: minHeight,
+      width,
+      height: PANEL_DIMENSIONS.MIN_HEIGHT,
     });
-  }, [defaultWidth, minHeight, setDimensions]);
+  }, [setDimensions]);
 
   return <Mindmap />;
 };

@@ -1,11 +1,11 @@
 /** @format */
-import { ReactNode, forwardRef, ForwardedRef } from "react";
+import { ReactNode, forwardRef, ForwardedRef, WheelEvent } from "react";
 import { Box } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
 
 interface FlowContainerProps {
   children: ReactNode;
-  onWheel?: (event: React.WheelEvent) => void;
+  onWheel?: (event: WheelEvent<HTMLDivElement>) => void;
 }
 
 export const FlowContainer = forwardRef<HTMLDivElement, FlowContainerProps>(
@@ -36,7 +36,7 @@ export const FlowContainer = forwardRef<HTMLDivElement, FlowContainerProps>(
           },
           "& .react-flow__handle": {
             "&:hover": {
-              transform: "scale(1.4) translateX(-50%)",
+              // transform: "scale(1.4) translateX(-50%)",
               backgroundColor: theme.palette.primary.main,
             },
           },
