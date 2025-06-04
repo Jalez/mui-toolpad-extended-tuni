@@ -24,7 +24,6 @@ export const GRID_ROW_HEIGHT = 200;
 export const GRID_MARGIN = [10, 10];
 export const GRID_CONTAINER_PADDING = [0, 0];
 
-
 // Resize handle directions
 export type ResizeHandle = "s" | "w" | "e" | "n" | "sw" | "nw" | "se" | "ne";
 export const GRID_RESIZE_HANDLES: ResizeHandle[] = ["se", "sw", "ne", "nw"];
@@ -62,3 +61,33 @@ export type BreakpointColor =
   | "success"
   | "warning"
   | "default";
+
+// Control types for Mindmap
+export const CONTROL_TYPES = {
+  ZOOM: "zoom",
+  FIT_VIEW: "fit-view",
+  CONTROLS: "controls",
+  MINIMAP: "minimap",
+  BACKGROUND: "background",
+  PANEL: "panel",
+  SELECTION: "selection",
+  KEYBOARD: "keyboard",
+} as const;
+
+// Control IDs for Mindmap
+export const CONTROL_IDS = {
+  ZOOM_IN: "zoom-in",
+  ZOOM_OUT: "zoom-out",
+  FIT_VIEW: "fit-view",
+  SHOW_MINIMAP: "show-minimap",
+  SHOW_BACKGROUND: "show-background",
+  SHOW_CONTROLS: "show-controls",
+  CENTER_SELECTED: "center-selected",
+} as const;
+
+// Control priorities for Mindmap
+export const CONTROL_PRIORITIES = {
+  HIGH: 1,
+  MEDIUM: 2,
+  LOW: 3,
+} as const;

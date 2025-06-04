@@ -32,16 +32,22 @@ Mindmap Component TODOs:
     - Mathematical formula support
     - Code snippet support with syntax highlighting
 
-[ ] 6. Accessibility improvements:
-    - Keyboard navigation between nodes
-    - Screen reader support
-    - High contrast mode
-    - Configurable node sizes and font sizes
+New UnifiedControls:
+- Create and include a new Delete component as a button to the mindmap controls to delete an item. (look at useNodeOperations.ts, use its delete logic) Essentially, the button should only work if there is a selected item, and when clicked, it should indeed delete that selected item. React flow should allow you to know if an item is selected or not. 
+- Design a new revert Control component and implement it. Revert should allow you to revert the last action that the user did in the mindmap, whether it's renaming a node, removing a node, removing an edge, etc. 
+
 
 [ ] 7. Integration features:
     - Link nodes to course materials
     - Integration with calendar for timeline view
     - Connection to learning management system
     - API for external tools to modify the mindmap
+
+Lower priority: 
+[ ] 6. Accessibility improvements:
+    - Keyboard navigation between nodes
+    - Screen reader support
+    - High contrast mode
+    - Configurable node sizes and font sizes
 
 Let's implement these features one by one, waiting for approval before moving to the next one.

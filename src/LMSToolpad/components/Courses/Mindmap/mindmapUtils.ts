@@ -1,104 +1,20 @@
 /** @format */
 import { Node } from "@xyflow/react";
 import { NodeData } from "./types";
+import { LAYOUT_OPTIONS, NODE_POSITION } from "./constants";
+import { nodesData } from "./test/nodesData";
 
-// Replace the placeholder with actual test data
-export const nodesData: Array<{ id: string; data: NodeData }> = [
-  {
-    id: "root",
-    data: {
-      label: "Testing Cases",
-      level: 0,
-      details:
-        "Overview of software testing methodologies and best practices in modern software development. Testing ensures reliability, performance, and user satisfaction.",
-      nodeLevel: "intermediate",
-      subject: "COMP.CS",
-      courseCode: "COMP.CS.100",
-    },
-  },
-  {
-    id: "section1",
-    data: {
-      label: "1. Introduction",
-      level: 1,
-      details:
-        "Basic concepts and importance of software testing in development lifecycle. Covers test planning, execution strategies, and quality assurance fundamentals.",
-      nodeLevel: "basic",
-      subject: "COMP.CS",
-    },
-  },
-  {
-    id: "section1-b1",
-    data: {
-      label: "Dynamic testing is key",
-      level: 2,
-      parent: "section1",
-      details:
-        "Dynamic testing involves executing the actual code to verify its behavior. This includes unit tests, integration tests, and system tests.",
-      nodeLevel: "basic",
-      subject: "COMP.CS",
-    },
-  },
-  {
-    id: "section1-b2",
-    data: {
-      label: "Quality matters",
-      level: 2,
-      parent: "section1",
-      details:
-        "Quality assurance practices ensure software meets requirements and industry standards. Focus on code reviews, testing standards, and automated testing.",
-      nodeLevel: "intermediate",
-      subject: "COMP.CS",
-    },
-  },
-  {
-    id: "section2",
-    data: {
-      label: "2. What is a Test Case?",
-      level: 1,
-      details:
-        "Learn about test case design, documentation, and execution. Understanding different types of test cases and their applications.",
-      nodeLevel: "basic",
-      subject: "COMP.CS",
-    },
-  },
-  {
-    id: "section2-b1",
-    data: {
-      label: "Definition: Evaluate behavior",
-      level: 2,
-      parent: "section2",
-      details:
-        "A test case is a set of conditions used to determine if a system or one of its features is working correctly. Includes inputs, execution steps, and expected results.",
-      nodeLevel: "basic",
-      subject: "COMP.CS",
-    },
-  },
-  {
-    id: "section2-b2",
-    data: {
-      label: "Components: objective, input, expected result",
-      level: 2,
-      parent: "section2",
-      details:
-        "Key components of a test case include: test objective, test data (input), test steps, expected results, and actual results. Good test cases are clear, repeatable, and maintainable.",
-      nodeLevel: "intermediate",
-      subject: "COMP.CS",
-    },
-  },
-];
-
-// Build a mapping (child -> parent) for simulation and grouping
+// Build a mapping (child -> parent) using the new `parentId` property
 export const parentMap: { [childId: string]: string } = {};
 nodesData.forEach((node) => {
-  if (node.data.level > 0 && node.data.parent) {
-    parentMap[node.id] = node.data.parent;
+  if (node.data.level > 0 && node.parentId) {
+    parentMap[node.id] = node.parentId;
   }
 });
 
-// Helper function to determine if a node has children
+// Helper function to check for children
 export const hasChildren = (id: string) =>
-  nodesData.some((n) => n.data.parent === id);
+  nodesData.some((n) => n.parentId === id);
 
 // Default expanded state for nodes
 export const defaultExpanded: { [id: string]: boolean } = {};
@@ -108,7 +24,7 @@ nodesData.forEach((node) => {
   }
 });
 
-// Initialize nodes with proper spacing
+// Initialize nodes with proper spacing while preserving custom positions & types
 export const initializeNodes = () => {
   return nodesData.map((node) => {
     const level = node.data.level;
@@ -117,38 +33,39 @@ export const initializeNodes = () => {
       .filter((n) => n.data.level === level)
       .findIndex((n) => n.id === node.id);
 
+    // Add source and target handles based on node level
+    const targetHandle = level > 0; // All nodes except root can be targets
+    const sourceHandle = level < 2; // Only level 0 and 1 nodes can be sources
+
     return {
       id: node.id,
-      type: "custom",
-      data: { ...node.data },
-      position: {
-        x: 200 + level * 400,
-        y: 150 + (levelIndex - (levelCount - 1) / 2) * 200,
+      type: node.type ? node.type : "cellnode",
+      data: {
+        ...node.data,
+        // Add handle configuration to node data
+        hasSourceHandle: sourceHandle,
+        hasTargetHandle: targetHandle,
       },
+      position: node.position || {
+        x: NODE_POSITION.LEVEL_X_OFFSET * level + 100,
+        y:
+          NODE_POSITION.LEVEL_Y_OFFSET * (levelIndex - (levelCount - 1) / 2) +
+          300,
+      },
+      style: node.style,
+      parentId: node.parentId,
+      extent: node.extent,
     };
   });
 };
 
-// Initialize edges
-export const initializeEdges = () =>
-  nodesData
-    .filter((node) => node.data.level > 0 && node.data.parent)
-    .map((node) => ({
-      id: `e-${node.data.parent}-${node.id}`,
-      source: node.data.parent!,
-      target: node.id,
-    }));
-
-// Memoize collision detection for performance
 export const createCollisionDetector = (nodes: Node[], _: number) => {
   const nodesMap = new Map(
     nodes.map((node) => [`${node.position.x},${node.position.y}`, true])
   );
-
   return (x: number, y: number) => nodesMap.has(`${x},${y}`);
 };
 
-// Find non-colliding position for new node
 export const findNonCollidingPosition = (
   baseX: number,
   baseY: number,
@@ -160,31 +77,25 @@ export const findNonCollidingPosition = (
   const spiralStep = threshold;
   let angle = 0;
   let radius = 0;
-
   while (isColliding(newX, newY)) {
-    // Use spiral pattern for better position distribution
     angle += Math.PI / 4;
     radius += spiralStep / (2 * Math.PI);
     newX = baseX + radius * Math.cos(angle);
     newY = baseY + radius * Math.sin(angle);
   }
-
   return { x: newX, y: newY };
 };
 
-// Layout functions using React Flow's native positioning
 export const applyLayout = (
   nodes: Node[],
   layoutType: "default" | "horizontal" | "vertical" | "radial" = "default",
-  options = {
-    nodeDistance: 200,
-    rankSeparation: 200,
-    centerStrength: 0.5,
+  options: LayoutOptions = {
+    nodeDistance: LAYOUT_OPTIONS.NODE_DISTANCE,
+    rankSeparation: LAYOUT_OPTIONS.RANK_SEPARATION,
+    centerStrength: LAYOUT_OPTIONS.CENTER_STRENGTH,
   }
 ) => {
-  // Create a deep copy of nodes to avoid mutating the input
   const positionedNodes = JSON.parse(JSON.stringify(nodes));
-
   switch (layoutType) {
     case "horizontal":
       return applyHorizontalLayout(positionedNodes, options);
@@ -203,173 +114,131 @@ interface LayoutOptions {
   centerStrength: number;
 }
 
-// Horizontal tree layout (left to right)
 const applyHorizontalLayout = (
   nodes: Node<NodeData>[],
   options: LayoutOptions
 ) => {
-  // Group nodes by level
   const nodesByLevel = new Map<number, Node<NodeData>[]>();
-
   nodes.forEach((node) => {
     const level = Number(node.data.level);
-    if (!nodesByLevel.has(level)) {
-      nodesByLevel.set(level, []);
-    }
+    if (!nodesByLevel.has(level)) nodesByLevel.set(level, []);
     nodesByLevel.get(level)?.push(node);
   });
-
-  // Position nodes by level horizontally
   Array.from(nodesByLevel.entries()).forEach(([level, levelNodes]) => {
     levelNodes.forEach((node, index) => {
       node.position = {
-        x: level * options.rankSeparation + 100,
-        y: (index - (levelNodes.length - 1) / 2) * options.nodeDistance + 300,
+        x: level * options.rankSeparation + NODE_POSITION.LEVEL_X_OFFSET,
+        y:
+          (index - (levelNodes.length - 1) / 2) * options.nodeDistance +
+          NODE_POSITION.DEFAULT_ROOT_Y,
       };
     });
   });
-
   return nodes;
 };
 
-// Vertical tree layout (top to bottom)
 const applyVerticalLayout = (
   nodes: Node<NodeData>[],
   options: LayoutOptions
 ) => {
-  // Group nodes by level
   const nodesByLevel = new Map<number, Node<NodeData>[]>();
-
   nodes.forEach((node) => {
     const level = Number(node.data.level);
-    if (!nodesByLevel.has(level)) {
-      nodesByLevel.set(level, []);
-    }
+    if (!nodesByLevel.has(level)) nodesByLevel.set(level, []);
     nodesByLevel.get(level)?.push(node);
   });
-
-  // Position nodes by level vertically
   Array.from(nodesByLevel.entries()).forEach(([level, levelNodes]) => {
     levelNodes.forEach((node, index) => {
       node.position = {
-        x: (index - (levelNodes.length - 1) / 2) * options.nodeDistance + 400,
-        y: level * options.rankSeparation + 100,
+        x:
+          (index - (levelNodes.length - 1) / 2) * options.nodeDistance +
+          NODE_POSITION.DEFAULT_ROOT_X,
+        y: level * options.rankSeparation + NODE_POSITION.LEVEL_Y_OFFSET,
       };
     });
   });
-
   return nodes;
 };
 
-// Radial layout
 const applyRadialLayout = (nodes: Node<NodeData>[], options: LayoutOptions) => {
-  // Find the root node
   const rootNode = nodes.find((node) => node.data.level === 0);
-  const centerX = rootNode?.position.x || 400;
-  const centerY = rootNode?.position.y || 300;
-
-  // Position other nodes in circles around the root
+  const centerX = rootNode?.position.x || NODE_POSITION.DEFAULT_ROOT_X;
+  const centerY = rootNode?.position.y || NODE_POSITION.DEFAULT_ROOT_Y;
   nodes.forEach((node) => {
-    if (node.data.level === 0) return; // Skip root node
-
+    if (node.data.level === 0) return;
     const level = Number(node.data.level);
     const nodesAtLevel = nodes.filter((n) => n.data.level === level).length;
     const indexAtLevel = nodes.filter(
       (n) => n.data.level === level && n.id.localeCompare(node.id) < 0
     ).length;
-
-    // Calculate position in a circle
     const radius = level * options.rankSeparation;
     const angleStep = (2 * Math.PI) / nodesAtLevel;
     const angle = indexAtLevel * angleStep;
-
     node.position = {
       x: centerX + radius * Math.cos(angle),
       y: centerY + radius * Math.sin(angle),
     };
   });
-
   return nodes;
 };
 
-// Default layout (slightly spread nodes)
 const applyDefaultLayout = (
   nodes: Node<NodeData>[],
   options: LayoutOptions
 ) => {
-  // Find parent-child relationships
   const childrenMap = new Map<string, Node<NodeData>[]>();
-
   nodes.forEach((node) => {
-    const parent = node.data.parent;
+    const parent = node.parentId;
     if (parent) {
-      if (!childrenMap.has(parent)) {
-        childrenMap.set(parent, []);
-      }
+      if (!childrenMap.has(parent)) childrenMap.set(parent, []);
       childrenMap.get(parent)?.push(node);
     }
   });
-
-  // Position root node
   const rootNode = nodes.find((node) => node.data.level === 0);
-  if (rootNode) {
-    rootNode.position = { x: 400, y: 300 };
-  }
-
-  // Position child nodes relative to their parents
+  if (rootNode)
+    rootNode.position = {
+      x: NODE_POSITION.DEFAULT_ROOT_X,
+      y: NODE_POSITION.DEFAULT_ROOT_Y,
+    };
   const positionChildren = (parentId: string, depth: number = 1) => {
     const children = childrenMap.get(parentId) || [];
     const parent = nodes.find((node) => node.id === parentId);
     if (!parent) return;
-
     const centerX = parent.position.x;
     const centerY = parent.position.y;
     const childCount = children.length;
-
     children.forEach((child, index) => {
-      // Calculate position based on parent and siblings
       const angleStep = Math.PI / (childCount + 1);
       const angle = Math.PI / 2 + (index + 1) * angleStep;
       const distance = options.rankSeparation;
-
       child.position = {
         x: centerX + distance * Math.cos(angle),
-        y: centerY + distance * Math.sin(angle) + depth * 100,
+        y:
+          centerY +
+          distance * Math.sin(angle) +
+          depth * NODE_POSITION.LEVEL_Y_OFFSET,
       };
-
-      // Recursively position this node's children
       positionChildren(child.id, depth + 1);
     });
   };
-
-  if (rootNode) {
-    positionChildren(rootNode.id);
-  }
-
+  if (rootNode) positionChildren(rootNode.id);
   return nodes;
 };
 
-// Add utility function to find node clusters
 export const findNodeClusters = (nodes: Node<NodeData>[]) => {
   const clusters = new Map<string, string[]>();
-
   nodes.forEach((node) => {
-    const parentId = node.data.parent || "root";
-    if (!clusters.has(parentId)) {
-      clusters.set(parentId, []);
-    }
+    const parentId = node.parentId || "root";
+    if (!clusters.has(parentId)) clusters.set(parentId, []);
     clusters.get(parentId)?.push(node.id);
   });
-
   return Object.fromEntries(clusters);
 };
 
-// Optimize node overlap resolution
 export const resolveNodeOverlap = (nodes: Node[], padding: number = 20) => {
   const quadtree = new Map<string, Node>();
   const getQuadKey = (x: number, y: number) =>
     `${Math.floor(x / 160)},${Math.floor(y / 160)}`;
-
   return nodes.map((node) => {
     const key = getQuadKey(node.position.x, node.position.y);
     if (quadtree.has(key)) {

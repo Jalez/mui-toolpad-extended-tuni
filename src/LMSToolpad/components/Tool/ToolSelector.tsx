@@ -12,10 +12,11 @@ import { useNavigate } from "react-router-dom";
 import { NavigationPageStoreItem } from "../Navigation/store/useNavigationStore";
 import { SvgIconComponent } from "@mui/icons-material";
 import useCourseStore from "../Courses/store/useCourseStore";
+import React from "react";
 
 export type ToolSelectorItem = {
   path: string;
-  icon: JSX.Element;
+  icon: React.ReactElement;
   label: string;
   description: string;
   forRoles?: string[];

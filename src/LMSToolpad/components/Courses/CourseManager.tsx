@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import useCourseStore from "./store/useCourseStore";
 import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
-import { useRetry } from "../../../hooks/useRetry";
+import { useRetry } from "../../hooks/useRetry";
 import { VisitedCoursesNavigationAdapter } from "./Navigation/VisitedCoursesNavigationAdapter";
 import CourseList from "./CourseList";
 import Calendar from "./Calendar/Calendar";

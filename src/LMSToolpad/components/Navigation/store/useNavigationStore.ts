@@ -4,6 +4,7 @@ import { SvgIconComponent } from "@mui/icons-material";
 import { create } from "zustand";
 import HelpIcon from "@mui/icons-material/Help";
 import ContactPageIcon from "@mui/icons-material/ContactPage";
+import React from "react";
 
 // Base interface for common properties
 interface NavigationItemBase {
@@ -33,10 +34,10 @@ export interface NavigationPageStoreItem extends NavigationItemBase {
   kind: "page";
   segment: string;
   iconFC?: SvgIconComponent;
-  icon?: JSX.Element;
+  icon?: React.ReactElement;
   children?: NavigationPageStoreItem[];
   view?: React.ComponentType;
-  action?: JSX.Element;
+  action?: React.ReactElement;
   metadata?: ToolMetadata;
 }
 

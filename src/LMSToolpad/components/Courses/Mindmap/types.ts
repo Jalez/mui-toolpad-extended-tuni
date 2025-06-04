@@ -1,6 +1,15 @@
 /** @format */
 // Node data with level and optional parent
-export interface NodeData extends Record<string, unknown> {
+
+export interface EditNodeDialogProps {
+  open: boolean;
+  onClose: () => void;
+  onSave: (label: string, details: string) => void;
+  initialLabel: string;
+  initialDetails: string;
+}
+
+export interface NodeData {
   label: string;
   level: number;
   parent?: string;
@@ -10,12 +19,5 @@ export interface NodeData extends Record<string, unknown> {
   details?: string;
   // Added property to support parent creation callback
   onAddParent?: () => void;
-}
-
-export interface EditNodeDialogProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: (label: string, details: string) => void;
-  initialLabel: string;
-  initialDetails: string;
+  [key: string]: unknown;
 }

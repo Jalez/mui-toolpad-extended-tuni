@@ -4,10 +4,11 @@ import { NavigationPageStoreItem } from "../Navigation/store/useNavigationStore"
 import { MicroserviceConfig } from "../Microservices/MicroserviceRoutes";
 import ToolCard from "./ToolCard";
 import useCourseStore from "../Courses/store/useCourseStore";
+import React from "react";
 
 export type ToolDisplayerItem = {
   path: string;
-  icon: JSX.Element;
+  icon: React.ReactElement;
   label: string;
   description: string;
   forRoles?: string[];

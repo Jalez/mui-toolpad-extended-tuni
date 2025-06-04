@@ -5,7 +5,6 @@ import { Platform } from "../../../store/usePlatformStore";
 import {
   DndContext,
   DragOverlay,
-  useDraggable,
   useDroppable,
   DragEndEvent,
   DragStartEvent,

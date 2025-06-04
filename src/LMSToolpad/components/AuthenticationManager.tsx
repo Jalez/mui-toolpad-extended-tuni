@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useUserStore } from "../store/useUserStore";
 import { useNotificationStore } from "./Notifications/store/useNotificationsStore";
 import useCourseStore from "./Courses/store/useCourseStore";
-import { useRetry } from "../../hooks/useRetry";
+import { useRetry } from "../hooks/useRetry";
 
 const AuthenticationManager = () => {
   const [loggingIn, setLoggingIn] = useState(false);
