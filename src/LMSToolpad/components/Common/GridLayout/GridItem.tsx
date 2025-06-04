@@ -1,114 +1,65 @@
-import { Box, IconButton } from "@mui/material";
-import React, { memo, useCallback } from "react";
-import CloseIcon from "@mui/icons-material/Close";
-import { useTheme } from "@mui/material/styles";
-import { getWidget } from "./WidgetRegistry";
+/** @format */
 
-interface GridItemProps {
+import React, { ReactNode } from "react";
+import { Box, useTheme } from "@mui/material";
+import useGridLayout from "./useGridLayout";
+
+export interface GridItemProps {
+  children: ReactNode;
   id: string;
-  isEditable: boolean;
-  onRemove?: (id: string) => void;
-  handleAboutToRemove?: (value: boolean) => void;
+  isFlexContainer?: boolean;
 }
 
-const GridItem = ({
+/**
+ * Grid item component that applies consistent styling and resize visual feedback.
+ *
+ * Features:
+ * - Visual indication when in resize or move mode
+ * - Consistent styling for all grid items
+ * - Optional flex container for content that needs to fill the space
+ * - Content is non-interactable when in edit mode (using BlurOverlay)
+ */
+const GridItem: React.FC<GridItemProps> = ({
+  children,
   id,
-  isEditable,
-  onRemove,
-  handleAboutToRemove,
-}: GridItemProps) => {
+  isFlexContainer = false,
+}) => {
   const theme = useTheme();
-  const widget = getWidget(id);
-
-  if (!widget) {
-    return null;
-  }
-
-  const { Component, props } = widget;
-
-  // Handler for remove button - memoize to prevent recreation on every render
-  const handleRemove = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
-      e.preventDefault();
-      if (onRemove) onRemove(id);
-      if (handleAboutToRemove) handleAboutToRemove(false);
-    },
-    [id, onRemove, handleAboutToRemove]
-  );
-
-  const handleMouseEnter = useCallback(() => {
-    if (handleAboutToRemove) handleAboutToRemove(true);
-  }, [handleAboutToRemove]);
-
-  const handleMouseLeave = useCallback(() => {
-    if (handleAboutToRemove) handleAboutToRemove(false);
-  }, [handleAboutToRemove]);
+  const { editMode } = useGridLayout();
 
   return (
-    <>
-      {isEditable && onRemove && (
-        <IconButton
-          onClick={handleRemove}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-          size="small"
-          sx={{
-            position: "absolute",
-            top: 5,
-            right: 5,
-            zIndex: 9999,
-            bgcolor: "background.paper",
-            borderRadius: "50%",
-            width: 24,
-            height: 24,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            pointerEvents: "auto", // This is critical - allows click events
-            "&:hover": {
-              bgcolor: "error.light",
-              color: "error.contrastText",
-            },
-          }}
-        >
-          <CloseIcon fontSize="small" />
-        </IconButton>
-      )}
-      <Box
-        sx={{
-
-          borderRadius: 1,
-          overflow: "hidden",
-          position: "relative",
-          outline: isEditable
-            ? `2px dashed ${theme.palette.primary.main}`
+    <Box
+      data-grid-item-id={id}
+      sx={{
+        bgcolor: theme.palette.background.paper,
+        borderRadius: 1,
+        boxShadow: 1,
+        overflow: "hidden",
+        p: 1,
+        height: "100%",
+        display: isFlexContainer ? "flex" : "block",
+        flexDirection: isFlexContainer ? "column" : "initial",
+        // Add visual indication when in edit mode
+        outline: editMode ? `2px dashed ${theme.palette.primary.main}` : "none",
+        transition: "outline 0.2s ease-in-out",
+        position: "relative", // For proper positioning of tools
+        "&:hover": {
+          outline: editMode
+            ? `2px solid ${theme.palette.primary.main}`
             : "none",
-          "&:hover": {
-            outline: isEditable
-              ? `2px solid ${theme.palette.primary.main}`
-              : "none",
-          },
-          height: "100%",
-          width: "100%",
-        }}
-      >
-        <Box
-          sx={{
-            p: 0,
-            m: 0,
-            height: "100%",
-            overflow: "hidden",
-            userSelect: isEditable ? "none" : "auto",
-            pointerEvents: isEditable ? "none" : "auto",
-          }}
-        >
-          <Component {...props} />
-        </Box>
-      </Box>
-    </>
+        },
+      }}
+    >
+      {children}
+      {/* {editMode && (
+        <BlurOverlay>
+          <Typography variant='caption' fontWeight='bold' color='primary.main'>
+            Edit Mode: Drag or Resize
+          </Typography>
+        </BlurOverlay>
+      )} */}
+    </Box>
   );
 };
 
-export default memo(GridItem);
+export default GridItem;

@@ -6,6 +6,10 @@ import { persist } from "zustand/middleware";
 interface PanelState {
   editMode: boolean;
   toggleEditMode: () => void;
+  resizeMode: boolean;
+  toggleResizeMode: () => void;
+  moveMode: boolean;
+  toggleMoveMode: () => void;
 }
 
 /**
@@ -19,6 +23,11 @@ export const usePanelStore = create<PanelState>()(
     (set) => ({
       editMode: false,
       toggleEditMode: () => set((state) => ({ editMode: !state.editMode })),
+      resizeMode: false,
+      toggleResizeMode: () =>
+        set((state) => ({ resizeMode: !state.resizeMode })),
+      moveMode: false,
+      toggleMoveMode: () => set((state) => ({ moveMode: !state.moveMode })),
     }),
     {
       name: "grid-layout-storage",
