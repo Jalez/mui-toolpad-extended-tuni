@@ -171,12 +171,16 @@ const ResizablePanelContent = ({ children }: ResizablePanelProps) => {
       resizeMode,
       dimensions,
       setIsDragging,
-      dragStart
+      dragStart,
+      { x: 10, y: 10 } // default leap values
     );
   };
 
   const handleTouchStart = (direction: "vertical" | "horizontal" | "corner") =>
-    startDragging(direction, resizeMode, dimensions, setIsDragging, dragStart);
+    startDragging(direction, resizeMode, dimensions, setIsDragging, dragStart, {
+      x: 10,
+      y: 10,
+    });
   const [expandedStyle, setExpandedStyle] = useState<React.CSSProperties>({});
   const [animateExpansion, setAnimateExpansion] = useState(false);
 
