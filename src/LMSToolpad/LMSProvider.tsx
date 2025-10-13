@@ -28,6 +28,9 @@ import { UserManager } from "./components/UserManager";
 import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/RegisteredPageTools";
 import { PageContainer } from "@toolpad/core";
 import { useWidgetNavigation } from "./components/Navigation/hooks/useWidgetNavigation";
+import { GridItemProvider } from "./components/Common/GridLayout/GridItemContext";
+import { CalendarManager, CalendarEventAggregator } from "./components/Calendar";
+import { FlowManager } from "./components/Flow";
 
 export interface LMSProviderProps {
   children?: ReactNode;
@@ -115,21 +118,25 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
   return (
     <LocalizationProvider dateAdapter={AdapterLuxon}>
       <SnackbarProvider maxSnack={6} autoHideDuration={10000}>
-        <AppProvider
-          branding={{
-            logo: <Logo />,
-            title: "",
-          }}
-          navigation={addActions(addIcons(navigation))}
-          theme={lmsTheme}
-          router={router as Router}
-          session={session}
-          authentication={authentication}
-        >
-          <AuthenticationManager />
-          <UserManager />
-          <CourseManager />
-          <DashboardLayout
+        <GridItemProvider>
+          <AppProvider
+            branding={{
+              logo: <Logo />,
+              title: "",
+            }}
+            navigation={addActions(addIcons(navigation))}
+            theme={lmsTheme}
+            router={router as Router}
+            session={session}
+            authentication={authentication}
+          >
+            <AuthenticationManager />
+            <UserManager />
+            <CourseManager />
+            <CalendarManager />
+            <CalendarEventAggregator />
+            <FlowManager />
+            <DashboardLayout
             data-testid="dashboard-layout"
             // border={false}
 
@@ -188,7 +195,8 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
             <Dialogs />
             <Notifications />
           </DashboardLayout>
-        </AppProvider>
+          </AppProvider>
+        </GridItemProvider>
       </SnackbarProvider>
     </LocalizationProvider>
   );
