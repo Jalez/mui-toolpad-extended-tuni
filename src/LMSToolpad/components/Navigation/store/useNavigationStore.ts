@@ -38,6 +38,7 @@ export interface NavigationPageStoreItem extends NavigationItemBase {
   children?: NavigationPageStoreItem[];
   view?: React.ComponentType;
   action?: React.ReactElement;
+  showTitle?: boolean;
   metadata?: ToolMetadata;
 }
 
