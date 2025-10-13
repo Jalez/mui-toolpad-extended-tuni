@@ -69,10 +69,9 @@ const CourseList = ({
   return (
     <Box
       sx={{
-        bgcolor: theme.palette.background.default,
         width: "100%",
         height: containerHeight,
-        border: `0.5em solid ${theme.palette.divider}`,
+        backgroundColor: "background.default",
       }}
     >
       <Scroller

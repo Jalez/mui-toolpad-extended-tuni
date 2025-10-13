@@ -166,8 +166,6 @@ const Calendar: React.FC = () => {
     <Box
       ref={containerRef}
       sx={{
-        bgcolor: theme.palette.background.default,
-        border: `0.5em solid ${theme.palette.divider}`,
         width: "100%",
         height: "100%",
         display: "flex",
