@@ -4,86 +4,38 @@ import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
 import { useRetry } from "../../hooks/useRetry";
 import { VisitedCoursesNavigationAdapter } from "./Navigation/VisitedCoursesNavigationAdapter";
 import CourseList from "./CourseList";
-import Calendar from "./Calendar/Calendar";
-import Mindmap from "./Mindmap";
+import CourseEventPublisher from "./CourseEventPublisher";
 import {
   registerWidget,
   unregisterWidget,
 } from "../Common/GridLayout/WidgetRegistry";
-import PsychologyIcon from "@mui/icons-material/Psychology";
 import SchoolIcon from "@mui/icons-material/School";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 const CourseManager = () => {
   const { getCourses, setCurrentCourseUrl, getCourseByUrl, courses } =
     useCourseStore();
 
-  // Register widgets only once on mount
+  // Register course-list widget only (Calendar and Flow are handled by their respective managers)
   useEffect(() => {
-    const widgetsToRegister = [
-      {
-        id: "course-list",
-        component: CourseList,
-        options: {
-          name: "Course List",
-          description:
-            "Displays a list of courses with filtering and sorting options",
-          category: "academic",
-          props: { displayMode: "instance", containerHeight: "100%" },
-          iconComponent: SchoolIcon, // Directly pass the component, not a string
-          metadata: {
-            route: {
-              path: "course-list",
-              element: (
-                <CourseList displayMode="instance" containerHeight="100%" />
-              ),
-            },
-          },
+    registerWidget("course-list", CourseList, {
+      name: "Course List",
+      description:
+        "Displays a list of courses with filtering and sorting options",
+      category: "academic",
+      props: { displayMode: "instance", containerHeight: "100%" },
+      iconComponent: SchoolIcon,
+      metadata: {
+        route: {
+          path: "course-list",
+          element: (
+            <CourseList displayMode="instance" containerHeight="100%" />
+          ),
         },
       },
-      {
-        id: "calendar",
-        component: Calendar,
-        options: {
-          name: "Calendar",
-          description: "Shows course events and deadlines in a calendar view",
-          category: "planning",
-          iconComponent: CalendarMonthIcon, // Directly pass the component
-          metadata: {
-            route: {
-              path: "calendar",
-              element: <Calendar />,
-            },
-          },
-        },
-      },
-      {
-        id: "mindmap",
-        component: Mindmap,
-        options: {
-          name: "Mindmap",
-          description:
-            "Visual representation of course relationships and topics",
-          category: "visualization",
-          iconComponent: PsychologyIcon, // Directly pass the component
-          metadata: {
-            route: {
-              path: "mindmap",
-              element: <Mindmap />,
-            },
-          },
-        },
-      },
-    ];
-
-    widgetsToRegister.forEach(({ id, component, options }) => {
-      registerWidget(id, component, options);
     });
 
     return () => {
-      widgetsToRegister.forEach(({ id }) => {
-        unregisterWidget(id);
-      });
+      unregisterWidget("course-list");
     };
   }, []);
 
@@ -117,6 +69,7 @@ const CourseManager = () => {
     <>
       <VisitedCoursesNavigationAdapter />
       <CourseNavigationBuilder />
+      <CourseEventPublisher />
     </>
   );
 };
