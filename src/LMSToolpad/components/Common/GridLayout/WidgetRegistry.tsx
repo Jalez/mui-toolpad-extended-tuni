@@ -30,6 +30,7 @@ export interface WidgetEntry {
     keepVisible?: boolean;
     order?: number;
     tags?: string[];
+    showInNavigation?: boolean;
     route?: {
       path: string;
       element?: ReactNode;
@@ -62,7 +63,7 @@ const updateWidgetNavigation = () => {
   const navigationStore = useNavigationStore.getState();
   const { setFilterOptions } = useNavigationFilterStore.getState();
 
-  // Group widgets by category
+  // Group widgets by category, but only include widgets that should appear in navigation
   const sections: Record<
     string,
     Array<{
@@ -74,6 +75,11 @@ const updateWidgetNavigation = () => {
   > = {};
 
   widgetRegistry.forEach((widget, id) => {
+    // Only add widgets to navigation if explicitly marked as showInNavigation
+    if (!widget.metadata?.showInNavigation) {
+      return;
+    }
+
     const category = widget.category || "Widgets";
     if (!sections[category]) {
       sections[category] = [];
@@ -182,6 +188,7 @@ export function registerWidget(
       keepVisible?: boolean;
       order?: number;
       tags?: string[];
+      showInNavigation?: boolean;
       route?: {
         path: string;
         element?: ReactNode;
