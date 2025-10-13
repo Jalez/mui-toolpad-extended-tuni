@@ -50,6 +50,18 @@ const initialLayouts = {
 const Home = () => {
   const [layouts, setLayouts] = useState(initialLayouts);
 
+  // Create a named component for the LayoutSelector wrapper to ensure proper registration/unregistration
+  const HomeLayoutSelector: React.FC = () => {
+    return (
+      <LayoutSelector
+        storageKey={STORAGE_KEY}
+        onPresetChange={(newLayouts) =>
+          setLayouts(newLayouts as typeof initialLayouts)
+        }
+      />
+    );
+  };
+
   // Create grid items for ResponsiveGridLayout
   const gridItems = [
     {
@@ -69,18 +81,11 @@ const Home = () => {
   useEffect(() => {
     // Register both the EditModeToggler and LayoutSelector.
     registerPageToolbarAction("/", EditModeToggler);
-    registerPageToolbarAction("/", () => (
-      <LayoutSelector
-        storageKey={STORAGE_KEY}
-        onPresetChange={(newLayouts) =>
-          setLayouts(newLayouts as typeof initialLayouts)
-        }
-      />
-    ));
+    registerPageToolbarAction("/", HomeLayoutSelector);
 
     return () => {
       unregisterPageToolbarAction("/", EditModeToggler);
-      unregisterPageToolbarAction("/", LayoutSelector);
+      unregisterPageToolbarAction("/", HomeLayoutSelector);
     };
   }, []);
 
