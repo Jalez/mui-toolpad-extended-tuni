@@ -1,6 +1,6 @@
 /** @format */
 
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
 import CourseCodeLoader from "../Courses/CourseCodeLoader";
 import CourseInstanceSelector from "../Courses/CourseInstanceSelector";
 import CourseInstanceLoader from "../Courses/CourseInstanceLoader";
@@ -9,11 +9,33 @@ import {
   NavigationPageStoreItem,
   useNavigationStore,
 } from "../Navigation/store/useNavigationStore";
-import ToolDisplayer from "../Tool/ToolDisplayer";
 import Home from "../Routes/Home/Home";
 import React, { useEffect } from "react";
 import { VisitedCoursesNavigationAdapter } from "../Courses/Navigation/VisitedCoursesNavigationAdapter";
 import { useWidgetRoutes } from "../Navigation/hooks/useWidgetRoutes";
+import { Typography, IconButton, Box } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SubSections from "./MicroserviceSubsections";
+
+/**
+ * Page header component with back button and title
+ */
+const PageHeader: React.FC<{ title: string; onBack?: () => void }> = ({ title, onBack }) => (
+  <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+    {onBack && (
+      <IconButton
+        onClick={onBack}
+        sx={{ mr: 1, color: 'primary.main' }}
+        aria-label="Go back"
+      >
+        <ArrowBackIcon />
+      </IconButton>
+    )}
+    <Typography variant="h2" sx={{ color: 'primary.main' }}>
+      {title}
+    </Typography>
+  </Box>
+);
 
 /**
  * Core component for handling microservices and course-related routing.
@@ -24,11 +46,21 @@ import { useWidgetRoutes } from "../Navigation/hooks/useWidgetRoutes";
  * @param {React.ReactNode} props.children - Child components to render
  */
 const Microservices = ({ children }: { children: React.ReactNode }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const {
     allMicroserviceNavigation,
     updateMicroserviceNavigationForSections,
     sections,
   } = useNavigationStore();
+
+  // Helper function to get parent path for back navigation
+  const getParentPath = (currentPath: string) => {
+    const pathSegments = currentPath.split('/').filter(Boolean);
+    // Remove the last segment to get parent path
+    pathSegments.pop();
+    return '/' + pathSegments.join('/');
+  };
 
   // Get dynamic widget routes
   const widgetRoutes = useWidgetRoutes();
@@ -65,13 +97,18 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
                 <Route
                   index
                   element={
-                    (nav.view && <nav.view />) || (
-                      <ToolDisplayer
-                        title={nav.title as string}
-                        show={true}
-                        navItems={nav.children as NavigationPageStoreItem[]}
-                      />
-                    )
+                    <>
+                      {nav.title && (nav.showTitle !== false) && (
+                        <PageHeader
+                          title={nav.title}
+                          onBack={() => navigate(getParentPath(location.pathname))}
+                        />
+                      )}
+                      {nav.children && nav.children.length > 0 && (
+                        <SubSections children={nav.children as NavigationPageStoreItem[]} />
+                      )}
+                      {nav.view && <nav.view />}
+                    </>
                   }
                 />
                 {nav.children?.map((child) => (
@@ -79,22 +116,35 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
                     <Route
                       index
                       element={
-                        (child.view && <child.view />) || (
-                          <ToolDisplayer
-                            title={child.title as string}
-                            show={true}
-                            navItems={
-                              child.children as NavigationPageStoreItem[]
-                            }
-                          />
-                        )
+                        <>
+                          {child.title && (child.showTitle !== false) && (
+                            <PageHeader
+                              title={child.title}
+                              onBack={() => navigate(getParentPath(location.pathname))}
+                            />
+                          )}
+                          {child.children && child.children.length > 0 && (
+                            <SubSections children={child.children as NavigationPageStoreItem[]} />
+                          )}
+                          {child.view && <child.view />}
+                        </>
                       }
                     />
                     {child.children?.map((subChild) => (
                       <Route
                         key={subChild.segment}
                         path={subChild.segment}
-                        element={subChild.view ? <subChild.view /> : null}
+                        element={
+                          <>
+                            {subChild.title && (subChild.showTitle !== false) && (
+                              <PageHeader
+                                title={subChild.title}
+                                onBack={() => navigate(getParentPath(location.pathname))}
+                              />
+                            )}
+                            {subChild.view ? <subChild.view /> : null}
+                          </>
+                        }
                       />
                     ))}
                   </Route>
