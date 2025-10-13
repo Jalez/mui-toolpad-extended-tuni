@@ -8,7 +8,7 @@ import CourseEventPublisher from "./CourseEventPublisher";
 import {
   registerWidget,
   unregisterWidget,
-} from "../Common/GridLayout/WidgetRegistry";
+} from "../Navigation/NavigationRegistry";
 import SchoolIcon from "@mui/icons-material/School";
 
 const CourseManager = () => {

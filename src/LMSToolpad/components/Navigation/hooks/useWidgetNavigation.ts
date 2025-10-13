@@ -5,7 +5,7 @@ import { useNavigationFilterStore } from "../store/useNavigationFilterStore";
 import {
   getAllWidgets,
   useWidgetRegistryStore,
-} from "../../Common/GridLayout/WidgetRegistry";
+} from "../NavigationRegistry";
 
 /**
  * Hook that maintains persistent navigation entries for widgets.

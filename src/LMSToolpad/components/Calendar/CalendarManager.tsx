@@ -5,7 +5,7 @@ import Calendar from "./Calendar";
 
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { createGridItem, useGridItemContext } from "../Common/GridLayout";
-import { registerWidget, unregisterWidget } from "../Common/GridLayout/WidgetRegistry";
+import { registerWidget, unregisterWidget } from "../Navigation/NavigationRegistry";
 
 const CalendarManager = () => {
   const { registerGridItem, unregisterGridItem } = useGridItemContext();

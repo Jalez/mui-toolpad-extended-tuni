@@ -13,7 +13,7 @@ import ToolDisplayer from "../Tool/ToolDisplayer";
 import Home from "../Routes/Home/Home";
 import React, { useEffect } from "react";
 import { VisitedCoursesNavigationAdapter } from "../Courses/Navigation/VisitedCoursesNavigationAdapter";
-import { useWidgetRoutes } from "../../hooks/useWidgetRoutes";
+import { useWidgetRoutes } from "../Navigation/hooks/useWidgetRoutes";
 
 /**
  * Core component for handling microservices and course-related routing.
