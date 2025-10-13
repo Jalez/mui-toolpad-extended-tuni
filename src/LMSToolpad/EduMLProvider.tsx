@@ -1,7 +1,7 @@
 /** @format */
 
 import React from "react";
-import { LMSProvider } from "./LMSProvider";
+import LMSProvider from "./LMSProvider";
 
 export interface EduMLProviderProps {
   children: React.ReactNode;
