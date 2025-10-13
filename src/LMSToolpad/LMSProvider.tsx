@@ -30,7 +30,6 @@ import { PageContainer } from "@toolpad/core";
 import { useWidgetNavigation } from "./components/Navigation/hooks/useWidgetNavigation";
 import { GridItemProvider } from "./components/Common/GridLayout/GridItemContext";
 import { CalendarManager, CalendarEventAggregator } from "./components/Calendar";
-import { FlowManager } from "./components/Flow";
 
 export interface LMSProviderProps {
   children?: ReactNode;
@@ -135,7 +134,6 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
             <CourseManager />
             <CalendarManager />
             <CalendarEventAggregator />
-            <FlowManager />
             <DashboardLayout
             data-testid="dashboard-layout"
             // border={false}
