@@ -187,7 +187,19 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
           actionFC,
         } = pageConfig;
 
-        const newPage = {
+        const pageChildren = instances?.map((instance) => ({
+          kind: "page" as const,
+          segment: instance,
+          title: instance,
+          metadata: {
+            description,
+            forRoles: ["student", "teacher"],
+            microservices: microservices,
+          },
+          children: [],
+        }));
+
+        const newPage: NavigationPageStoreItem = {
           kind: "page" as const,
           segment,
           title,
@@ -200,18 +212,7 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
             underHeader,
             microservices: instances ? undefined : microservices,
           },
-          children:
-            instances?.map((instance) => ({
-              kind: "page" as const,
-              segment: instance,
-              title: instance,
-              metadata: {
-                description,
-                forRoles: ["student", "teacher"],
-                microservices: microservices,
-              },
-              children: [],
-            })) || [],
+          ...(pageChildren && pageChildren.length > 0 ? { children: pageChildren } : {}),
         };
 
         newSections[sectionKey].pages[segment] = newPage;
