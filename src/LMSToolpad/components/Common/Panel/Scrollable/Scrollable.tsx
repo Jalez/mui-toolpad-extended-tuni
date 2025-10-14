@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { usePanelContext } from "../Main/Context/PanelContextProvider";
 import InternalScrolling from "./InternalScrolling";
 import { useScrollContext } from "./context/ScrollerContextProvider";
-import { useExpandableContext } from "../Expandable/context/ExpandableContextProvider";
 
 interface ScrollableProps {
   children: React.ReactNode;
@@ -12,7 +11,6 @@ interface ScrollableProps {
 const Scrollable = ({ children }: ScrollableProps) => {
   const { panelContentRef, dimensions, panelRef } = usePanelContext();
   const { setItemCounts } = useScrollContext();
-  const { isExpanded } = useExpandableContext();
 
   // useEffect(() => {
   //   if (!isExpanded || !panelContentRef.current) return;

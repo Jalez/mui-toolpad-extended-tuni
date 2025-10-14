@@ -37,7 +37,6 @@ const PanelContent = ({
   tools,
   resizeMode,
   handleMouseDown,
-  handleTouchStart,
   toggleExpand,
 }: PanelContentProps) => (
   <>
@@ -60,14 +59,18 @@ const PanelContent = ({
 
     {(isDragging.vertical || isDragging.horizontal) && (
       <BlurOverlay>
-        <ResizeIndicator dimensions={dimensions} />
+        <ResizeIndicator isResizing={isDragging.vertical || isDragging.horizontal} />
       </BlurOverlay>
     )}
 
     {resizeMode && (
       <ResizeHandlers
-        handleMouseDown={handleMouseDown}
-        handleTouchStart={handleTouchStart}
+        isResizing={isDragging.vertical || isDragging.horizontal}
+        onResizeStart={(direction) => {
+          // Handle both mouse and touch events
+          const handler = handleMouseDown(direction as "vertical" | "horizontal" | "corner");
+          return handler;
+        }}
       />
     )}
   </>

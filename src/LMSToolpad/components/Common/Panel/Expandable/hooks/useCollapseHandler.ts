@@ -1,12 +1,11 @@
 import { useEffect } from "react";
-import { Position, PanelRef } from "../../types";
+import { PanelRef } from "../../types";
 
 export const useCollapseHandler = (
   isExpanded: boolean,
   expandedPanelId: string | null,
   id: string,
   panelRef: PanelRef,
-  initialPosition: Position,
   setExtendedStyle: (style: React.CSSProperties) => void,
   setExtendedContainerStyle: (style: React.CSSProperties) => void,
   setIsExpanded: (expanded: boolean) => void

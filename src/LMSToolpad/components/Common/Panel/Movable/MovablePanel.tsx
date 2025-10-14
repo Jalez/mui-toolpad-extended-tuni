@@ -65,7 +65,7 @@ interface MovablePanelProps {
   gap?: number;
 }
 
-const Movable = ({ id, children, tools, gap = 2 }: MovablePanelProps) => {
+const Movable = ({ id, children, tools }: MovablePanelProps) => {
   const { moveMode } = usePanelStore();
   // Store original children reference
   const { parentRef } = useMovableContext();

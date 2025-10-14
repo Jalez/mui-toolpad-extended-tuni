@@ -5,7 +5,6 @@ import Panel from "./Main/Panel";
 import { PanelProps } from "./Main/Context/PanelContextProvider";
 import Scroller from "./Scrollable/Scroller";
 import { usePanelContext } from "./Main/Context/PanelContextProvider";
-import { Box } from "@mui/material";
 
 export interface CompoundPanelProps extends PanelProps {
   /**
@@ -124,8 +123,6 @@ export interface SectionProps {
  * ```
  */
 export const Section: React.FC<SectionProps> = ({
-  title,
-  priority,
   children,
 }) => {
   // Actual implementation is handled by SectionsContent
@@ -147,10 +144,10 @@ const SectionsContent: React.FC<{ children: React.ReactNode }> = ({
 
         // Check if this is a Section component
         if (child.type === Section) {
-          const { title, priority, children: sectionChildren } = child.props;
+          const sectionProps = child.props as SectionProps;
           return (
-            <SectionRenderer title={title} priority={priority}>
-              {sectionChildren}
+            <SectionRenderer title={sectionProps.title} priority={sectionProps.priority}>
+              {sectionProps.children}
             </SectionRenderer>
           );
         }

@@ -5,9 +5,9 @@ import { useRef, useEffect, useState } from "react";
 import { usePanelStore } from "../../GridLayout/store/usePanelStore";
 import { startDragging } from "../Resizable/Hooks/useResizeHandlers";
 import { useResizablePanel } from "./useResizablePanel";
-import { useExpandable } from "../Expandable/hooks/useExpandable";
+import { useExpandablePanelStore } from "../Expandable/store/useExpandablePanelStore";
 import { useDimensionManagement } from "../Main/hooks/useDimensionManagement";
-import { ExpandableContextProvider } from "../Expandable/context/ExpandableContextProvider";
+import { ExpandableContextProvider, useExpandableContext } from "../Expandable/context/ExpandableContextProvider";
 import {
   PanelProps,
   PanelProvider,
@@ -162,7 +162,18 @@ const ResizablePanelContent = ({ children }: ResizablePanelProps) => {
     });
   }, [dimensions, snapDimensions, setItemCounts]);
 
-  const { isExpanded, toggleExpand, expandedPanelId } = useExpandable();
+  const { isExpanded, setIsExpanded } = useExpandableContext();
+  const { expandedPanelId, setExpandedPanelId } = useExpandablePanelStore();
+
+  const toggleExpand = () => {
+    if (isExpanded) {
+      setIsExpanded(false);
+      setExpandedPanelId(null);
+    } else {
+      setIsExpanded(true);
+      setExpandedPanelId(id);
+    }
+  };
 
   const handleMouseDown = (direction: "vertical" | "horizontal" | "corner") => {
     isUserResizingRef.current = true;

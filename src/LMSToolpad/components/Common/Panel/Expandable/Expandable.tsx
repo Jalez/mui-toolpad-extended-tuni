@@ -24,7 +24,7 @@ const Expandable = () => {
   const { isExpanded, setIsExpanded } = useExpandableContext();
 
   // Use the initialSetup hook
-  const { readyForExpansion, setReadyForExpansion, initialPosition } =
+  const { readyForExpansion, setReadyForExpansion } =
     useInitialSetup(expandedPanelId, id, panelRef, setExtendedStyle);
 
   // Use the expansionAnimation hook
@@ -43,7 +43,6 @@ const Expandable = () => {
     expandedPanelId,
     id,
     panelRef,
-    initialPosition,
     setExtendedStyle,
     setExtendedContainerStyle,
     setIsExpanded

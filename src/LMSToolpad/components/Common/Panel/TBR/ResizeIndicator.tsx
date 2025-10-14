@@ -13,7 +13,6 @@ interface ResizeIndicatorProps {
  */
 const ResizeIndicator: React.FC<ResizeIndicatorProps> = ({
   isResizing,
-  direction = "se",
 }) => {
   if (!isResizing) return null;
 

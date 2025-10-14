@@ -1,6 +1,5 @@
 /** @format */
 
-import { useEffect } from "react";
 import { usePanelStore } from "../../GridLayout/store/usePanelStore";
 import { startDragging } from "./Hooks/useResizeHandlers";
 import { useDimensionManagement } from "../Main/hooks/useDimensionManagement";
@@ -9,7 +8,7 @@ import ResizeIndicator from "./ResizeIndicator";
 import ResizeHandlers from "./ResizeHandlers";
 import { usePanelContext } from "../Main/Context/PanelContextProvider";
 import { useResizableContext } from "./Context/ResizableContextProvider";
-import { useResponsiveResize } from "./hooks/useResponsiveResize";
+import { useResponsiveResize } from "./Hooks/useResponsiveResize";
 
 const Resizable = () => {
   const { resizeMode } = usePanelStore();
