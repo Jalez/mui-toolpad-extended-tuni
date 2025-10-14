@@ -88,28 +88,31 @@ export default function AITab({ settings, onUpdate }: AITabProps) {
     label: string;
   } | null>(null);
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   // onDragStart: set active chip from its id.
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
-    const activeId = active.id.toString();
+    const activeIdString = active.id.toString();
+    setActiveId(activeIdString);
     // find chip label from assignableItems
-    const item = assignableItems.find((i) => `chip-${i.key}` === activeId);
-    if (item) setActiveChip({ id: activeId, label: item.label });
+    const item = assignableItems.find((i) => `chip-${i.key}` === activeIdString);
+    if (item) setActiveChip({ id: activeIdString, label: item.label });
     else {
       // if chip comes from an agent droppable, its id will be "chip-{key}-agent-{index}"
-      const parts = activeId.split("-");
+      const parts = activeIdString.split("-");
       const key = parts[1];
       const label = assignableItems.find((i) => i.key === key)?.label || key;
-      setActiveChip({ id: activeId, label });
+      setActiveChip({ id: activeIdString, label });
     }
   };
 
   // onDragEnd: determine drop target and update assignments.
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    const activeId = active.id.toString();
-    if (!over || !activeChip) {
+    const { over } = event;
+    if (!over || !activeChip || !activeId) {
       setActiveChip(null);
+      setActiveId(null);
       return;
     }
     const overId = over.id.toString();
@@ -119,13 +122,13 @@ export default function AITab({ settings, onUpdate }: AITabProps) {
       const newConfigs = settings.ai.agentConfigurations.map((config) => {
         if (
           config.assigned.includes(
-            activeChip!.id.replace("chip-", "").split("-")[0]
+            activeId.replace("chip-", "").split("-")[0]
           )
         ) {
           return {
             ...config,
             assigned: config.assigned.filter(
-              (k) => k !== activeChip!.id.replace("chip-", "").split("-")[0]
+              (k) => k !== activeId.replace("chip-", "").split("-")[0]
             ),
           };
         }
@@ -139,17 +142,18 @@ export default function AITab({ settings, onUpdate }: AITabProps) {
       let newConfigs = settings.ai.agentConfigurations.map((config) => ({
         ...config,
         assigned: config.assigned.filter(
-          (k) => k !== activeChip!.id.replace("chip-", "").split("-")[0]
+          (k) => k !== activeId.replace("chip-", "").split("-")[0]
         ),
       }));
       // Add chip to target agent if not already added.
-      const chipKey = activeChip.id.replace("chip-", "").split("-")[0];
+      const chipKey = activeId.replace("chip-", "").split("-")[0];
       if (!newConfigs[agentIndex].assigned.includes(chipKey)) {
         newConfigs[agentIndex].assigned.push(chipKey);
       }
       handleAIUpdate(["agentConfigurations"], newConfigs);
     }
     setActiveChip(null);
+    setActiveId(null);
   };
 
   // New agent form state
