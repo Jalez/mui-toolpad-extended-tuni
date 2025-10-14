@@ -16,7 +16,7 @@ const AuthenticationManager = () => {
     action: getUser,
     condition: !user?.platformRoles,
     successMessage: "User authenticated successfully",
-    errorMessage: "Failed to get user platform role, retrying...",
+    errorMessage: "Failed to get user platform role",
   });
 
   // Handle return from authentication
