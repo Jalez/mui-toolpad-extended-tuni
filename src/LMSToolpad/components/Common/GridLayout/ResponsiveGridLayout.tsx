@@ -99,10 +99,10 @@ const ResponsiveGridLayout: React.FC<GridLayoutProps> = ({
         className="layout"
         layouts={currentLayouts}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480 }}
-        cols={{ lg: 12, md: 12, sm: 12, xs: 12 }}
+        cols={{ lg: 15, md: 15, sm: 15, xs: 15 }}
         rowHeight={200} // changed from 10 to 30 for proper height resizing
+        
         width={containerWidth} // using container width for layout calculations
-        margin={[10, 10]}
         containerPadding={[0, 0]}
         isResizable={editMode}
         isDraggable={editMode}
@@ -116,7 +116,6 @@ const ResponsiveGridLayout: React.FC<GridLayoutProps> = ({
           <Box
             key={item.id}
             sx={{
-              bgcolor: theme.palette.background.default,
               borderRadius: 1,
               overflow: "hidden",
               //   p: 0.5,
