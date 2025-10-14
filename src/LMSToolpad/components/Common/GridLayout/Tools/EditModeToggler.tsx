@@ -1,7 +1,7 @@
 /** @format */
 
 import { Tooltip, IconButton, Divider, Box } from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
+import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import usePanelStore from "../store/usePanelStore";
 import BreakpointIndicator from "./BreakpointIndicator";
 
@@ -18,7 +18,7 @@ const EditModeToggler = () => {
 
   return (
     <Box display="flex" flexDirection="row" alignItems="center">
-      <Tooltip title={editMode ? "Exit Edit Mode" : "Enter Edit Mode"}>
+      <Tooltip title={editMode ? "Exit Layout Edit Mode" : "Edit Layout"}>
         <IconButton
           onClick={handleClick}
           size="small"
@@ -32,7 +32,7 @@ const EditModeToggler = () => {
             },
           }}
         >
-          <EditIcon />
+          <ViewModuleIcon />
         </IconButton>
         {/* {If its in edit mode, also show the breakpoint indicator} */}
       </Tooltip>

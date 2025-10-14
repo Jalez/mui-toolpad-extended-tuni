@@ -71,7 +71,6 @@ const CourseList = ({
       sx={{
         width: "100%",
         height: containerHeight,
-        backgroundColor: "background.default",
       }}
     >
       <Scroller
