@@ -21,6 +21,7 @@ type NotificationStore = {
   notifications: Notification[] | [];
   addNotificationData: (notificationData: NotificationRaw) => void;
   removeNotificationData: (notificationId: number) => void;
+  clearNotificationsByType: (type: string) => void;
 };
 
 // Helper function to check if a notification should be shown
@@ -56,6 +57,13 @@ export const useNotificationStore = create<NotificationStore>((set) => ({
     set((state) => ({
       notifications: state.notifications.filter(
         (notification) => notification.id !== `${notificationId}`
+      ),
+    }));
+  },
+  clearNotificationsByType: (type: string) => {
+    set((state) => ({
+      notifications: state.notifications.filter(
+        (notification) => notification.type !== type
       ),
     }));
   },

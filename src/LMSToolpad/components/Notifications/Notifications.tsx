@@ -47,7 +47,7 @@ const CircularProgressAction = ({
       setProgress(remaining);
 
       if (remaining <= 0) {
-        clearInterval(timerRef.current);
+        clearInterval(timerRef.current as NodeJS.Timeout);
         closeSnackbar(notificationKey);
       }
     }, 50);
