@@ -19,17 +19,11 @@ export const useRetry = ({
   condition = true,
 }: UseRetryProps) => {
   const [attempts, setAttempts] = useState(0);
-  const { addNotificationData } = useNotificationStore();
+  const { addNotificationData, clearNotificationsByType } = useNotificationStore();
 
   const retry = useCallback(() => {
     if (condition && attempts < maxAttempts) {
-      if (attempts >= 1) {
-        addNotificationData({
-          type: "error",
-          message: errorMessage,
-        });
-      }
-
+      // Don't show error messages during retries, just retry the action
       const timeOut = setTimeout(() => {
         action();
         setAttempts((prev) => prev + 1);
@@ -37,11 +31,14 @@ export const useRetry = ({
 
       return () => clearTimeout(timeOut);
     } else if (attempts >= maxAttempts) {
+      // Only show error message when all retries have failed
       addNotificationData({
         type: "error",
-        message: "Maximum retry attempts reached. Please try again later.",
+        message: errorMessage,
       });
     } else if (!condition) {
+      // Clear any existing error notifications before showing success
+      clearNotificationsByType("error");
       addNotificationData({
         type: "success",
         message: successMessage,
@@ -55,6 +52,7 @@ export const useRetry = ({
     delay,
     errorMessage,
     successMessage,
+    clearNotificationsByType,
   ]);
 
   useEffect(() => {
