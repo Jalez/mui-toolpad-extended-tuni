@@ -105,15 +105,23 @@ src/LMSToolpad/components/
    - Update their registration to use course microservice registry
 
 ### Phase 3: Navigation Updates
-1. **Update navigation store:**
-   - Separate `allCourseMicroserviceNavigation` from `allAppMicroserviceNavigation`
-   - Update `updateMicroserviceNavigationForSections` to handle course context
+1. **Update unified navigation store:**
+   - Add context-aware methods for app and course navigation
+   - Implement `getMicroservicesForContext()` method
+   - Add context parameter to existing methods where needed
+   - Ensure logical separation through sections (app sections vs course sections)
 
-2. **Update route generation:**
-   - Modify `useWidgetRoutes` for app microservices
-   - Create `useCourseMicroserviceRoutes` for course context
+2. **Update existing navigation logic:**
+   - Modify `useWidgetRoutes` to use context-aware navigation store methods
+   - Update CourseTools to use `getMicroservicesForContext('course')` instead of separate store
+   - Ensure app navigation doesn't interfere with course navigation
 
-3. **Update App.tsx:**
+3. **Maintain separation through conventions:**
+   - App navigation uses "App" prefixed section names
+   - Course navigation uses "Course" prefixed section names
+   - Context-aware filtering prevents cross-contamination
+
+4. **Update App.tsx:**
    - Replace Microservices with LMSRoutes
    - Add CourseRouter as separate route
    - Clarify component purposes
@@ -171,34 +179,36 @@ src/LMSToolpad/components/
 
 ## Store Updates
 
-### Navigation Store Changes
+### Unified Navigation Store (Shared API)
+A single NavigationStore serves as the common API for both app and course navigation:
 ```typescript
 interface ViewStore {
-  // Existing
+  // Existing - unified navigation structure
   navigation: NavigationStoreItem[];
   sections: Record<string, NavigationSection>;
   sectionOrder: string[];
   visibleSections: Record<string, boolean>;
 
-  // New separation
-  allCourseMicroserviceNavigation: NavigationPageStoreItem[];
-  allAppMicroserviceNavigation: NavigationPageStoreItem[]; // widgets
+  // Unified microservice registry (context-aware)
+  allMicroserviceNavigation: NavigationPageStoreItem[];
 
-  // Updated methods
-  addCourseMicroserviceNavigation: (item: NavigationPageStoreItem) => void;
+  // Context-aware methods
   addAppMicroserviceNavigation: (item: NavigationPageStoreItem) => void;
-  updateCourseMicroserviceNavigationForSections: () => void;
+  addCourseMicroserviceNavigation: (item: NavigationPageStoreItem) => void;
+  getMicroservicesForContext: (context: 'app' | 'course') => NavigationPageStoreItem[];
+  updateMicroserviceNavigationForSections: (context?: 'app' | 'course') => void;
+
+  // Section management (sections can represent different contexts)
+  addAppSection: (props: addSectionProps) => void;
+  addCourseSection: (props: addSectionProps) => void;
 }
 ```
 
-### New Course Microservice Registry
-```typescript
-interface CourseMicroserviceRegistry {
-  registerCourseMicroservice: (id: string, config: CourseMicroserviceConfig) => void;
-  unregisterCourseMicroservice: (id: string) => void;
-  getCourseMicroservices: () => Map<string, CourseMicroserviceConfig>;
-}
-```
+This approach provides:
+- **Single API**: One NavigationStore handles all navigation logic
+- **Context Separation**: App and course navigation are logically separated through sections/contexts
+- **No Duplication**: Shared navigation patterns and utilities
+- **Clean Interface**: Context-aware methods prevent coupling while maintaining shared functionality
 
 ## Migration Steps
 
@@ -213,9 +223,10 @@ interface CourseMicroserviceRegistry {
 3. Update imports and dependencies
 
 ### Step 3: Update Service Registration
-1. Update EduTest/EduTest2 to use course microservice registration
-2. Update navigation store to handle separated microservices
-3. Update CourseTools to use course microservice registry
+1. Update main navigation store to support context-aware operations
+2. Update EduTest/EduTest2 to use context-aware registration methods
+3. Update CourseTools to use `getMicroservicesForContext('course')` method
+4. Maintain logical separation through section naming conventions
 
 ### Step 4: Update App.tsx
 ```typescript
@@ -264,21 +275,23 @@ const App = () => {
 ## Success Criteria
 
 1. **Modular Course Logic:** All course-specific logic is contained within the `Courses` folder
-2. **Clear Component Hierarchy:** LMSRoutes contains app microservices and Courses microservice
-3. **Proper Route Namespacing:** `/courses` prefix exclusively used for `:code` course routes
-4. **Unified Terminology:** All services called "microservices" regardless of scope
-5. **Clean App Structure:** App.tsx clearly shows LMSRoutes → [App Microservices, Courses → [EduTest, EduTest2]]
-6. **Proper Routing:** All routes work under new structure with no breaking changes
-7. **Improved Maintainability:** Components have single responsibilities and clear boundaries
+2. **Unified Navigation API:** Single NavigationStore serves as common API for both app and course navigation
+3. **Context-Aware Separation:** App and course navigation are logically separated through context-aware methods
+4. **Clear Component Hierarchy:** LMSRoutes contains app microservices and Courses microservice
+5. **Proper Route Namespacing:** `/courses` prefix exclusively used for `:code` course routes
+6. **Unified Terminology:** All services called "microservices" regardless of scope
+7. **Clean App Structure:** App.tsx clearly shows LMSRoutes → [App Microservices, Courses → [EduTest, EduTest2]]
+8. **Proper Routing:** All routes work under new structure with no breaking changes
+9. **Shared Logic:** Navigation patterns and utilities are shared while maintaining separation
 
 ## Timeline Estimate
 
 - **Phase 1:** 2-3 days (infrastructure)
 - **Phase 2:** 3-4 days (component migration)
-- **Phase 3:** 2-3 days (navigation updates)
+- **Phase 3:** 1-2 days (navigation updates - simplified with unified store)
 - **Phase 4:** 1-2 days (testing and validation)
 
-Total: 8-12 days for complete implementation.
+Total: 7-11 days for complete implementation (reduced due to unified approach).
 
 ## Alternative Approaches Considered
 
@@ -299,9 +312,12 @@ Total: 8-12 days for complete implementation.
 This refactor addresses the core architectural issues by:
 
 1. **Ensuring Modularity**: All course-specific logic is contained within the `Courses` folder
-2. **Clear Component Hierarchy**: LMSRoutes contains both app microservices and the Courses microservice
-3. **Proper Route Namespacing**: `/courses` prefix is exclusively for course routes with `:code` parameter
-4. **Unified Microservice Concept**: All services are called "microservices" regardless of scope
-5. **Clean App Structure**: App.tsx clearly shows the relationship between LMSRoutes, app microservices, and the Courses microservice
+2. **Unified Navigation API**: Single NavigationStore serves as common API for both app and course navigation
+3. **Context-Aware Separation**: App and course navigation are logically separated through context-aware methods
+4. **Clear Component Hierarchy**: LMSRoutes contains both app microservices and the Courses microservice
+5. **Proper Route Namespacing**: `/courses` prefix is exclusively for course routes with `:code` parameter
+6. **Unified Microservice Concept**: All services are called "microservices" regardless of scope
+7. **Clean App Structure**: App.tsx clearly shows the relationship between LMSRoutes, app microservices, and the Courses microservice
+8. **Shared Logic**: Navigation patterns and utilities are shared while maintaining logical separation
 
-The phased approach minimizes risk while delivering substantial architectural improvements and better separation of concerns.
+The unified approach simplifies the architecture while maintaining proper separation of concerns through context-aware design patterns.
