@@ -12,7 +12,6 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTheme } from "@mui/material/styles";
 import { useNavigationStore } from "./store/useNavigationStore";
 import { useNavigationFilterStore } from "./store/useNavigationFilterStore";
-import { isEqual } from "lodash";
 
 export const NavigationFilter = () => {
   const theme = useTheme();

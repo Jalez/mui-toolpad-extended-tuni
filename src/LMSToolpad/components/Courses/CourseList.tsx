@@ -5,8 +5,7 @@ import { useUserStore } from "../../store/useUserStore";
 import Scroller from "../Common/Panel/Scrollable/Scroller"; // Our unified scroller
 import { useNavigate } from "react-router-dom";
 
-import { usePanelContext } from "../Common/Panel/Main/Context/PanelContextProvider";
-import { Box, useTheme } from "@mui/material";
+import { Box } from "@mui/material";
 
 export type priority = "high" | "low" | "normal";
 
@@ -29,8 +28,6 @@ const CourseList = ({
   } = useCourseStore();
   const navigate = useNavigate();
   const { user } = useUserStore();
-  const theme = useTheme();
-  // const { minHeight, minWidth } = usePanelContext();
   const minHeight = 200;
   const minWidth = 300;
   const visibleLists = user?.preferences.visibleCourseLists;
