@@ -50,7 +50,7 @@ const ToolSelector = ({
           return {
             path: `${item.segment}`,
             icon: IconComponent ? <IconComponent fontSize="large" /> : <></>,
-            label: item.title,
+            label: item.title || "",
             description: item.metadata?.description || "",
             forRoles: item.metadata?.forRoles,
           };
