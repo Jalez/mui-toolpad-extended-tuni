@@ -3,41 +3,12 @@ import useCourseStore from "./store/useCourseStore";
 import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
 import { useRetry } from "../../hooks/useRetry";
 import { VisitedCoursesNavigationAdapter } from "./Navigation/VisitedCoursesNavigationAdapter";
-import CourseList from "./CourseList";
 import CourseEventPublisher from "./CourseEventPublisher";
-import {
-  registerWidget,
-  unregisterWidget,
-} from "../Navigation/NavigationRegistry";
-import SchoolIcon from "@mui/icons-material/School";
+
 
 const CourseManager = () => {
   const { getCourses, setCurrentCourseUrl, getCourseByUrl, courses } =
     useCourseStore();
-
-  // Register course-list widget only (Calendar and Flow are handled by their respective managers)
-  useEffect(() => {
-    registerWidget("course-list", CourseList, {
-      name: "Course List",
-      description:
-        "Displays a list of courses with filtering and sorting options",
-      category: "academic",
-      props: { displayMode: "instance", containerHeight: "100%" },
-      iconComponent: SchoolIcon,
-      metadata: {
-        route: {
-          path: "course-list",
-          element: (
-            <CourseList displayMode="instance" containerHeight="100%" />
-          ),
-        },
-      },
-    });
-
-    return () => {
-      unregisterWidget("course-list");
-    };
-  }, []);
 
   // Use the retry hook for fetching courses
   useRetry({

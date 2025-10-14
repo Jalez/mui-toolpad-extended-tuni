@@ -6,7 +6,6 @@ import {
 } from "../../../layout/Toolbars/toolbarRegistry";
 import CourseList from "../../Courses/CourseList";
 import EditModeToggler from "../../Common/GridLayout/Tools/EditModeToggler";
-import LayoutSelector from "../../Common/GridLayout/Tools/LayoutSelector";
 import { Box } from "@mui/material";
 import { ResponsiveGridLayout, createGridItem, useGridItemContext } from "../../Common/GridLayout";
 
@@ -50,16 +49,6 @@ const HomeContent = () => {
   const [layouts, setLayouts] = useState(initialLayouts);
 
   // Create a named component for the LayoutSelector wrapper to ensure proper registration/unregistration
-  const HomeLayoutSelector: React.FC = () => {
-    return (
-      <LayoutSelector
-        storageKey={STORAGE_KEY}
-        onPresetChange={(newLayouts) =>
-          setLayouts(newLayouts as typeof initialLayouts)
-        }
-      />
-    );
-  };
 
   // Get dynamically registered grid items and add the hardcoded course-list
   const dynamicGridItems = getAllGridItems();
@@ -74,11 +63,9 @@ const HomeContent = () => {
   useEffect(() => {
     // Register both the EditModeToggler and LayoutSelector.
     registerPageToolbarAction("/", EditModeToggler);
-    registerPageToolbarAction("/", HomeLayoutSelector);
 
     return () => {
       unregisterPageToolbarAction("/", EditModeToggler);
-      unregisterPageToolbarAction("/", HomeLayoutSelector);
     };
   }, []);
 
