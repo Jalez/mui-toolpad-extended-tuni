@@ -5,14 +5,14 @@ import Calendar from "./Calendar";
 
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { createGridItem, useGridItemContext } from "../Common/GridLayout";
-import { registerWidget, unregisterWidget } from "../Navigation/NavigationRegistry";
+import { registerMicroservice, unregisterMicroservice } from "../Navigation/NavigationRegistry";
 
 const CalendarManager = () => {
   const { registerGridItem, unregisterGridItem } = useGridItemContext();
 
-  // Register widget on mount
+  // Register microservice on mount
   useEffect(() => {
-    registerWidget("calendar", Calendar, {
+    registerMicroservice("calendar", Calendar, {
       name: "Calendar",
       description: "Shows events and deadlines in a calendar view",
       category: "planning",
@@ -26,7 +26,7 @@ const CalendarManager = () => {
     });
 
     return () => {
-      unregisterWidget("calendar");
+      unregisterMicroservice("calendar");
     };
   }, []);
 

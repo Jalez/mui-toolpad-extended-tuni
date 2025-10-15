@@ -27,7 +27,7 @@ import { UserManager } from "./components/UserManager";
 
 import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/RegisteredPageTools";
 import { PageContainer } from "@toolpad/core";
-import { useWidgetNavigation } from "./components/Navigation/hooks/useWidgetNavigation";
+import { useMicroserviceNavigation } from "./components/Navigation/hooks/useMicroserviceNavigation";
 import { GridItemProvider } from "./components/Common/GridLayout/GridItemContext";
 import { CalendarManager, CalendarEventAggregator } from "./components/Calendar";
 
@@ -112,7 +112,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
     [getUser, logout]
   );
 
-  useWidgetNavigation(); // Add persistent widget navigation
+  useMicroserviceNavigation(); // Add persistent microservice navigation
 
   return (
     <LocalizationProvider dateAdapter={AdapterLuxon}>

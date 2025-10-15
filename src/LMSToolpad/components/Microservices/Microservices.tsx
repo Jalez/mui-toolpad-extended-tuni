@@ -12,7 +12,7 @@ import {
 import Home from "../Routes/Home/Home";
 import React, { useEffect } from "react";
 import { VisitedCoursesNavigationAdapter } from "../Courses/Navigation/VisitedCoursesNavigationAdapter";
-import { useWidgetRoutes } from "../Navigation/hooks/useWidgetRoutes";
+import { useMicroserviceRoutes } from "../Navigation/hooks/useMicroserviceRoutes";
 import { Typography, IconButton, Box } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SubSections from "./MicroserviceSubsections";
@@ -62,8 +62,8 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
     return '/' + pathSegments.join('/');
   };
 
-  // Get dynamic widget routes
-  const widgetRoutes = useWidgetRoutes();
+  // Get dynamic microservice routes
+  const microserviceRoutes = useMicroserviceRoutes();
 
   useEffect(() => {
     updateMicroserviceNavigationForSections();
@@ -79,8 +79,8 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
       {children}
       <Routes>
         <Route path="" element={<Home />} index />
-        {/* Dynamic widget routes */}
-        {widgetRoutes}
+        {/* Dynamic microservice routes */}
+        {microserviceRoutes}
         <Route path="help" element={<div>Help</div>} />
         <Route path="contact" element={<div>Contact</div>} />
         <Route path=":code" element={<CourseCodeLoader />}>
