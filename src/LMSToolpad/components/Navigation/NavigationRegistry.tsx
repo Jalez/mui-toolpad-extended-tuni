@@ -7,19 +7,19 @@ import { useNavigationStore } from "./store/useNavigationStore";
 import { useNavigationFilterStore } from "./store/useNavigationFilterStore";
 
 /**
- * Widget Registry System
+ * Microservice Registry System
  *
  * @version 1.2.0
  *
- * A flexible system for registering and managing widgets for grid layouts.
+ * A flexible system for registering and managing microservices for grid layouts.
  * Supports dynamic registration, unregistration, and automatic re-rendering.
  * Optimized to prevent excessive re-rendering.
  */
 
 /**
- * Widget entry containing both the component and optional props
+ * Microservice entry containing both the component and optional props
  */
-export interface WidgetEntry {
+export interface MicroserviceEntry {
   Component: ComponentType<any>;
   props?: Record<string, any>;
   name: string;
@@ -40,14 +40,14 @@ export interface WidgetEntry {
 }
 
 /**
- * Internal store to manage widget registry state and trigger re-renders.
+ * Internal store to manage microservice registry state and trigger re-renders.
  * @internal
  */
-interface WidgetRegistryStore {
-  widgets: Map<string, WidgetEntry>;
+interface MicroserviceRegistryStore {
+  microservices: Map<string, MicroserviceEntry>;
   lastUpdate: number;
-  registerWidget: (id: string, entry: WidgetEntry) => void;
-  unregisterWidget: (id: string) => void;
+  registerMicroservice: (id: string, entry: MicroserviceEntry) => void;
+  unregisterMicroservice: (id: string) => void;
   getRoutes: () => Array<{
     path: string;
     element: ReactNode;
@@ -55,15 +55,15 @@ interface WidgetRegistryStore {
   }>;
 }
 
-// Create a singleton instance of the widget registry
-const widgetRegistry = new Map<string, WidgetEntry>();
+// Create a singleton instance of the microservice registry
+const microserviceRegistry = new Map<string, MicroserviceEntry>();
 
-// Function to update navigation with current widget state
-const updateWidgetNavigation = () => {
+// Function to update navigation with current microservice state
+const updateMicroserviceNavigation = () => {
   const navigationStore = useNavigationStore.getState();
   const { setFilterOptions } = useNavigationFilterStore.getState();
 
-  // Group widgets by category, but only include widgets that should appear in navigation
+  // Group microservices by category, but only include microservices that should appear in navigation
   const sections: Record<
     string,
     Array<{
@@ -74,26 +74,26 @@ const updateWidgetNavigation = () => {
     }>
   > = {};
 
-  widgetRegistry.forEach((widget, id) => {
-    // Only add widgets to navigation if explicitly marked as showInNavigation
-    if (!widget.metadata?.showInNavigation) {
+  microserviceRegistry.forEach((microservice, id) => {
+    // Only add microservices to navigation if explicitly marked as showInNavigation
+    if (!microservice.metadata?.showInNavigation) {
       return;
     }
 
-    const category = widget.category || "Widgets";
+    const category = microservice.category || "Microservices";
     if (!sections[category]) {
       sections[category] = [];
     }
 
     sections[category].push({
       segment: id,
-      title: widget.name,
-      Icon: widget.iconComponent,
-      description: widget.description,
+      title: microservice.name,
+      Icon: microservice.iconComponent,
+      description: microservice.description,
     });
 
     // Set visibility if specified in metadata
-    if (widget.metadata?.keepVisible) {
+    if (microservice.metadata?.keepVisible) {
       setFilterOptions((prev) => ({
         ...prev,
         [category]: true,
@@ -113,25 +113,25 @@ const updateWidgetNavigation = () => {
 };
 
 // Create the store with optimized structure and singleton registry
-const useWidgetRegistryStoreRaw = create<WidgetRegistryStore>((set) => ({
-  widgets: widgetRegistry,
+const useMicroserviceRegistryStoreRaw = create<MicroserviceRegistryStore>((set) => ({
+  microservices: microserviceRegistry,
   lastUpdate: Date.now(),
-  registerWidget: (id, entry) => {
-    widgetRegistry.set(id, entry);
+  registerMicroservice: (id, entry) => {
+    microserviceRegistry.set(id, entry);
     set({
-      widgets: new Map(widgetRegistry),
+      microservices: new Map(microserviceRegistry),
       lastUpdate: Date.now(),
     });
-    updateWidgetNavigation();
+    updateMicroserviceNavigation();
   },
-  unregisterWidget: (id) => {
-    if (widgetRegistry.has(id)) {
-      widgetRegistry.delete(id);
+  unregisterMicroservice: (id) => {
+    if (microserviceRegistry.has(id)) {
+      microserviceRegistry.delete(id);
       set({
-        widgets: new Map(widgetRegistry),
+        microservices: new Map(microserviceRegistry),
         lastUpdate: Date.now(),
       });
-      updateWidgetNavigation();
+      updateMicroserviceNavigation();
     }
   },
   getRoutes: () => {
@@ -141,15 +141,15 @@ const useWidgetRegistryStoreRaw = create<WidgetRegistryStore>((set) => ({
       index?: boolean;
     }> = [];
 
-    widgetRegistry.forEach((widget) => {
-      if (widget.metadata?.route) {
-        const Component = widget.Component;
+    microserviceRegistry.forEach((microservice) => {
+      if (microservice.metadata?.route) {
+        const Component = microservice.Component;
         routes.push({
-          path: widget.metadata.route.path,
-          element: widget.metadata.route.element || (
-            <Component {...widget.props} />
+          path: microservice.metadata.route.path,
+          element: microservice.metadata.route.element || (
+            <Component {...microservice.props} />
           ),
-          index: widget.metadata.route.index,
+          index: microservice.metadata.route.index,
         });
       }
     });
@@ -158,24 +158,24 @@ const useWidgetRegistryStoreRaw = create<WidgetRegistryStore>((set) => ({
   },
 }));
 
-// Helper hook that only triggers re-renders when the widget map actually changes
-export const useWidgetRegistryStore = () =>
-  useWidgetRegistryStoreRaw(
+// Helper hook that only triggers re-renders when the microservice map actually changes
+export const useMicroserviceRegistryStore = () =>
+  useMicroserviceRegistryStoreRaw(
     (state) => ({
-      widgets: state.widgets,
+      microservices: state.microservices,
       lastUpdate: state.lastUpdate,
     }),
     shallow
   );
 
 /**
- * Register a new widget.
+ * Register a new microservice.
  *
- * @param id - The unique identifier for this widget.
+ * @param id - The unique identifier for this microservice.
  * @param Component - The React component to render.
- * @param options - Optional configuration for the widget including props and metadata.
+ * @param options - Optional configuration for the microservice including props and metadata.
  */
-export function registerWidget(
+export function registerMicroservice(
   id: string,
   Component: ComponentType<any>,
   options?: {
@@ -197,11 +197,11 @@ export function registerWidget(
     };
   }
 ) {
-  if (widgetRegistry.has(id)) {
-    return; // Skip if widget is already registered
+  if (microserviceRegistry.has(id)) {
+    return; // Skip if microservice is already registered
   }
 
-  const entry: WidgetEntry = {
+  const entry: MicroserviceEntry = {
     Component,
     props: options?.props,
     name: options?.name || id,
@@ -211,52 +211,52 @@ export function registerWidget(
     metadata: options?.metadata,
   };
 
-  useWidgetRegistryStoreRaw.getState().registerWidget(id, entry);
+  useMicroserviceRegistryStoreRaw.getState().registerMicroservice(id, entry);
 }
 
 /**
- * Unregister a widget.
+ * Unregister a microservice.
  *
- * @param id - The unique identifier for the widget to remove.
+ * @param id - The unique identifier for the microservice to remove.
  */
-export function unregisterWidget(id: string) {
-  useWidgetRegistryStoreRaw.getState().unregisterWidget(id);
+export function unregisterMicroservice(id: string) {
+  useMicroserviceRegistryStoreRaw.getState().unregisterMicroservice(id);
 }
 
 /**
- * Get a specific widget by ID.
+ * Get a specific microservice by ID.
  *
- * @param id - The unique identifier for the widget.
- * @returns The widget entry or undefined if not found.
+ * @param id - The unique identifier for the microservice.
+ * @returns The microservice entry or undefined if not found.
  */
-export function getWidget(id: string): WidgetEntry | undefined {
-  return widgetRegistry.get(id);
+export function getMicroservice(id: string): MicroserviceEntry | undefined {
+  return microserviceRegistry.get(id);
 }
 
 /**
- * Get all registered widgets.
+ * Get all registered microservices.
  *
- * @returns A Map of all registered widgets.
+ * @returns A Map of all registered microservices.
  */
-export function getAllWidgets(): Map<string, WidgetEntry> {
-  return new Map(widgetRegistry);
+export function getAllMicroservices(): Map<string, MicroserviceEntry> {
+  return new Map(microserviceRegistry);
 }
 
 /**
- * Get all widget IDs.
+ * Get all microservice IDs.
  *
- * @returns An array of all registered widget IDs.
+ * @returns An array of all registered microservice IDs.
  */
-export function getWidgetIds(): string[] {
-  return Array.from(widgetRegistry.keys());
+export function getMicroserviceIds(): string[] {
+  return Array.from(microserviceRegistry.keys());
 }
 
 /**
- * Check if a widget is registered.
+ * Check if a microservice is registered.
  *
- * @param id - The unique identifier for the widget.
- * @returns True if the widget is registered, false otherwise.
+ * @param id - The unique identifier for the microservice.
+ * @returns True if the microservice is registered, false otherwise.
  */
-export function isWidgetRegistered(id: string): boolean {
-  return widgetRegistry.has(id);
+export function isMicroserviceRegistered(id: string): boolean {
+  return microserviceRegistry.has(id);
 }

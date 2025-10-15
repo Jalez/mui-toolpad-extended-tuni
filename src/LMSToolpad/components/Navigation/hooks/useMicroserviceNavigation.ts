@@ -3,21 +3,21 @@ import { useEffect } from "react";
 import { useNavigationStore } from "../store/useNavigationStore";
 import { useNavigationFilterStore } from "../store/useNavigationFilterStore";
 import {
-  getAllWidgets,
-  useWidgetRegistryStore,
+  getAllMicroservices,
+  useMicroserviceRegistryStore,
 } from "../NavigationRegistry";
 
 /**
- * Hook that maintains persistent navigation entries for widgets.
+ * Hook that maintains persistent navigation entries for microservices.
  */
-export const useWidgetNavigation = () => {
+export const useMicroserviceNavigation = () => {
   const { addSection, recalculateNavigation } = useNavigationStore();
   const { setFilterOptions, initializeFilters } = useNavigationFilterStore();
-  const { lastUpdate } = useWidgetRegistryStore();
+  const { lastUpdate } = useMicroserviceRegistryStore();
 
   useEffect(() => {
-    // Get all registered widgets
-    const widgets = getAllWidgets();
+    // Get all registered microservices
+    const microservices = getAllMicroservices();
     const sections: Record<
       string,
       Array<{
@@ -28,22 +28,22 @@ export const useWidgetNavigation = () => {
       }>
     > = {};
 
-    // Group widgets by category
-    widgets.forEach((widget, id) => {
-      const category = widget.category || "Widgets";
+    // Group microservices by category
+    microservices.forEach((microservice, id) => {
+      const category = microservice.category || "Microservices";
       if (!sections[category]) {
         sections[category] = [];
       }
 
       sections[category].push({
         segment: id,
-        title: widget.name,
-        Icon: widget.iconComponent,
-        description: widget.description,
+        title: microservice.name,
+        Icon: microservice.iconComponent,
+        description: microservice.description,
       });
 
       // Set visibility if specified in metadata
-      if (widget.metadata?.keepVisible) {
+      if (microservice.metadata?.keepVisible) {
         setFilterOptions((prev) => ({
           ...prev,
           [category]: true,
@@ -62,7 +62,7 @@ export const useWidgetNavigation = () => {
     // Initialize filters for all sections and recalculate navigation
     initializeFilters();
     recalculateNavigation();
-  }, [lastUpdate]); // Re-run when widgets are registered/unregistered
+  }, [lastUpdate]); // Re-run when microservices are registered/unregistered
 
   return null;
 };
