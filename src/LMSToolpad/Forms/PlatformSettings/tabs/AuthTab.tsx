@@ -20,14 +20,14 @@ export default function AuthTab({ settings, onUpdate }: AuthTabProps) {
   return (
     <Stack spacing={3}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableAutoComplete
             label='Authentication Methods'
             value={settings.auth.allowedAuthMethods}
             onChange={(value) => handleAuthUpdate('allowedAuthMethods', value)}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSelect
             label='Default User Role'
             value={settings.auth.defaultUserRole}
@@ -41,7 +41,7 @@ export default function AuthTab({ settings, onUpdate }: AuthTabProps) {
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableNumber
             label='Minimum Password Length'
             value={settings.auth.minimumPasswordLength}
@@ -55,7 +55,7 @@ export default function AuthTab({ settings, onUpdate }: AuthTabProps) {
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSwitch
             label='Email Verification Required'
             value={settings.auth.requireEmailVerification}
@@ -64,7 +64,7 @@ export default function AuthTab({ settings, onUpdate }: AuthTabProps) {
             }
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSwitch
             label='Allow Self Registration'
             value={settings.auth.allowSelfRegistration}

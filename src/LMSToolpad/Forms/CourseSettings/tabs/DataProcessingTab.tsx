@@ -1,6 +1,7 @@
 /** @format */
 
-import { Grid, Stack, Typography, Divider } from "@mui/material";
+import Grid from "@mui/material/Grid";
+import { Stack, Typography, Divider } from "@mui/material";
 import { CourseRaw } from "../../../components/Courses/store/useCourseStore";
 import EditableSwitch from "../../Components/Editables/EditableSwitch";
 import EditableNumber from "../../Components/Editables/EditableNumber";
@@ -59,7 +60,7 @@ export default function DataProcessingTab({
     <Stack spacing={3}>
       <Typography variant="h6">Data Processing Details</Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSelect
             label="Legal Basis"
             value={ensuredFormData.dataProcessing.legalBasis}
@@ -74,7 +75,7 @@ export default function DataProcessingTab({
             ]}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableNumber
             label="Data Retention Period (days)"
             value={ensuredFormData.dataProcessing.retention}
@@ -87,7 +88,7 @@ export default function DataProcessingTab({
 
       <Typography variant="h6">Special Categories of Personal Data</Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSwitch
             label="Process Special Categories of Personal Data"
             value={ensuredFormData.dataProcessing.specialCategories}

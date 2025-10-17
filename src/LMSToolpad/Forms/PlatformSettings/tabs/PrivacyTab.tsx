@@ -36,14 +36,14 @@ export default function PrivacyTab({ settings, onUpdate }: PrivacyTabProps) {
     <Stack spacing={3}>
       <Typography variant='h6'>GDPR Settings</Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSwitch
             label='GDPR Compliance Mode'
             value={settings.privacy.gdprEnabled}
             onChange={(value) => handlePrivacyUpdate('gdprEnabled', value)}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableNumber
             label='Data Retention Period (days)'
             value={settings.privacy.dataRetentionPeriod}
@@ -58,7 +58,7 @@ export default function PrivacyTab({ settings, onUpdate }: PrivacyTabProps) {
 
       <Typography variant='h6'>Default Privacy Settings</Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSwitch
             label='Allow Analytics'
             value={settings.privacy.defaultPrivacySettings.allowAnalytics}
@@ -67,7 +67,7 @@ export default function PrivacyTab({ settings, onUpdate }: PrivacyTabProps) {
             }
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSwitch
             label='Allow Personalization'
             value={settings.privacy.defaultPrivacySettings.allowPersonalization}
@@ -82,7 +82,7 @@ export default function PrivacyTab({ settings, onUpdate }: PrivacyTabProps) {
 
       <Typography variant='h6'>Cookie Settings</Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSwitch
             label='Analytics Cookies'
             value={settings.privacy.cookieSettings.analytics}
@@ -99,7 +99,7 @@ export default function PrivacyTab({ settings, onUpdate }: PrivacyTabProps) {
             }
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableNumber
             label='Cookie Expiry (days)'
             value={settings.privacy.cookieSettings.expiryDays}

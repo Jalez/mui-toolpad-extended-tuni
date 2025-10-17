@@ -20,7 +20,7 @@ export default function CoursesTab({ settings, onUpdate }: CoursesTabProps) {
   return (
     <Stack spacing={3}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }} >
           <EditableAutoComplete<PlatformRole>
             label='Course Creation Roles'
             value={settings.courses.courseCreation.requiredRoles}
@@ -36,7 +36,7 @@ export default function CoursesTab({ settings, onUpdate }: CoursesTabProps) {
             helperText='Roles that are allowed to create new courses'
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }} >
           <EditableSelect
             label='Default Course Visibility'
             value={settings.courses.defaultCourseVisibility}
@@ -52,19 +52,21 @@ export default function CoursesTab({ settings, onUpdate }: CoursesTabProps) {
         </Grid>
       </Grid>
 
-      <Grid item xs={12} md={6}>
-        <EditableNumber
+      <Grid container spacing={3}>
+        <Grid size={{ xs: 12, md: 6 }} >
+          <EditableNumber
           label='Default Enrollment Duration (days)'
           value={settings.courses.defaultEnrollmentDuration}
           onChange={(value) =>
             handleCoursesUpdate('defaultEnrollmentDuration', value)
           }
           min={1}
-        />
+          />
+        </Grid>
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }} >
           <EditableSwitch
             label='Require Course Approval'
             value={settings.courses.courseCreation.requireApproval}
@@ -76,7 +78,7 @@ export default function CoursesTab({ settings, onUpdate }: CoursesTabProps) {
             }
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12, md: 6 }} >
           <EditableAutoComplete<string>
             label='Course Categories'
             value={settings.courses.courseCategories}

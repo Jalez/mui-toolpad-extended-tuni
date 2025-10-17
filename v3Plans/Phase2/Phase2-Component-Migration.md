@@ -42,21 +42,19 @@ Phase 2 focuses on migrating components and extracting course-specific logic fro
 ### 1. Create New Components
 
 #### `Courses/CourseRouter.tsx`
-**Purpose**: Main router for all course-related routes (preserves existing `:code` path structure)
+**Purpose**: Main router for all course-related routes (handles routes relative to `:code` captured by LMSRoutes)
 
 ```typescript
 // BEFORE: Course routing scattered in Microservices.tsx
 
-// AFTER: Centralized course routing with preserved path structure
+// AFTER: CourseRouter contains the nested route structure
 const CourseRouter = () => {
   return (
     <Routes>
-      <Route path=":code" element={<CourseCodeLoader />}>
-        <Route index element={<CourseInstanceSelector />} />
-        <Route path=":instance" element={<CourseInstanceLoader />}>
-          <Route index element={<CourseTools />} />
-          <Route path=":microservice/*" element={<CourseMicroserviceRouter />} />
-        </Route>
+      <Route index element={<CourseInstanceSelector />} />
+      <Route path=":instance" element={<CourseInstanceLoader />}>
+        <Route index element={<CourseTools />} />
+        <Route path=":microservice/*" element={<CourseMicroserviceRouter />} />
       </Route>
     </Routes>
   );
@@ -98,6 +96,8 @@ const CourseMicroserviceRouter = () => {
 #### `Microservices.tsx` (becomes `LMSRoutes.tsx`)
 **Remove course routing logic (lines 86-155)**
 
+**Note**: CourseCodeLoader will need to be modified to accept `children` prop and render them instead of `<Outlet />` to support this new structure.
+
 ```typescript
 // BEFORE: Contains course routing
 <Route path=":code" element={<CourseCodeLoader />}>
@@ -111,9 +111,31 @@ const CourseMicroserviceRouter = () => {
   <Route path="contact" element={<div>Contact</div>} />
   {/* Dynamic microservice routes */}
   {microserviceRoutes}
-  {/* Course routing moved to separate component (preserves existing :code path structure) */}
-  <Route path=":code/*" element={<CourseRouter />} />
+  {/* Course routing with CourseCodeLoader providing context */}
+  <Route path=":code" element={<CourseCodeLoader />}>
+    <CourseRouter />
+  </Route>
 </Routes>
+```
+
+#### `Courses/CourseCodeLoader.tsx`
+**Modify to accept children prop for new routing structure**
+
+```typescript
+// BEFORE: Renders Outlet for nested routes
+if (fetchState === "loading") return <LoadingScreen />;
+return <Outlet />;
+
+// AFTER: Renders children (CourseRouter) for new structure
+interface CourseCodeLoaderProps {
+  children?: React.ReactNode;
+}
+
+const CourseCodeLoader = ({ children }: CourseCodeLoaderProps) => {
+  // ... existing logic
+  if (fetchState === "loading") return <LoadingScreen />;
+  return <>{children}</>;
+};
 ```
 
 #### `Courses/CourseTools.tsx`
@@ -168,14 +190,14 @@ src/LMSToolpad/components/
 | **Component** | **Responsibility** | **Routes Handled** |
 |---------------|-------------------|-------------------|
 | **LMSRoutes** | Top-level app routing | `/`, `/help`, `/contact`, dynamic app routes |
-| **CourseRouter** | Course routing coordination | `/:code/*` (preserves existing path structure) |
-| **CourseMicroserviceRouter** | Individual microservice routing | `/:code/:instance/:microservice/*` |
-| **CourseTools** | Course microservice management | `/:code/:instance` |
+| **CourseRouter** | Course routing coordination | Routes relative to `:code` (/:instance, /:instance/:microservice/*) |
+| **CourseMicroserviceRouter** | Individual microservice routing | `/:instance/:microservice/*` |
+| **CourseTools** | Course microservice management | `/:instance` |
 
 ## Validation Checklist
 
 - [ ] Course routing extracted from LMSRoutes to CourseRouter
-- [ ] CourseRouter handles `/:code/*` routes properly (preserves existing path structure)
+- [ ] CourseRouter handles routes relative to `:code` parameter (/:instance, /:instance/:microservice/*)
 - [ ] CourseMicroserviceRouter handles individual microservice routing
 - [ ] CourseTools enhanced for context-aware microservice filtering
 - [ ] All existing course routes work correctly (`/:code/:instance/:microservice`)

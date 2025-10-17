@@ -1,6 +1,7 @@
 /** @format */
 
-import { Grid, Stack, Typography, Divider } from '@mui/material';
+import Grid from '@mui/material/Grid';
+import { Stack, Typography, Divider } from '@mui/material';
 import { Platform } from '../../../store/usePlatformStore';
 import EditableText from '../../Components/Editables/EditableText';
 import EditableNumber from '../../Components/Editables/EditableNumber';
@@ -47,21 +48,21 @@ export default function GeneralTab({ settings, onUpdate }: GeneralTabProps) {
   return (
     <Stack spacing={3}>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableText
             label='Platform Name'
             value={settings.name}
             onChange={(value) => handleUpdate('name', value)}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableText
             label='Contact Email'
             value={settings.contactEmail}
             onChange={(value) => handleUpdate('contactEmail', value)}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <EditableText
             label='Description'
             value={settings.description}
@@ -69,7 +70,7 @@ export default function GeneralTab({ settings, onUpdate }: GeneralTabProps) {
             multiline
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableText
             label='Support URL'
             value={settings.supportUrl}
@@ -79,14 +80,14 @@ export default function GeneralTab({ settings, onUpdate }: GeneralTabProps) {
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableNumber
             label='Max File Size (MB)'
             value={settings.storage.maxFileSize}
             onChange={(value) => handleStorageUpdate('maxFileSize', value)}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableNumber
             label='Total Storage Limit (GB)'
             value={settings.storage.totalStorageLimit}
@@ -101,7 +102,7 @@ export default function GeneralTab({ settings, onUpdate }: GeneralTabProps) {
 
       <Typography variant='h6'>Administrator Management</Typography>
       <Grid container spacing={3}>
-        <Grid item xs={12}>
+        <Grid size={{ xs: 12 }}>
           <EditableAutoComplete
             label='Admin Emails'
             value={settings.admins.emails}
@@ -111,7 +112,7 @@ export default function GeneralTab({ settings, onUpdate }: GeneralTabProps) {
       </Grid>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <EditableSwitch
             label='Maintenance Mode'
             value={settings.maintenance.enabled}
@@ -119,7 +120,7 @@ export default function GeneralTab({ settings, onUpdate }: GeneralTabProps) {
           />
         </Grid>
         {settings.maintenance.enabled && (
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <EditableText
               label='Maintenance Message'
               value={settings.maintenance.message}

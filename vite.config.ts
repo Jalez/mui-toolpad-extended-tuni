@@ -16,6 +16,14 @@ export default defineConfig({
       include: ["src"],
     }),
   ],
+  optimizeDeps: {
+    include: [
+      "@mui/material",
+      "@mui/icons-material",
+      "@mui/x-date-pickers",
+      "@toolpad/core",
+    ],
+  },
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.ts"),
@@ -35,6 +43,16 @@ export default defineConfig({
       output: {
         exports: "named",
       },
+      onwarn(warning, warn) {
+        // Suppress "use client" directive warnings from node_modules
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE' && warning.message.includes('"use client"')) {
+          return;
+        }
+        warn(warning);
+      },
+    },
+    commonjsOptions: {
+      transformMixedEsModules: true,
     },
   },
   // test: {
