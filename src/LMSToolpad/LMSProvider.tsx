@@ -20,7 +20,7 @@ import CourseManager from "./components/Courses/CourseManager";
 
 import Dialogs from "./components/Dialogs/Dialogs";
 import { useThemeStore } from "./store/useThemeStore";
-import { createTheme, Theme, useTheme } from "@mui/material";
+import { createTheme, Theme, useTheme, ThemeProvider } from "@mui/material";
 import RegisteredAppTools from "./layout/Toolbars/AppToolbar/RegisteredAppTools";
 import PageContent from "./layout/Content/PageContent";
 import { UserManager } from "./components/UserManager";
@@ -69,15 +69,55 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
   const router = useCustomRouter();
   const themeUsed = useTheme();
   const { theme } = useThemeStore();
-  const [lmsTheme, setLmsTheme] = useState<Theme>(() =>
-    createTheme(theme as any)
-  );
+  const [lmsTheme, setLmsTheme] = useState<Theme>(() => {
+    const currentMode = theme?.defaultColorScheme || 'light';
+    const colorScheme = theme?.colorSchemes?.[currentMode];
+
+    if (!colorScheme) {
+      console.error('No initial color scheme found for mode:', currentMode);
+      return createTheme();
+    }
+
+    return createTheme({
+      palette: {
+        mode: currentMode,
+        ...colorScheme.palette,
+      },
+      typography: theme.typography,
+      shape: theme.shape,
+      spacing: theme.spacing,
+      breakpoints: theme.breakpoints,
+      components: theme.components,
+      transitions: theme.transitions,
+      zIndex: theme.zIndex,
+    });
+  });
 
   // Update theme when it changes
   useEffect(() => {
+    console.log('Theme changed in LMSProvider:', theme);
+    const currentMode = theme?.defaultColorScheme || 'light';
+    const colorScheme = theme?.colorSchemes?.[currentMode];
+
+    if (!colorScheme) {
+      console.error('No color scheme found for mode:', currentMode);
+      return;
+    }
+
     const newTheme = createTheme({
-      ...(theme as any),
+      palette: {
+        mode: currentMode,
+        ...colorScheme.palette,
+      },
+      typography: theme.typography,
+      shape: theme.shape,
+      spacing: theme.spacing,
+      breakpoints: theme.breakpoints,
+      components: theme.components,
+      transitions: theme.transitions,
+      zIndex: theme.zIndex,
     });
+    console.log('New MUI theme created:', newTheme.palette?.mode);
     setLmsTheme(newTheme);
   }, [theme]);
 
@@ -118,17 +158,18 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
     <LocalizationProvider dateAdapter={AdapterLuxon}>
       <SnackbarProvider maxSnack={6} autoHideDuration={10000}>
         <GridItemProvider>
-          <AppProvider
-            branding={{
-              logo: <Logo />,
-              title: "",
-            }}
-            navigation={addActions(addIcons(navigation))}
-            theme={lmsTheme}
-            router={router as Router}
-            session={session}
-            authentication={authentication}
-          >
+          <ThemeProvider theme={lmsTheme}>
+            <AppProvider
+              branding={{
+                logo: <Logo />,
+                title: "",
+              }}
+              navigation={addActions(addIcons(navigation))}
+              theme={lmsTheme}
+              router={router as Router}
+              session={session}
+              authentication={authentication}
+            >
             <AuthenticationManager />
             <UserManager />
             <CourseManager />
@@ -139,15 +180,13 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
             // border={false}
 
             sx={{
-              "& .MuiListItemIcon-root": {
-                paddingRight: "20px" + "!important",
-              },
+          
               bgcolor: "background.paper",
               "& .MuiDrawer-paper": {
-                border: 0,
+                border: 0, // No border on the drawer
               },
               "& .MuiAppBar-root": {
-                borderBottom: 0,
+                borderBottom: 0, // No border on the app bar
               },
               "& .MuiContainer-root": {
                 display: "flex",
@@ -192,8 +231,9 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
             </PageContainer>
             <Dialogs />
             <Notifications />
-          </DashboardLayout>
-          </AppProvider>
+            </DashboardLayout>
+            </AppProvider>
+          </ThemeProvider>
         </GridItemProvider>
       </SnackbarProvider>
     </LocalizationProvider>
