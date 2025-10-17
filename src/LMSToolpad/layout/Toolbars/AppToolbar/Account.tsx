@@ -7,7 +7,7 @@ import {
   AccountPopoverFooter,
   AccountPreview,
   SignOutButton,
-  // ThemeSwitcher,
+  ThemeSwitcher,
 } from "@toolpad/core";
 
 import { useUserStore } from "../../../store/useUserStore";
@@ -58,7 +58,7 @@ const AccountMenu = () => {
       </MenuItem>
       <AccountPopoverFooter>
         <Stack spacing={1}>
-          {/* <ThemeSwitcher /> */}
+          <ThemeSwitcher />
           <SignOutButton />
         </Stack>
       </AccountPopoverFooter>
