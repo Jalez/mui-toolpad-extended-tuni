@@ -16,6 +16,7 @@ import DevelopmentTools from "../../../components/DevTools/DevelopmentTools";
 import { useUserStore } from "../../../store/useUserStore";
 import useDialogStore from "../../../store/useDialogStore";
 import { CollapsingButtons } from "../../../components/Common/CollapsingButtons";
+import ThemeToggle from "../../../components/Common/ThemeToggle";
 
 export const CollapsibleMenu = () => {
   // const [isExpanded, setIsExpanded] = useState(false);
@@ -64,6 +65,7 @@ export const CollapsibleMenu = () => {
           </IconButton>
         </Tooltip>
         <DevelopmentTools />
+        <ThemeToggle />
         <PlatformSettingsOpener />
       </Stack>
     </CollapsingButtons>
