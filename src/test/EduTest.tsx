@@ -3,9 +3,8 @@ import ScienceIcon from "@mui/icons-material/Science";
 import { useEffect, useMemo } from "react";
 import {
   NavigationPageStoreItem,
-  useNavigationStore,
 } from "../LMSToolpad/components/Navigation/store/useNavigationStore";
-import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/CourseMicroservice";
+import { useCourseNavigationStore } from "../LMSToolpad/components/Courses/store/useCourseNavigationStore";
 
 /**
  * EduTest Course Microservice
@@ -13,13 +12,10 @@ import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Cour
  * This is an example course microservice that demonstrates how to create
  * a self-contained tool that integrates with the Course system.
  *
- * When used inside CourseMicroservice, it uses the course-specific registration.
- * When used standalone, it falls back to the global navigation store.
+ * Registers directly with the course navigation store.
  */
 const EduTest = () => {
-  const { registerCourseMicroservice, isInsideCourseMicroservice } =
-    useCourseMicroserviceRegistration();
-  const { addMicroserviceNavigation } = useNavigationStore();
+  const { addCourseMicroserviceNavigation } = useCourseNavigationStore();
 
   // Define navigation structure
   // - "edutest" root: no view, shows tool selector (no title needed)
@@ -77,17 +73,8 @@ const EduTest = () => {
   );
 
   useEffect(() => {
-    if (isInsideCourseMicroservice) {
-      registerCourseMicroservice(eduTestNavigation);
-    } else {
-      addMicroserviceNavigation(eduTestNavigation);
-    }
-  }, [
-    isInsideCourseMicroservice,
-    registerCourseMicroservice,
-    addMicroserviceNavigation,
-    eduTestNavigation,
-  ]);
+    addCourseMicroserviceNavigation(eduTestNavigation);
+  }, [addCourseMicroserviceNavigation, eduTestNavigation]);
 
   return <></>;
 };
