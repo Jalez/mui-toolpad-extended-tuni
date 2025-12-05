@@ -8,8 +8,8 @@ import CourseInstanceLoader from "./CourseInstanceLoader";
 import CourseTools from "./CourseTools";
 import {
   NavigationPageStoreItem,
-  useNavigationStore,
 } from "../Navigation/store/useNavigationStore";
+import { useCourseNavigationStore } from "./store/useCourseNavigationStore";
 import { Typography, IconButton, Box } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SubSections from "../Microservices/MicroserviceSubsections";
@@ -109,12 +109,12 @@ interface CourseMicroserviceProps {
 const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { allMicroserviceNavigation, addMicroserviceNavigation } =
-    useNavigationStore();
+  const { allCourseMicroserviceNavigation, addCourseMicroserviceNavigation } =
+    useCourseNavigationStore();
 
   // Registration functions for course microservices
   const registerCourseMicroservice = (navigation: NavigationPageStoreItem) => {
-    addMicroserviceNavigation(navigation);
+    addCourseMicroserviceNavigation(navigation);
   };
 
   const unregisterCourseMicroservice = (segment: string) => {
@@ -140,10 +140,10 @@ const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => 
           <Route path=":instance" element={<CourseInstanceLoader />}>
             <Route
               index
-              element={<CourseTools microservices={allMicroserviceNavigation} />}
+              element={<CourseTools microservices={allCourseMicroserviceNavigation} />}
             />
             {/* Dynamic routes for registered course microservices */}
-            {allMicroserviceNavigation.map((nav) => (
+            {allCourseMicroserviceNavigation.map((nav) => (
               <Route key={nav.segment} path={nav.segment}>
                 <Route
                   index
