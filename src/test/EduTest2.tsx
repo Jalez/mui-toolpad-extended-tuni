@@ -4,22 +4,18 @@ import React, { useEffect, useMemo } from "react";
 import ScienceIcon from "@mui/icons-material/Science";
 import {
   NavigationPageStoreItem,
-  useNavigationStore,
 } from "../LMSToolpad/components/Navigation/store/useNavigationStore";
-import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/CourseMicroservice";
+import { useCourseNavigationStore } from "../LMSToolpad/components/Courses/store/useCourseNavigationStore";
 
 /**
  * EduTest2 Course Microservice
  *
  * This is another example course microservice demonstrating the registration pattern.
  *
- * When used inside CourseMicroservice, it uses the course-specific registration.
- * When used standalone, it falls back to the global navigation store.
+ * Registers directly with the course navigation store.
  */
 const EduTest2 = () => {
-  const { registerCourseMicroservice, isInsideCourseMicroservice } =
-    useCourseMicroserviceRegistration();
-  const { addMicroserviceNavigation } = useNavigationStore();
+  const { addCourseMicroserviceNavigation } = useCourseNavigationStore();
 
   const eduTest2Navigation: NavigationPageStoreItem = useMemo(
     () => ({
@@ -56,17 +52,8 @@ const EduTest2 = () => {
   );
 
   useEffect(() => {
-    if (isInsideCourseMicroservice) {
-      registerCourseMicroservice(eduTest2Navigation);
-    } else {
-      addMicroserviceNavigation(eduTest2Navigation);
-    }
-  }, [
-    isInsideCourseMicroservice,
-    registerCourseMicroservice,
-    addMicroserviceNavigation,
-    eduTest2Navigation,
-  ]);
+    addCourseMicroserviceNavigation(eduTest2Navigation);
+  }, [addCourseMicroserviceNavigation, eduTest2Navigation]);
 
   return <></>;
 };
