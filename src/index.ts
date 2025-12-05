@@ -44,6 +44,9 @@ export { default as Home } from "./LMSToolpad/components/Routes/Home/Home";
 
 export { default as CourseTools } from "./LMSToolpad/components/Courses/CourseTools";
 
+export { default as CourseMicroservice } from "./LMSToolpad/components/Courses/CourseMicroservice";
+export { useCourseMicroserviceRegistration } from "./LMSToolpad/components/Courses/CourseMicroservice";
+
 export { default as LoadingScreen } from "./LMSToolpad/components/LoadingScreen";
 
 export { default as ToolSelector } from "./LMSToolpad/components/Tool/ToolSelector";
