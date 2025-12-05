@@ -80,8 +80,8 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
 
     return createTheme({
       palette: {
-        mode: currentMode,
         ...colorScheme.palette,
+        mode: currentMode,
       },
       typography: theme.typography,
       shape: theme.shape,
@@ -106,8 +106,8 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
 
     const newTheme = createTheme({
       palette: {
-        mode: currentMode,
         ...colorScheme.palette,
+        mode: currentMode,
       },
       typography: theme.typography,
       shape: theme.shape,
