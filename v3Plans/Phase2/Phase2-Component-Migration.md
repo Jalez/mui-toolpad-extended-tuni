@@ -1,214 +1,153 @@
 # Phase 2: Component Migration & Course Logic Extraction
 
-## Overview
+## Overview - COMPLETED
 
-Phase 2 focuses on migrating components and extracting course-specific logic from the main application routing. This involves:
+Phase 2 focused on creating a clean separation between app-level and course-level concerns by:
 
-1. **Extract course routing** from `Microservices.tsx` to dedicated course components
-2. **Enhance existing Courses folder** components for better microservice management
-3. **Create CourseRouter** for organized course routing (preserves existing `:code` path structure)
-4. **Update component responsibilities** for clearer separation of concerns
+1. **Creating `CourseMicroservice`** - A self-contained component that handles all course-related routing
+2. **Establishing clear component hierarchy** - Course microservices (like EduTest) are now explicitly children of CourseMicroservice
+3. **Simplifying `Microservices.tsx`** - Removed course routing, now only handles app-level routes
+4. **Providing registration context** - Course microservices register through `useCourseMicroserviceRegistration`
 
-## Current State Analysis
+## Architecture Changes
 
-### Existing Components
-- **Microservices.tsx**: Currently handles both app-level and course-level routing (lines 86-155 contain course logic)
-- **Courses/CourseTools.tsx**: Already exists and manages course microservices
-- **Courses/Navigation/**: Already contains course navigation components
-- **Courses/store/useCourseStore.ts**: Already manages course state
-
-### Course Routing Currently in Microservices.tsx (Lines 86-155)
-```typescript
-<Route path=":code" element={<CourseCodeLoader />}>
-  <Route index element={<CourseInstanceSelector />} />
-  <Route path=":instance" element={<CourseInstanceLoader />}>
-    <Route
-      index
-      element={
-        <CourseTools microservices={allMicroserviceNavigation} />
-      }
-    />
-    {allMicroserviceNavigation.map((nav) => (
-      <Route key={nav.segment} path={nav.segment}>
-        {/* Complex nested routing for microservices */}
-      </Route>
-    ))}
-  </Route>
-</Route>
+### Before
+```
+App.tsx
+└── BrowserRouter
+    └── LMSProvider
+        └── Microservices (handled ALL routing including course routes)
+            ├── EduTest (registered globally)
+            └── EduTest2 (registered globally)
 ```
 
-## Files to be Modified
-
-### 1. Create New Components
-
-#### `Courses/CourseRouter.tsx`
-**Purpose**: Main router for all course-related routes (handles routes relative to `:code` captured by LMSRoutes)
-
-```typescript
-// BEFORE: Course routing scattered in Microservices.tsx
-
-// AFTER: CourseRouter contains the nested route structure
-const CourseRouter = () => {
-  return (
-    <Routes>
-      <Route index element={<CourseInstanceSelector />} />
-      <Route path=":instance" element={<CourseInstanceLoader />}>
-        <Route index element={<CourseTools />} />
-        <Route path=":microservice/*" element={<CourseMicroserviceRouter />} />
-      </Route>
-    </Routes>
-  );
-};
+### After
+```
+App.tsx
+└── BrowserRouter
+    └── LMSProvider
+        └── Microservices (app-level routes: /, /help, /contact)
+            └── CourseMicroservice (course routes: /:code/*)
+                ├── EduTest (registers as course microservice)
+                └── EduTest2 (registers as course microservice)
 ```
 
-#### `Courses/CourseMicroserviceRouter.tsx`
-**Purpose**: Handle individual microservice routing within courses
+## Files Created
 
-```typescript
-const CourseMicroserviceRouter = () => {
-  const { microservice } = useParams();
-  const { allMicroserviceNavigation } = useNavigationStore();
+### `Courses/CourseMicroservice.tsx`
+Self-contained course microservice that:
+- Provides `CourseMicroserviceContext` for child microservices to register
+- Exports `useCourseMicroserviceRegistration` hook
+- Handles all course routing:
+  - `/:code` - CourseCodeLoader + CourseInstanceSelector
+  - `/:code/:instance` - CourseInstanceLoader + CourseTools
+  - `/:code/:instance/:microservice/*` - Dynamic course microservice routes
 
-  const currentMicroservice = allMicroserviceNavigation.find(
-    (ms) => ms.segment === microservice
-  );
+## Files Modified
 
-  if (!currentMicroservice) {
-    return <div>Microservice not found</div>;
-  }
-
-  return (
-    <>
-      {currentMicroservice.title && (
-        <PageHeader title={currentMicroservice.title} />
-      )}
-      {currentMicroservice.children && (
-        <SubSections children={currentMicroservice.children} />
-      )}
-      {currentMicroservice.view && <currentMicroservice.view />}
-    </>
-  );
-};
+### `App.tsx`
+```tsx
+// Now shows clear hierarchy
+<BrowserRouter>
+  <LMSProvider>
+    <Microservices>
+      <CourseMicroservice>
+        <EduTest />
+        <EduTest2 />
+      </CourseMicroservice>
+    </Microservices>
+  </LMSProvider>
+</BrowserRouter>
 ```
 
-### 2. Modify Existing Components
+### `Microservices.tsx`
+- Removed all course-specific routing (now handled by CourseMicroservice)
+- Only handles: `/`, `/help`, `/contact`, and dynamic app microservices
+- Simplified from 162 lines to ~60 lines
 
-#### `Microservices.tsx` (becomes `LMSRoutes.tsx`)
-**Remove course routing logic (lines 86-155)**
+### `EduTest.tsx` & `EduTest2.tsx`
+- Now use `useCourseMicroserviceRegistration` hook
+- Supports both contexts:
+  - Inside CourseMicroservice: Uses course-specific registration
+  - Standalone: Falls back to global navigation store (backward compatible)
 
-**Note**: CourseCodeLoader will need to be modified to accept `children` prop and render them instead of `<Outlet />` to support this new structure.
+### `index.ts` (exports)
+- Added `CourseMicroservice` default export
+- Added `useCourseMicroserviceRegistration` named export
 
+## API Reference
+
+### `useCourseMicroserviceRegistration`
 ```typescript
-// BEFORE: Contains course routing
-<Route path=":code" element={<CourseCodeLoader />}>
-  {/* Complex course routing logic */}
-</Route>
-
-// AFTER: Only app-level routing
-<Routes>
-  <Route path="" element={<Home />} index />
-  <Route path="help" element={<div>Help</div>} />
-  <Route path="contact" element={<div>Contact</div>} />
-  {/* Dynamic microservice routes */}
-  {microserviceRoutes}
-  {/* Course routing with CourseCodeLoader providing context */}
-  <Route path=":code" element={<CourseCodeLoader />}>
-    <CourseRouter />
-  </Route>
-</Routes>
-```
-
-#### `Courses/CourseCodeLoader.tsx`
-**Modify to accept children prop for new routing structure**
-
-```typescript
-// BEFORE: Renders Outlet for nested routes
-if (fetchState === "loading") return <LoadingScreen />;
-return <Outlet />;
-
-// AFTER: Renders children (CourseRouter) for new structure
-interface CourseCodeLoaderProps {
-  children?: React.ReactNode;
+interface CourseMicroserviceContextValue {
+  registerCourseMicroservice: (navigation: NavigationPageStoreItem) => void;
+  unregisterCourseMicroservice: (segment: string) => void;
+  isInsideCourseMicroservice: boolean;
 }
 
-const CourseCodeLoader = ({ children }: CourseCodeLoaderProps) => {
-  // ... existing logic
-  if (fetchState === "loading") return <LoadingScreen />;
-  return <>{children}</>;
-};
+// Usage in course microservices
+const { registerCourseMicroservice, isInsideCourseMicroservice } =
+  useCourseMicroserviceRegistration();
+
+useEffect(() => {
+  if (isInsideCourseMicroservice) {
+    registerCourseMicroservice(myNavigation);
+  } else {
+    addMicroserviceNavigation(myNavigation); // fallback
+  }
+}, [...]);
 ```
 
-#### `Courses/CourseTools.tsx`
-**Enhance for better microservice filtering**
+## Route Structure
 
-```typescript
-// BEFORE: Basic microservice handling
-const { allMicroserviceNavigation } = useNavigationStore();
+| Path | Component | Description |
+|------|-----------|-------------|
+| `/` | Home | App home page |
+| `/help` | Help | Help page |
+| `/contact` | Contact | Contact page |
+| `/:code` | CourseCodeLoader | Course code level |
+| `/:code/:instance` | CourseInstanceLoader + CourseTools | Course instance with tools |
+| `/:code/:instance/:microservice` | Dynamic | Course microservice (EduTest, etc.) |
+| `/:code/:instance/:microservice/:child` | Dynamic | Nested microservice routes |
 
-// AFTER: Context-aware microservice filtering
-const { getMicroservicesForContext } = useNavigationStore();
-const courseMicroservices = getMicroservicesForContext('course');
+## Benefits
 
-// Filter based on course configuration
-const enabledMicroservices = courseMicroservices.filter(ms =>
-  currentCourse?.services?.includes(ms.segment)
-);
-```
+1. **Clear Separation of Concerns**
+   - App-level routing in Microservices.tsx
+   - Course-level routing in CourseMicroservice.tsx
 
-### 3. Update Navigation Integration
+2. **Self-Contained Modules**
+   - Course functionality is fully encapsulated
+   - Easy to understand where course logic lives
 
-#### `Courses/Navigation/CourseNavigationBuilder.tsx`
-**Enhance for course-specific navigation**
+3. **Explicit Hierarchy**
+   - App.tsx clearly shows the component structure
+   - Course microservices are explicitly children of CourseMicroservice
 
-```typescript
-// BEFORE: Basic course navigation
-const courseNavItems = getCourseNavigationItems();
-
-// AFTER: Context-aware course navigation
-const courseNavItems = getMicroservicesForContext('course').filter(ms =>
-  isRelevantForCourse(ms, currentCourse)
-);
-```
-
-## Project Structure After Phase 2
-
-```
-src/LMSToolpad/components/
-├── LMSRoutes.tsx                    (renamed from Microservices.tsx)
-├── Courses/
-│   ├── CourseRouter.tsx             (NEW - main course router)
-│   ├── CourseMicroserviceRouter.tsx (NEW - individual microservice router)
-│   ├── CourseTools.tsx              (enhanced for microservice filtering)
-│   └── Navigation/                  (existing course navigation)
-└── Navigation/
-    └── store/
-        └── useNavigationStore.ts    (unchanged in this phase)
-```
-
-## Component Responsibilities After Phase 2
-
-| **Component** | **Responsibility** | **Routes Handled** |
-|---------------|-------------------|-------------------|
-| **LMSRoutes** | Top-level app routing | `/`, `/help`, `/contact`, dynamic app routes |
-| **CourseRouter** | Course routing coordination | Routes relative to `:code` (/:instance, /:instance/:microservice/*) |
-| **CourseMicroserviceRouter** | Individual microservice routing | `/:instance/:microservice/*` |
-| **CourseTools** | Course microservice management | `/:instance` |
+4. **Backward Compatible**
+   - EduTest/EduTest2 work both inside and outside CourseMicroservice
+   - Existing navigation store methods still work
 
 ## Validation Checklist
 
-- [ ] Course routing extracted from LMSRoutes to CourseRouter
-- [ ] CourseRouter handles routes relative to `:code` parameter (/:instance, /:instance/:microservice/*)
-- [ ] CourseMicroserviceRouter handles individual microservice routing
-- [ ] CourseTools enhanced for context-aware microservice filtering
-- [ ] All existing course routes work correctly (`/:code/:instance/:microservice`)
-- [ ] No breaking changes to existing functionality
-- [ ] Project builds successfully after migration
+- [x] CourseMicroservice component created with routing
+- [x] useCourseMicroserviceRegistration hook exported
+- [x] EduTest/EduTest2 updated to use new registration pattern
+- [x] Microservices.tsx simplified (course routing removed)
+- [x] App.tsx shows clear hierarchy
+- [x] Exports updated in index.ts
+- [x] No TypeScript errors
+- [x] ESLint passes (only warning about exported hook)
+- [x] Route structure preserved
 
 ## Impact Assessment
 
-**Breaking Changes:** Minimal - route structure preserved, only component organization changed
-**Functionality:** All existing course routing preserved
-**Performance:** No impact expected
-**Testing:** Route testing recommended to ensure all paths work correctly
+**Breaking Changes:** Minimal
+- Course microservices should be placed inside `<CourseMicroservice>` for proper routing
+- Direct import of EduTest outside CourseMicroservice still works (backward compatible)
 
-This phase establishes clear component boundaries while maintaining backward compatibility with existing course routes.
+**Functionality:** All existing routes preserved, cleaner architecture
+
+**Performance:** No impact expected
+
+**Testing:** Routes should be manually tested to verify all paths work
