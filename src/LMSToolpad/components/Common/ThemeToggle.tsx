@@ -1,12 +1,11 @@
 /** @format */
 
-import { IconButton, Tooltip, useTheme } from '@mui/material';
+import { IconButton, Tooltip } from '@mui/material';
 import { Brightness6, Brightness7, Brightness4 } from '@mui/icons-material';
 import { useThemeStore } from '../../store/useThemeStore';
 import { AppTheme } from '../../store/useThemeStore';
 
 export const ThemeToggle = () => {
-  const theme = useTheme();
   const { theme: currentTheme, updateTheme } = useThemeStore();
 
   const currentMode = currentTheme?.defaultColorScheme || 'light';
