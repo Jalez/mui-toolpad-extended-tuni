@@ -9,8 +9,8 @@ import CenteredHeading from "../CenteredHeading";
 import LtiLoginUrlForm from "./LtiLoginUrlForm";
 import {
   NavigationPageStoreItem,
-  useNavigationStore,
 } from "../Navigation/store/useNavigationStore";
+import { useCourseNavigationStore } from "./store/useCourseNavigationStore";
 import ToolDisplayer from "../Tool/ToolDisplayer";
 
 interface CourseToolsProps {
@@ -37,19 +37,19 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
   const { updateStateCourse, currentCourse } = useCourseStore();
   const { addNotificationData } = useNotificationStore();
   const [show, setShow] = useState(true);
-  const { allMicroserviceNavigation } = useNavigationStore();
+  const { allCourseMicroserviceNavigation } = useCourseNavigationStore();
   const [currentMicroservices, setCurrentMicroservices] = useState<
     NavigationPageStoreItem[] | undefined
   >(microservices);
   // Add null checking and default to empty array
-  // console.log('SECTION', allMicroserviceNavigation);
+  // console.log('SECTION', allCourseMicroserviceNavigation);
   useEffect(() => {
-    if (!microservices && code && allMicroserviceNavigation) {
-      setCurrentMicroservices(allMicroserviceNavigation);
+    if (!microservices && code && allCourseMicroserviceNavigation) {
+      setCurrentMicroservices(allCourseMicroserviceNavigation);
     } else if (microservices) {
       setCurrentMicroservices(microservices);
     }
-  }, [microservices, code, instance, allMicroserviceNavigation]);
+  }, [microservices, code, instance, allCourseMicroserviceNavigation]);
 
   // Initialize with empty arrays if no tools are available
   const [usedTools, setUsedTools] = useState<NavigationPageStoreItem[]>(
