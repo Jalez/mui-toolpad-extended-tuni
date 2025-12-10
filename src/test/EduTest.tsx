@@ -15,7 +15,10 @@ import { useCourseNavigationStore } from "../LMSToolpad/components/Courses/store
  * Registers directly with the course navigation store.
  */
 const EduTest = () => {
-  const { addCourseMicroserviceNavigation } = useCourseNavigationStore();
+  const {
+    addCourseMicroserviceNavigation,
+    removeCourseMicroserviceNavigation,
+  } = useCourseNavigationStore();
 
   // Define navigation structure
   // - "edutest" root: no view, shows tool selector (no title needed)
@@ -74,7 +77,10 @@ const EduTest = () => {
 
   useEffect(() => {
     addCourseMicroserviceNavigation(eduTestNavigation);
-  }, [addCourseMicroserviceNavigation, eduTestNavigation]);
+    return () => {
+      removeCourseMicroserviceNavigation(eduTestNavigation.segment);
+    };
+  }, [addCourseMicroserviceNavigation, removeCourseMicroserviceNavigation, eduTestNavigation]);
 
   return <></>;
 };
