@@ -1,18 +1,10 @@
 /** @format */
 
 import React, { createContext, useContext, ReactNode } from "react";
-import { Route, Routes, useNavigate, useLocation } from "react-router-dom";
-import CourseCodeLoader from "./CourseCodeLoader";
-import CourseInstanceSelector from "./CourseInstanceSelector";
-import CourseInstanceLoader from "./CourseInstanceLoader";
-import CourseTools from "./CourseTools";
 import {
   NavigationPageStoreItem,
 } from "../Navigation/store/useNavigationStore";
 import { useCourseNavigationStore } from "./store/useCourseNavigationStore";
-import { Typography, IconButton, Box } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SubSections from "../Microservices/MicroserviceSubsections";
 
 /**
  * Context for course microservices to register themselves
@@ -42,38 +34,6 @@ const CourseMicroserviceContext = createContext<CourseMicroserviceContextValue>(
  */
 export const useCourseMicroserviceRegistration = () => {
   return useContext(CourseMicroserviceContext);
-};
-
-/**
- * Page header component with back button and title
- */
-const PageHeader: React.FC<{ title: string; onBack?: () => void }> = ({
-  title,
-  onBack,
-}) => (
-  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-    {onBack && (
-      <IconButton
-        onClick={onBack}
-        sx={{ mr: 1, color: "primary.main" }}
-        aria-label="Go back"
-      >
-        <ArrowBackIcon />
-      </IconButton>
-    )}
-    <Typography variant="h2" sx={{ color: "primary.main" }}>
-      {title}
-    </Typography>
-  </Box>
-);
-
-/**
- * Helper function to get parent path for back navigation
- */
-const getParentPath = (currentPath: string) => {
-  const pathSegments = currentPath.split("/").filter(Boolean);
-  pathSegments.pop();
-  return "/" + pathSegments.join("/");
 };
 
 interface CourseMicroserviceProps {
@@ -107,10 +67,10 @@ interface CourseMicroserviceProps {
  * ```
  */
 const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { allCourseMicroserviceNavigation, addCourseMicroserviceNavigation } =
-    useCourseNavigationStore();
+  const {
+    addCourseMicroserviceNavigation,
+    removeCourseMicroserviceNavigation,
+  } = useCourseNavigationStore();
 
   // Registration functions for course microservices
   const registerCourseMicroservice = (navigation: NavigationPageStoreItem) => {
@@ -118,8 +78,7 @@ const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => 
   };
 
   const unregisterCourseMicroservice = (segment: string) => {
-    // Note: Currently the store doesn't support removal, but we expose it for future use
-    console.log(`Unregister course microservice: ${segment}`);
+    removeCourseMicroserviceNavigation(segment);
   };
 
   const contextValue: CourseMicroserviceContextValue = {
@@ -132,91 +91,6 @@ const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => 
     <CourseMicroserviceContext.Provider value={contextValue}>
       {/* Render children (course microservices like EduTest) so they can register */}
       {children}
-
-      {/* Course routing structure - handles /:code/* paths */}
-      <Routes>
-        <Route path=":code" element={<CourseCodeLoader />}>
-          <Route index element={<CourseInstanceSelector />} />
-          <Route path=":instance" element={<CourseInstanceLoader />}>
-            <Route
-              index
-              element={<CourseTools microservices={allCourseMicroserviceNavigation} />}
-            />
-            {/* Dynamic routes for registered course microservices */}
-            {allCourseMicroserviceNavigation.map((nav) => (
-              <Route key={nav.segment} path={nav.segment}>
-                <Route
-                  index
-                  element={
-                    <>
-                      {nav.title && nav.showTitle !== false && (
-                        <PageHeader
-                          title={nav.title}
-                          onBack={() =>
-                            navigate(getParentPath(location.pathname))
-                          }
-                        />
-                      )}
-                      {nav.children && nav.children.length > 0 && (
-                        <SubSections
-                          children={nav.children as NavigationPageStoreItem[]}
-                        />
-                      )}
-                      {nav.view && <nav.view />}
-                    </>
-                  }
-                />
-                {nav.children?.map((child) => (
-                  <Route key={child.segment} path={child.segment}>
-                    <Route
-                      index
-                      element={
-                        <>
-                          {child.title && child.showTitle !== false && (
-                            <PageHeader
-                              title={child.title}
-                              onBack={() =>
-                                navigate(getParentPath(location.pathname))
-                              }
-                            />
-                          )}
-                          {child.children && child.children.length > 0 && (
-                            <SubSections
-                              children={
-                                child.children as NavigationPageStoreItem[]
-                              }
-                            />
-                          )}
-                          {child.view && <child.view />}
-                        </>
-                      }
-                    />
-                    {child.children?.map((subChild) => (
-                      <Route
-                        key={subChild.segment}
-                        path={subChild.segment}
-                        element={
-                          <>
-                            {subChild.title && subChild.showTitle !== false && (
-                              <PageHeader
-                                title={subChild.title}
-                                onBack={() =>
-                                  navigate(getParentPath(location.pathname))
-                                }
-                              />
-                            )}
-                            {subChild.view ? <subChild.view /> : null}
-                          </>
-                        }
-                      />
-                    ))}
-                  </Route>
-                ))}
-              </Route>
-            ))}
-          </Route>
-        </Route>
-      </Routes>
     </CourseMicroserviceContext.Provider>
   );
 };

@@ -41,8 +41,7 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
   const [currentMicroservices, setCurrentMicroservices] = useState<
     NavigationPageStoreItem[] | undefined
   >(microservices);
-  // Add null checking and default to empty array
-  // console.log('SECTION', allCourseMicroserviceNavigation);
+
   useEffect(() => {
     if (!microservices && code && allCourseMicroserviceNavigation) {
       setCurrentMicroservices(allCourseMicroserviceNavigation);
@@ -52,33 +51,26 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
   }, [microservices, code, instance, allCourseMicroserviceNavigation]);
 
   // Initialize with empty arrays if no tools are available
-  const [usedTools, setUsedTools] = useState<NavigationPageStoreItem[]>(
-    currentMicroservices?.filter((ms) =>
-      currentCourse?.services?.includes(ms.segment)
-    ) || []
-  );
+  const [usedTools, setUsedTools] = useState<NavigationPageStoreItem[]>([]);
   const [availableTools, setAvailableTools] = useState<
     NavigationPageStoreItem[]
-  >(
-    currentMicroservices?.filter(
-      (ms) => !currentCourse?.services?.includes(ms.segment)
-    ) || []
-  );
+  >([]);
 
   useEffect(() => {
     if (code && instance && currentMicroservices) {
-      setUsedTools(
-        currentMicroservices.filter((ms) =>
-          currentCourse?.services?.includes(ms.segment)
-        )
+      // Filter enabled microservices from currentMicroservices based on course services
+      const enabled = currentMicroservices.filter((ms) =>
+        currentCourse?.services?.includes(ms.segment)
       );
-      setAvailableTools(
-        currentMicroservices.filter(
-          (ms) => !currentCourse?.services?.includes(ms.segment)
-        )
+      setUsedTools(enabled);
+
+      // Available tools are those not in the enabled list
+      const available = currentMicroservices.filter(
+        (ms) => !currentCourse?.services?.includes(ms.segment)
       );
+      setAvailableTools(available);
     }
-  }, [code, instance, microservices, currentCourse]);
+  }, [code, instance, currentMicroservices, currentCourse]);
 
   useEffect(() => {
     setShow(false);

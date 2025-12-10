@@ -79,23 +79,50 @@ export const useCourseNavigationStore = create<CourseNavigationStore>(
           (ms) => ms.segment === item.segment
         );
         if (!exists) {
-          return {
+          console.log(
+            "[CourseNavigationStore] Adding course microservice:",
+            item.segment,
+            item
+          );
+          const newState = {
             allCourseMicroserviceNavigation: [
               ...state.allCourseMicroserviceNavigation,
               item,
             ],
           };
+          console.log(
+            "[CourseNavigationStore] Total course microservices:",
+            newState.allCourseMicroserviceNavigation.length,
+            newState.allCourseMicroserviceNavigation.map((ms) => ms.segment)
+          );
+          return newState;
         }
+        console.log(
+          "[CourseNavigationStore] Course microservice already exists:",
+          item.segment
+        );
         return state;
       }),
 
     removeCourseMicroserviceNavigation: (segment) =>
-      set((state) => ({
-        allCourseMicroserviceNavigation:
-          state.allCourseMicroserviceNavigation.filter(
-            (ms) => ms.segment !== segment
-          ),
-      })),
+      set((state) => {
+        console.log(
+          "[CourseNavigationStore] Removing course microservice:",
+          segment
+        );
+        const newState = {
+          allCourseMicroserviceNavigation:
+            state.allCourseMicroserviceNavigation.filter(
+              (ms) => ms.segment !== segment
+            ),
+        };
+        console.log(
+          "[CourseNavigationStore] Remaining course microservices:",
+          newState.allCourseMicroserviceNavigation.length,
+          newState.allCourseMicroserviceNavigation.map((ms) => ms.segment)
+        );
+        return newState;
+      }),
 
     getEnabledMicroservicesForCourse: (courseServices) => {
       const state = get();

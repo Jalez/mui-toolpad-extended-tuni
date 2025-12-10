@@ -21,10 +21,13 @@ export const VisitedCoursesNavigationAdapter: React.FC = () => {
   const { courses } = useCourseStore();
   const { createNavigationItemFromCourse } = useCourseNavigationAdapter();
 
+  console.log("[VisitedCoursesNavigationAdapter] Render - courses:", courses.length);
+
   useEffect(() => {
+    console.log("[VisitedCoursesNavigationAdapter] useEffect - courses:", courses.length);
     // This function will be called whenever visited courses change
     const handleVisitedCourses = (visitedCourseIds: string[]) => {
-      // console.log("Received visited course IDs:", visitedCourseIds); // Debug log
+      console.log("[VisitedCoursesNavigationAdapter] handleVisitedCourses - ids:", visitedCourseIds);
       if (!courses.length) return;
 
       const visitedCourses = visitedCourseIds
@@ -36,32 +39,37 @@ export const VisitedCoursesNavigationAdapter: React.FC = () => {
         })
         .filter((course): course is Course => !!course);
 
+      console.log("[VisitedCoursesNavigationAdapter] visitedCourses found:", visitedCourses.length);
       if (visitedCourses.length > 0) {
-        // console.log("Found matching courses:", visitedCourses); // Debug log
+        const pages = visitedCourses.map((course) =>
+          createNavigationItemFromCourse(course)
+        );
+        console.log("[VisitedCoursesNavigationAdapter] Adding section with pages:", pages.map(p => ({ segment: p.segment, microservices: p.microservices })));
         addDynamicSection({
           header: "Last 5 visited courses",
           keepVisible: true,
-          pages: visitedCourses.map((course) =>
-            createNavigationItemFromCourse(course)
-          ),
+          pages,
         });
+        // Note: Microservices.tsx handles navigation updates via useEffect
+        // when sections change, so no need to call updateMicroserviceNavigationForSections here
       }
     };
 
     if (courses.length > 0) {
       // Initial load - get current visited courses
       const initialCourses = getVisitedCourses();
-      // console.log("Initial visited courses:", initialCourses); // Debug log
+      console.log("[VisitedCoursesNavigationAdapter] Initial courses from localStorage:", initialCourses);
       handleVisitedCourses(initialCourses);
 
       // Subscribe to future updates
       const unsubscribe = onVisitedCoursesUpdate(handleVisitedCourses);
-      return () => {
-        console.log("Unsubscribing from visited courses updates"); // Debug log
-        unsubscribe();
-      };
+      return () => unsubscribe();
     }
-  }, [courses, addDynamicSection, createNavigationItemFromCourse]);
+  }, [
+    courses,
+    addDynamicSection,
+    createNavigationItemFromCourse,
+  ]);
 
   return null;
 };
