@@ -7,6 +7,10 @@ import ContactPageIcon from "@mui/icons-material/ContactPage";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import React from "react";
 
+// Import course navigation store for aggregating microservices
+// This is the only place we reference the course store - the rest is generic
+import { useCourseNavigationStore } from "../../Courses/store/useCourseNavigationStore";
+
 // Base interface for common properties
 interface NavigationItemBase {
   kind: "header" | "page" | "divider";
@@ -101,6 +105,11 @@ type ViewStore = {
   sections: Record<string, NavigationSection>;
   // Array maintaining the order of sections
   sectionOrder: string[];
+  /**
+   * App-level microservice navigation items only.
+   * Course microservices are handled by useCourseNavigationStore.
+   * These are typically registered via NavigationRegistry for app-level routes.
+   */
   allMicroserviceNavigation: NavigationPageStoreItem[];
   addSection: (props: addSectionProps) => void;
   removeHeader: (header: string) => void;
@@ -133,6 +142,7 @@ type ViewStore = {
  * - Added support for dividers in navigation
  * - Introduced flexible section management with ordered headers
  * - Added action components support in navigation items
+ * - Clear separation: app-level navigation only (course microservices handled separately)
  *
  * @breaking-changes
  * - Removed updateSection and updateCourseInstanceSection methods
@@ -140,6 +150,12 @@ type ViewStore = {
  * - Sections are now managed through a structured record instead of flat array
  * - Navigation items require explicit header assignment
  * - Changed microservice update mechanism to be section-aware
+ *
+ * @scope
+ * This store handles **app-level navigation only**:
+ * - Global sections (Help, Contact, etc.)
+ * - App-level microservices registered via NavigationRegistry
+ * - Course microservices are handled by useCourseNavigationStore (separate store)
  *
  * @structure
  * Navigation is now organized into sections:
@@ -160,6 +176,31 @@ type ViewStore = {
  * });
  * ```
  */
+/**
+ * Helper function to aggregate microservices from all available sources.
+ * This is microservice-agnostic - it doesn't hard-code specific store types.
+ * The only store-specific code is here, allowing the rest of the logic to be generic.
+ */
+const getAllMicroservices = (state: ViewStore): NavigationPageStoreItem[] => {
+  const sources: NavigationPageStoreItem[][] = [
+    state.allMicroserviceNavigation, // App-level
+  ];
+
+  // Add course microservices if course navigation store exists
+  if (useCourseNavigationStore) {
+    try {
+      const courseStore = useCourseNavigationStore.getState();
+      if (courseStore?.allCourseMicroserviceNavigation) {
+        sources.push(courseStore.allCourseMicroserviceNavigation);
+      }
+    } catch {
+      // Course store not available - continue without it
+    }
+  }
+
+  return sources.flat();
+};
+
 export const useNavigationStore = create<ViewStore>((set, get) => ({
   navigation: DEFAULTNAVIGATION,
   sections: {},
@@ -255,9 +296,11 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
 
   recalculateNavigation: () => {
     const state = get();
-    const { visibleSections, collapsedSections } = state;
+    const { visibleSections } = state;
     let sectionNavigation: NavigationStoreItem[] = [];
 
+    // Build FULL navigation structure for route matching and breadcrumbs
+    // Sidebar collapse is a UI concern handled by the sidebar component
     state.sectionOrder.forEach((sectionKey) => {
       if (!visibleSections[sectionKey]) return;
 
@@ -267,34 +310,11 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
           sectionNavigation.push({ kind: "divider" });
         }
 
-        const isCollapsed = collapsedSections[sectionKey] !== false; // Default to collapsed
-
-        if (isCollapsed) {
-          // Create a collapsible section item that shows only the section icon/title
-          const sectionIcon = section.pageOrder.length > 0
-            ? section.pages[section.pageOrder[0]]?.iconFC
-            : undefined;
-
-          const collapsibleSection: NavigationPageStoreItem = {
-            kind: "page",
-            segment: `section-${sectionKey}`,
-            title: section.header.title,
-            iconFC: sectionIcon,
-            metadata: {
-              description: `Click to expand ${section.header.title} section`,
-              underHeader: sectionKey,
-            },
-            // Add an actionFC that renders the toggle action
-            actionFC: () => <SectionToggleAction sectionKey={sectionKey} />,
-          };
-          sectionNavigation.push(collapsibleSection);
-        } else {
-          // Show expanded section
-          sectionNavigation.push(section.header);
-          section.pageOrder.forEach((pageKey) => {
-            sectionNavigation.push(section.pages[pageKey]);
-          });
-        }
+        // Always include full section structure for proper route matching
+        sectionNavigation.push(section.header);
+        section.pageOrder.forEach((pageKey) => {
+          sectionNavigation.push(section.pages[pageKey]);
+        });
       }
     });
 
@@ -305,13 +325,33 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
       sectionNavigation = [...sectionNavigation, ...DEFAULTNAVIGATION];
     }
 
+    // Log navigation structure for debugging
+    const pagesWithChildren = sectionNavigation.filter(
+      (item): item is NavigationPageStoreItem => 
+        item.kind === "page" && !!(item.children && item.children.length > 0)
+    );
+    if (pagesWithChildren.length > 0) {
+      console.log("[recalculateNavigation] Pages with children:", pagesWithChildren.slice(0, 3).map(p => ({
+        segment: p.segment,
+        children: p.children?.map(c => ({
+          segment: c.segment,
+          grandchildren: c.children?.map(gc => gc.segment)
+        }))
+      })));
+    }
+
     if (
       JSON.stringify(state.navigation) !== JSON.stringify(sectionNavigation)
     ) {
+      console.log("[recalculateNavigation] Navigation changed, updating state");
       set({ navigation: sectionNavigation });
     }
   },
 
+  /**
+   * Add an app-level microservice navigation item.
+   * Note: Course microservices should use useCourseNavigationStore.addCourseMicroserviceNavigation instead.
+   */
   addMicroserviceNavigation: (item) =>
     set((state) => {
       const exists = state.allMicroserviceNavigation.find(
@@ -325,59 +365,108 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
       return state;
     }),
 
-  updateMicroserviceNavigationForSections: () =>
-    set((state) => {
-      const newSections = { ...state.sections };
-      let hasChanges = false;
+  updateMicroserviceNavigationForSections: () => {
+    try {
+      const result = set((state) => {
+        try {
+          const newSections = { ...state.sections };
+          let hasChanges = false;
 
-      Object.keys(newSections).forEach((sectionKey) => {
-        const section = newSections[sectionKey];
-        Object.keys(section.pages).forEach((pageKey) => {
-          const page = section.pages[pageKey];
-          if (page.metadata?.microservices) {
-            const originalChildren =
-              page.children?.filter(
-                (child) =>
-                  !state.allMicroserviceNavigation.some(
-                    (ms) => ms.segment === child.segment
-                  )
-              ) || [];
-            const msItems = state.allMicroserviceNavigation.filter((ms) =>
-              page.metadata!.microservices!.includes(ms.segment)
-            );
-            const newChildren = [...originalChildren, ...msItems];
-            if (JSON.stringify(page.children) !== JSON.stringify(newChildren)) {
-              section.pages[pageKey] = { ...page, children: newChildren };
-              hasChanges = true;
-            }
-          } else {
-            //Repeat the process for children
-            page.children?.forEach((child) => {
-              if (child.metadata?.microservices) {
+          // Get all microservices from all available sources (app-level + course-level)
+          const allMicroservices = getAllMicroservices(state);
+          
+          console.log("[updateMicroserviceNavigationForSections] Starting update...");
+          console.log("[updateMicroserviceNavigationForSections] All microservices:", allMicroservices.length, allMicroservices.map(m => m.segment));
+          console.log("[updateMicroserviceNavigationForSections] Sections:", Object.keys(newSections));
+          
+          if (allMicroservices.length === 0) {
+            console.log("[updateMicroserviceNavigationForSections] No microservices, returning early");
+            return state; // No microservices to add
+          }
+
+          Object.keys(newSections).forEach((sectionKey) => {
+            // Deep clone the section to avoid mutation issues
+            let currentSection = {
+              ...newSections[sectionKey],
+              pages: { ...newSections[sectionKey].pages },
+            };
+            let sectionHasChanges = false;
+            
+            Object.keys(currentSection.pages).forEach((pageKey) => {
+              const page = currentSection.pages[pageKey];
+              
+              if (page.metadata?.microservices) {
+                // Page directly expects microservices
                 const originalChildren =
-                  child.children?.filter(
-                    (subChild) =>
-                      !state.allMicroserviceNavigation.some(
-                        (ms) => ms.segment === subChild.segment
-                      )
+                  page.children?.filter(
+                    (child) =>
+                      !allMicroservices.some((ms) => ms.segment === child.segment)
                   ) || [];
-                const msItems = state.allMicroserviceNavigation.filter((ms) =>
-                  child.metadata!.microservices!.includes(ms.segment)
+                const msItems = allMicroservices.filter((ms) =>
+                  page.metadata!.microservices!.includes(ms.segment)
                 );
                 const newChildren = [...originalChildren, ...msItems];
-                if (
-                  JSON.stringify(child.children) !== JSON.stringify(newChildren)
-                ) {
-                  child.children = newChildren;
+                
+                if (JSON.stringify(page.children) !== JSON.stringify(newChildren)) {
+                  currentSection.pages[pageKey] = { ...page, children: newChildren };
+                  sectionHasChanges = true;
+                  hasChanges = true;
+                }
+              } else if (page.children && page.children.length > 0) {
+                // Process children - must create new objects for immutable update
+                let pageHasChanges = false;
+                const updatedChildren = page.children.map((child) => {
+                  if (child.metadata?.microservices) {
+                    const originalSubChildren =
+                      child.children?.filter(
+                        (subChild) =>
+                          !allMicroservices.some((ms) => ms.segment === subChild.segment)
+                      ) || [];
+                    const msItems = allMicroservices.filter((ms) =>
+                      child.metadata!.microservices!.includes(ms.segment)
+                    );
+                    const newSubChildren = [...originalSubChildren, ...msItems];
+                    
+                    if (JSON.stringify(child.children) !== JSON.stringify(newSubChildren)) {
+                      pageHasChanges = true;
+                      return { ...child, children: newSubChildren };
+                    }
+                  }
+                  return child;
+                });
+                
+                if (pageHasChanges) {
+                  currentSection.pages[pageKey] = { ...page, children: updatedChildren };
+                  sectionHasChanges = true;
                   hasChanges = true;
                 }
               }
             });
-          }
-        });
+            
+            if (sectionHasChanges) {
+              newSections[sectionKey] = currentSection;
+            }
+          });
+          
+          console.log("[updateMicroserviceNavigationForSections] Done, hasChanges:", hasChanges);
+          return hasChanges ? { sections: newSections } : state;
+        } catch (error) {
+          console.error(
+            "[updateMicroserviceNavigationForSections] Error:",
+            error
+          );
+          return state;
+        }
       });
-      return hasChanges ? { sections: newSections } : state;
-    }),
+      return result;
+    } catch (error) {
+      console.error(
+        "[updateMicroserviceNavigationForSections] Error:",
+        error
+      );
+      throw error;
+    }
+  },
 
   addStandaloneNavigation: (item) =>
     set((state) => {
