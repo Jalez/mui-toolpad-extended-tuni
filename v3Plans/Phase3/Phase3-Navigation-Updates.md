@@ -289,17 +289,17 @@ src/LMSToolpad/components/
 
 ## Validation Checklist
 
-- [ ] `useCourseNavigationStore` created with course-specific methods
-- [ ] `addCourseMicroserviceNavigation()` method works correctly
-- [ ] `getEnabledMicroservicesForCourse()` method works correctly
-- [ ] Main navigation store simplified (no course microservice logic)
-- [ ] CourseTools updated from `allMicroserviceNavigation` to course navigation store
-- [ ] CourseMicroserviceRouter updated from `allMicroserviceNavigation` to course navigation store
-- [ ] EduTest.tsx updated from `addMicroserviceNavigation` to `addCourseMicroserviceNavigation`
-- [ ] EduTest2.tsx updated from `addMicroserviceNavigation` to `addCourseMicroserviceNavigation`
-- [ ] NavigationRegistry remains unchanged (no tight coupling added)
-- [ ] EduTest/EduTest2 registration bypasses registry and uses course store directly
-- [ ] Course store can optionally sync with main registry for consistency
+- [x] `useCourseNavigationStore` created with course-specific methods
+- [x] `addCourseMicroserviceNavigation()` method works correctly
+- [x] `getEnabledMicroservicesForCourse()` method works correctly
+- [x] Main navigation store simplified (no course microservice logic)
+- [x] CourseTools updated from `allMicroserviceNavigation` to course navigation store
+- [x] CourseMicroserviceRouter updated from `allMicroserviceNavigation` to course navigation store (Note: CourseMicroservice handles routing directly)
+- [x] EduTest.tsx updated from `addMicroserviceNavigation` to `addCourseMicroserviceNavigation`
+- [x] EduTest2.tsx updated from `addMicroserviceNavigation` to `addCourseMicroserviceNavigation`
+- [x] NavigationRegistry remains unchanged (no tight coupling added)
+- [x] EduTest/EduTest2 registration bypasses registry and uses course store directly
+- [x] Course store can optionally sync with main registry for consistency
 - [ ] Project builds successfully after changes
 - [ ] No TypeScript errors introduced
 
