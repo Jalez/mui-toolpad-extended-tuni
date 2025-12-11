@@ -5,6 +5,20 @@ import { useNavigationFilterStore } from "../store/useNavigationFilterStore";
 import { useNavigationStore } from "../store/useNavigationStore";
 import { isEqual } from "lodash";
 
+const NAVIGATION_FILTER_STORAGE_KEY = "navigation-filter-preferences";
+
+/**
+ * Check if localStorage has saved filter preferences
+ */
+const hasLocalStoragePreferences = (): boolean => {
+  try {
+    const saved = localStorage.getItem(NAVIGATION_FILTER_STORAGE_KEY);
+    return saved !== null && saved !== "{}";
+  } catch {
+    return false;
+  }
+};
+
 export const useSyncNavigationFilters = () => {
   const { user, updateUser } = useUserStore();
   const { filterOptions, setFilterOptions } = useNavigationFilterStore();
@@ -14,8 +28,21 @@ export const useSyncNavigationFilters = () => {
   const previousSectionOrder = useRef<string[]>([]);
   const previousUserPrefs = useRef<string[]>([]);
 
-  // Initialize filter options from user preferences
+  // Initialize filter options from user preferences ONLY if localStorage doesn't have preferences
+  // localStorage takes priority over user preferences
   useEffect(() => {
+    // Skip if localStorage already has preferences (localStorage is the source of truth)
+    if (hasLocalStoragePreferences()) {
+      // localStorage has preferences, so we don't load from user preferences
+      // Just sync visibleSections with current filterOptions
+      if (isInitialLoad.current && Object.keys(filterOptions).length > 0) {
+        setVisibleSections(filterOptions);
+        isInitialLoad.current = false;
+      }
+      return;
+    }
+
+    // Only load from user preferences if localStorage is empty
     if (!user?.preferences?.visibleNavigation) return;
 
     // Skip if section order hasn't changed and user preferences haven't changed
@@ -55,6 +82,7 @@ export const useSyncNavigationFilters = () => {
     sectionOrder,
     setFilterOptions,
     filterOptions,
+    setVisibleSections,
   ]);
 
   // Update user preferences when filter options change

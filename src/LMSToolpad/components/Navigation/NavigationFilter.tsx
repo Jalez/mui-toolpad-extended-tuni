@@ -38,8 +38,8 @@ export const NavigationFilter = () => {
 
     sectionOrder.forEach((header) => {
       if (filterOptions[header] === undefined) {
-        // Default to true (visible) for all sections
-        newFilters[header] = true;
+        // Default: "Courses" = true, all other sections = false
+        newFilters[header] = header === "Courses";
         hasChanges = true;
       }
     });
