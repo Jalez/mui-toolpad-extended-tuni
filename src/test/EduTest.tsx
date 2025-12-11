@@ -20,6 +20,8 @@ const EduTest = () => {
     removeCourseMicroserviceNavigation,
   } = useCourseNavigationStore();
 
+    console.log("[EduTest] Component rendering");
+
   // Define navigation structure
   // - "edutest" root: no view, shows tool selector (no title needed)
   // - "dashboard": shows title "Dashboard" + view + subsections
@@ -76,8 +78,10 @@ const EduTest = () => {
   );
 
   useEffect(() => {
+    console.log("[EduTest] useEffect - registering navigation:", eduTestNavigation.segment);
     addCourseMicroserviceNavigation(eduTestNavigation);
     return () => {
+      console.log("[EduTest] useEffect cleanup - unregistering");
       removeCourseMicroserviceNavigation(eduTestNavigation.segment);
     };
   }, [addCourseMicroserviceNavigation, removeCourseMicroserviceNavigation, eduTestNavigation]);
