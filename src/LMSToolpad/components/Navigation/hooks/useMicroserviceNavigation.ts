@@ -11,7 +11,7 @@ import {
  * Hook that maintains persistent navigation entries for microservices.
  */
 export const useMicroserviceNavigation = () => {
-  const { addSection, recalculateNavigation } = useNavigationStore();
+  const { addSection, recalculateNavigation, setVisibleSections } = useNavigationStore();
   const { setFilterOptions, initializeFilters } = useNavigationFilterStore();
   const { lastUpdate } = useMicroserviceRegistryStore();
 
@@ -61,8 +61,11 @@ export const useMicroserviceNavigation = () => {
 
     // Initialize filters for all sections and recalculate navigation
     initializeFilters();
+    // Sync visibleSections with filterOptions after initialization
+    const updatedFilters = useNavigationFilterStore.getState().filterOptions;
+    setVisibleSections(updatedFilters);
     recalculateNavigation();
-  }, [lastUpdate]); // Re-run when microservices are registered/unregistered
+  }, [lastUpdate, setVisibleSections]); // Re-run when microservices are registered/unregistered
 
   return null;
 };

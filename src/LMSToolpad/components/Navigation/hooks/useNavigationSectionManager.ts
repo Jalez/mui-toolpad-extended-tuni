@@ -24,7 +24,7 @@ interface DynamicSection {
 }
 
 export const useNavigationSectionManager = () => {
-  const { addSection, recalculateNavigation, sectionOrder } =
+  const { addSection, recalculateNavigation, sectionOrder, setVisibleSections } =
     useNavigationStore();
   const { setFilterOptions, initializeFilters } = useNavigationFilterStore();
 
@@ -32,12 +32,23 @@ export const useNavigationSectionManager = () => {
   useEffect(() => {
     if (sectionOrder.length > 0) {
       initializeFilters();
+      // Sync visibleSections with filterOptions after initialization
+      const updatedFilters = useNavigationFilterStore.getState().filterOptions;
+      setVisibleSections(updatedFilters);
       recalculateNavigation();
     }
-  }, [sectionOrder, initializeFilters, recalculateNavigation]);
+  }, [sectionOrder, initializeFilters, recalculateNavigation, setVisibleSections]);
 
   const addDynamicSection = useCallback(
     (section: DynamicSection) => {
+      // Add section first - this will set visibleSections if keepVisible is true
+      addSection({
+        underHeader: section.header,
+        keepVisible: section.keepVisible,
+        pages: section.pages || [],
+      });
+
+      // Also update filterOptions to keep them in sync
       if (section.keepVisible) {
         setFilterOptions((prev) => ({
           ...prev,
@@ -45,14 +56,10 @@ export const useNavigationSectionManager = () => {
         }));
       }
 
-      addSection({
-        underHeader: section.header,
-        pages: section.pages || [],
-      });
-
-      recalculateNavigation();
+      // Note: recalculateNavigation is called automatically by addSection
+      // when visibleSections is updated, so we don't need to call it here
     },
-    [addSection, setFilterOptions, recalculateNavigation]
+    [addSection, setFilterOptions]
   );
 
   return { addDynamicSection };
