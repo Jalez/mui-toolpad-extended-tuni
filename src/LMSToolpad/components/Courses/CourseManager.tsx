@@ -2,7 +2,6 @@ import { useEffect } from "react";
 import useCourseStore from "./store/useCourseStore";
 import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
 import { useRetry } from "../../hooks/useRetry";
-import { VisitedCoursesNavigationAdapter } from "./Navigation/VisitedCoursesNavigationAdapter";
 import CourseEventPublisher from "./CourseEventPublisher";
 
 
@@ -38,7 +37,6 @@ const CourseManager = () => {
 
   return (
     <>
-      <VisitedCoursesNavigationAdapter />
       <CourseNavigationBuilder />
       <CourseEventPublisher />
     </>

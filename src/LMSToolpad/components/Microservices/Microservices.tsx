@@ -6,7 +6,6 @@ import {
 } from "../Navigation/store/useNavigationStore";
 import Home from "../Routes/Home/Home";
 import React, { useEffect, useRef, useCallback } from "react";
-import { VisitedCoursesNavigationAdapter } from "../Courses/Navigation/VisitedCoursesNavigationAdapter";
 import { useMicroserviceRoutes } from "../Navigation/hooks/useMicroserviceRoutes";
 import { useCourseRoutes } from "../Courses/hooks/useCourseRoutes";
 import { useCourseNavigationStore } from "../Courses/store/useCourseNavigationStore";
@@ -52,12 +51,26 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
     
     const sectionsCount = Object.keys(navStore.sections).length;
     const courseMsCount = courseStore.allCourseMicroserviceNavigation.length;
+    const visibleSectionsCount = Object.values(navStore.visibleSections).filter(Boolean).length;
     
     // Only update if we have both sections and course microservices
-    if (sectionsCount > 0 && courseMsCount > 0) {
-      console.log("[Microservices] Updating navigation structure...", { sectionsCount, courseMsCount });
+    // Also check if there are visible sections to avoid unnecessary updates
+    if (sectionsCount > 0 && courseMsCount > 0 && visibleSectionsCount > 0) {
+      console.log("[Microservices] Updating navigation structure...", { 
+        sectionsCount, 
+        courseMsCount, 
+        visibleSectionsCount,
+        visibleSections: Object.keys(navStore.visibleSections).filter(k => navStore.visibleSections[k])
+      });
+      // Update navigation structure - this now automatically recalculates navigation
+      // within the same state update, ensuring we use the updated sections
       navStore.updateMicroserviceNavigationForSections();
-      navStore.recalculateNavigation();
+    } else {
+      console.log("[Microservices] Skipping navigation update - conditions not met:", {
+        sectionsCount,
+        courseMsCount,
+        visibleSectionsCount
+      });
     }
   }, []);
 
@@ -108,7 +121,6 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <VisitedCoursesNavigationAdapter />
       {/* Render children - this includes CourseMicroservice with its nested routes */}
       {children}
       {/* App-level routes */}

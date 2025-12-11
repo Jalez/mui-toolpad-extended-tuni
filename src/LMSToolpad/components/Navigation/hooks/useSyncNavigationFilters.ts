@@ -8,7 +8,7 @@ import { isEqual } from "lodash";
 export const useSyncNavigationFilters = () => {
   const { user, updateUser } = useUserStore();
   const { filterOptions, setFilterOptions } = useNavigationFilterStore();
-  const { sectionOrder } = useNavigationStore();
+  const { sectionOrder, setVisibleSections } = useNavigationStore();
   const isInitialLoad = useRef(true);
   const lastUserUpdate = useRef<string>("");
   const previousSectionOrder = useRef<string[]>([]);
@@ -33,13 +33,8 @@ export const useSyncNavigationFilters = () => {
     // Convert array of visible headers to Record<string, boolean>
     const initialFilters: Record<string, boolean> = {};
     sectionOrder.forEach((header) => {
-      // Always set "Last 5 visited courses" to visible if it exists
-      if (header === "Last 5 visited courses") {
-        initialFilters[header] = true;
-      } else {
-        initialFilters[header] =
-          user.preferences.visibleNavigation.includes(header);
-      }
+      initialFilters[header] =
+        user.preferences.visibleNavigation.includes(header);
     });
 
     // Only update if there's an actual change to avoid infinite loops
@@ -47,6 +42,8 @@ export const useSyncNavigationFilters = () => {
 
     if (filtersChanged || isInitialLoad.current) {
       setFilterOptions(initialFilters);
+      // Sync visibleSections with filterOptions
+      setVisibleSections(initialFilters);
       isInitialLoad.current = false;
     }
 
@@ -74,12 +71,8 @@ export const useSyncNavigationFilters = () => {
         lastUserUpdate.current = newPrefs;
 
         // Convert Record<string, boolean> to array of visible headers
-        // Exclude "Last 5 visited courses" from being saved in preferences
         const visibleHeaders = Object.entries(filterOptions)
-          .filter(
-            ([header, isVisible]) =>
-              isVisible && header !== "Last 5 visited courses"
-          )
+          .filter(([, isVisible]) => isVisible)
           .map(([header]) => header);
 
         // Only update user if visible headers have actually changed

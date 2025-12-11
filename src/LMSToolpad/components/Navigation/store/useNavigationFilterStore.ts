@@ -22,21 +22,17 @@ export const useNavigationFilterStore = create<NavigationFilterState>(
             ? optionsOrUpdater(state.filterOptions)
             : optionsOrUpdater;
 
-        // Always ensure "Last 5 visited courses" is visible if it exists
-        if ("Last 5 visited courses" in newOptions) {
-          newOptions["Last 5 visited courses"] = true;
-        }
-
         return { filterOptions: newOptions };
       }),
     initializeFilters: () => {
       const { sectionOrder } = useNavigationStore.getState();
       const currentFilters = get().filterOptions;
 
-      // Create an object with all sections set to true by default
+      // Create an object with sections set to their default visibility
       const defaultFilters = sectionOrder.reduce(
         (acc, sectionKey) => {
           // Only set if not already set to preserve user preferences
+          // All sections default to true (visible)
           if (!(sectionKey in currentFilters)) {
             acc[sectionKey] = true;
           }

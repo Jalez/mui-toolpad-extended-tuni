@@ -5,21 +5,6 @@ import { Outlet, useNavigate, useParams } from "react-router-dom";
 import useCourseStore, { Course } from "./store/useCourseStore";
 import { useNotificationStore } from "../Notifications/store/useNotificationsStore";
 import LoadingScreen from "../LoadingScreen";
-import {
-  addVisitedCourse,
-  getVisitedCourses,
-} from "../../hooks/useVisitedCourses";
-
-/**
- * Checks if a course is already in the visited courses list
- */
-const isAlreadyVisited = (
-  course: Course,
-  visitedCourseIds: string[]
-): boolean => {
-  const courseId = `${course.code}:${course.instance}`;
-  return visitedCourseIds.includes(courseId);
-};
 
 /**
  * Component for loading specific course instance data.
@@ -49,14 +34,6 @@ const CourseInstanceLoader = () => {
 
     if (foundCourse) {
       setCurrentCourse(foundCourse);
-
-      // Only add to visited courses if it's not already there
-      const currentVisited = getVisitedCourses();
-      if (!isAlreadyVisited(foundCourse, currentVisited)) {
-        addVisitedCourse(foundCourse).catch((error) => {
-          console.error("Failed to add course to visited courses:", error);
-        });
-      }
     } else {
       addNotificationData({
         type: "error",

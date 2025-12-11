@@ -29,24 +29,37 @@ export const NavigationFilter = () => {
     return { ...filterOptions };
   }, [filterOptions]);
 
-  // When sectionOrder changes, initialize missing sections to visible (true)
-  // but only do this once when sectionOrder or filterOptions change
+  // Sync visibleSections with filterOptions whenever filterOptions changes
+  // This ensures that the navigation store's visibleSections stays in sync with filterOptions
   useEffect(() => {
+    // First, ensure all sections in sectionOrder have a value in filterOptions
     const newFilters = { ...filterOptions };
     let hasChanges = false;
 
     sectionOrder.forEach((header) => {
       if (filterOptions[header] === undefined) {
-        newFilters[header] = false;
+        // Default to true (visible) for all sections
+        newFilters[header] = true;
         hasChanges = true;
       }
     });
 
-    // Only update if there are actual changes
-    if (hasChanges) {
-      setVisibleSections(newFilters);
+    // Always sync visibleSections with filterOptions (including newFilters if changed)
+    const filtersToSync = hasChanges ? newFilters : filterOptions;
+    
+    // Only update if there are actual changes to avoid infinite loops
+    const currentVisibleSections = useNavigationStore.getState().visibleSections;
+    const visibleSectionsChanged = JSON.stringify(currentVisibleSections) !== JSON.stringify(filtersToSync);
+    
+    if (hasChanges || visibleSectionsChanged) {
+      if (hasChanges) {
+        // Update filterOptions first if we added defaults
+        setFilterOptions(newFilters);
+      }
+      // Then sync visibleSections - this will trigger recalculateNavigation automatically
+      setVisibleSections(filtersToSync);
     }
-  }, [sectionOrder, filterOptions, setVisibleSections]);
+  }, [sectionOrder, filterOptions, setFilterOptions, setVisibleSections]);
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault();
@@ -63,11 +76,6 @@ export const NavigationFilter = () => {
     (event: React.MouseEvent<HTMLElement>, option: string) => {
       event.preventDefault();
       event.stopPropagation();
-
-      // Prevent toggling "Last 5 visited courses" section
-      if (option === "Last 5 visited courses") {
-        return;
-      }
 
       const newOptions = {
         ...filterOptions,
@@ -118,7 +126,6 @@ export const NavigationFilter = () => {
           <MenuItem
             key={option}
             onClick={(event) => handleToggle(event, option)}
-            disabled={option === "Last 5 visited courses"}
           >
             <Checkbox checked={localFilterOptions[option]} />
             <ListItemText primary={option} />
