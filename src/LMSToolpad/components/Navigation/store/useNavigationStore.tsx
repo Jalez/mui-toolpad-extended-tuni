@@ -58,6 +58,7 @@ export type NavigationStoreItem =
  */
 export type addSectionProps = {
   underHeader: string;
+  keepVisible?: boolean;
   pages: Array<{
     segment: string;
     title: string;
@@ -181,24 +182,140 @@ type ViewStore = {
  * This is microservice-agnostic - it doesn't hard-code specific store types.
  * The only store-specific code is here, allowing the rest of the logic to be generic.
  */
+/**
+ * Helper function to calculate navigation structure from sections.
+ * This is extracted to be reusable from both updateMicroserviceNavigationForSections and recalculateNavigation.
+ */
+const calculateNavigationFromSections = (
+  sections: Record<string, NavigationSection>,
+  sectionOrder: string[],
+  visibleSections: Record<string, boolean>
+): NavigationStoreItem[] => {
+  let sectionNavigation: NavigationStoreItem[] = [];
+
+  console.log("[calculateNavigationFromSections] Starting. sectionOrder:", sectionOrder, "visibleSections:", visibleSections);
+  
+  // Verify state after update - check if children are present
+  const sectionsWithChildren = Object.entries(sections).map(([key, section]) => ({
+    sectionKey: key,
+    pages: Object.entries(section.pages).map(([pageKey, page]) => ({
+      pageKey,
+      segment: page.segment,
+      childrenCount: page.children?.length || 0,
+      firstChild: page.children?.[0] ? {
+        segment: page.children[0].segment,
+        childrenCount: page.children[0].children?.length || 0,
+        microservices: page.children[0].metadata?.microservices
+      } : null
+    }))
+  }));
+  console.log("[calculateNavigationFromSections] State verification - sections with children:", 
+    sectionsWithChildren.filter(s => s.pages.some(p => p.childrenCount > 0))
+      .map(s => ({
+        section: s.sectionKey,
+        pages: s.pages.filter(p => p.childrenCount > 0)
+      }))
+  );
+
+  // Build FULL navigation structure for route matching and breadcrumbs
+  // Sidebar collapse is a UI concern handled by the sidebar component
+  sectionOrder.forEach((sectionKey) => {
+    if (!visibleSections[sectionKey]) {
+      console.log(`[calculateNavigationFromSections] Skipping section ${sectionKey} - not visible`);
+      return;
+    }
+
+    const section = sections[sectionKey];
+    if (section) {
+      if (sectionNavigation.length > 0) {
+        sectionNavigation.push({ kind: "divider" });
+      }
+
+      // Always include full section structure for proper route matching
+      sectionNavigation.push(section.header);
+      section.pageOrder.forEach((pageKey) => {
+        const page = section.pages[pageKey];
+        // Log the first page's structure
+        if (pageKey === section.pageOrder[0]) {
+          console.log(`[calculateNavigationFromSections] Section ${sectionKey} first page:`, {
+            segment: page.segment,
+            childrenCount: page.children?.length,
+            firstChildChildren: page.children?.[0]?.children?.length,
+            firstChildSegment: page.children?.[0]?.segment
+          });
+        }
+        sectionNavigation.push(page);
+      });
+    }
+  });
+
+  if (DEFAULTNAVIGATION.length > 0) {
+    if (sectionNavigation.length > 0) {
+      sectionNavigation.push({ kind: "divider" });
+    }
+    sectionNavigation = [...sectionNavigation, ...DEFAULTNAVIGATION];
+  }
+
+  // Log navigation structure for debugging - find pages with grandchildren (microservices)
+  const pagesWithGrandchildren = sectionNavigation.filter(
+    (item): item is NavigationPageStoreItem => 
+      item.kind === "page" && 
+      !!(item.children && item.children.some(c => c.children && c.children.length > 0))
+  );
+  
+  if (pagesWithGrandchildren.length > 0) {
+    console.log("[calculateNavigationFromSections] Pages with grandchildren (microservices):", 
+      pagesWithGrandchildren.slice(0, 2).map(p => ({
+        segment: p.segment,
+        children: p.children?.map(c => ({
+          segment: c.segment,
+          grandchildren: c.children?.map(gc => gc.segment)
+        }))
+      }))
+    );
+  } else {
+    // Check what we DO have
+    const pagesWithChildren = sectionNavigation.filter(
+      (item): item is NavigationPageStoreItem => 
+        item.kind === "page" && !!(item.children && item.children.length > 0)
+    );
+    console.log("[calculateNavigationFromSections] No pages with grandchildren. Pages with children:", 
+      pagesWithChildren.slice(0, 2).map(p => ({
+        segment: p.segment,
+        childrenCount: p.children?.length,
+        firstChildHasGrandchildren: p.children?.[0]?.children?.length || 0
+      }))
+    );
+  }
+
+  return sectionNavigation;
+};
+
 const getAllMicroservices = (state: ViewStore): NavigationPageStoreItem[] => {
   const sources: NavigationPageStoreItem[][] = [
     state.allMicroserviceNavigation, // App-level
   ];
 
+  console.log("[getAllMicroservices] App-level microservices:", state.allMicroserviceNavigation.length);
+
   // Add course microservices if course navigation store exists
   if (useCourseNavigationStore) {
     try {
       const courseStore = useCourseNavigationStore.getState();
+      console.log("[getAllMicroservices] Course store state:", courseStore);
+      console.log("[getAllMicroservices] Course microservices from store:", courseStore?.allCourseMicroserviceNavigation?.length, courseStore?.allCourseMicroserviceNavigation?.map(m => m.segment));
       if (courseStore?.allCourseMicroserviceNavigation) {
         sources.push(courseStore.allCourseMicroserviceNavigation);
       }
-    } catch {
+    } catch (e) {
+      console.error("[getAllMicroservices] Error accessing course store:", e);
       // Course store not available - continue without it
     }
   }
 
-  return sources.flat();
+  const result = sources.flat();
+  console.log("[getAllMicroservices] Total microservices:", result.length, result.map(m => m.segment));
+  return result;
 };
 
 export const useNavigationStore = create<ViewStore>((set, get) => ({
@@ -211,6 +328,8 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
 
   setVisibleSections: (options: Record<string, boolean>) => {
     set({ visibleSections: options });
+    // Trigger recalculation after visible sections are updated
+    get().recalculateNavigation();
   },
 
   setCollapsedSections: (options: Record<string, boolean>) => {
@@ -226,10 +345,23 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
     }));
   },
 
-  addSection: ({ underHeader, pages }) =>
+  addSection: ({ underHeader, pages, keepVisible }) =>
     set((state) => {
       const sectionKey = underHeader;
       const newSections = { ...state.sections };
+      const newVisibleSections = { ...state.visibleSections };
+
+      console.log(`[addSection] Adding section: ${sectionKey} with ${pages.length} pages, keepVisible=${keepVisible}`);
+
+      // Set visibleSections if keepVisible is true (but not for "Last 5 visited courses" by default)
+      if (keepVisible) {
+        newVisibleSections[sectionKey] = true;
+        console.log(`[addSection] Setting ${sectionKey} to visible (keepVisible=true)`);
+      } else if (!(sectionKey in newVisibleSections)) {
+        // If not explicitly set, default to false (not visible)
+        newVisibleSections[sectionKey] = false;
+        console.log(`[addSection] Setting ${sectionKey} to not visible by default`);
+      }
 
       if (!newSections[sectionKey]) {
         newSections[sectionKey] = {
@@ -250,6 +382,8 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
           actionFC,
         } = pageConfig;
 
+        console.log(`[addSection] Page ${segment}: instances=${instances?.join(',')}, microservices=${microservices?.join(',')}`);
+
         const pageChildren = instances?.map((instance) => ({
           kind: "page" as const,
           segment: instance,
@@ -261,6 +395,11 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
           },
           children: [],
         }));
+
+        console.log(`[addSection] Page ${segment} children (instances):`, pageChildren?.map(c => ({
+          segment: c.segment,
+          microservices: c.metadata?.microservices
+        })));
 
         const newPage: NavigationPageStoreItem = {
           kind: "page" as const,
@@ -288,63 +427,47 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
         ? state.sectionOrder
         : [...state.sectionOrder, sectionKey];
 
-      return {
+      const updatedState = {
         sections: newSections,
         sectionOrder: newSectionOrder,
+        visibleSections: newVisibleSections,
       };
+
+      // If this section is visible and we have course microservices, 
+      // trigger microservice navigation update immediately
+      // This ensures microservices are added right away
+      if (newVisibleSections[sectionKey]) {
+        // Check if there are course microservices available
+        try {
+          const courseStore = useCourseNavigationStore?.getState();
+          if (courseStore?.allCourseMicroserviceNavigation?.length > 0) {
+            // We'll update microservices in a separate call to avoid circular dependencies
+            // The Microservices.tsx subscription will handle this
+            console.log(`[addSection] Section ${sectionKey} is visible and course microservices exist, will be updated by subscription`);
+          }
+        } catch (e) {
+          // Course store not available - ignore
+        }
+      }
+
+      return updatedState;
     }),
 
   recalculateNavigation: () => {
     const state = get();
-    const { visibleSections } = state;
-    let sectionNavigation: NavigationStoreItem[] = [];
-
-    // Build FULL navigation structure for route matching and breadcrumbs
-    // Sidebar collapse is a UI concern handled by the sidebar component
-    state.sectionOrder.forEach((sectionKey) => {
-      if (!visibleSections[sectionKey]) return;
-
-      const section = state.sections[sectionKey];
-      if (section) {
-        if (sectionNavigation.length > 0) {
-          sectionNavigation.push({ kind: "divider" });
-        }
-
-        // Always include full section structure for proper route matching
-        sectionNavigation.push(section.header);
-        section.pageOrder.forEach((pageKey) => {
-          sectionNavigation.push(section.pages[pageKey]);
-        });
-      }
-    });
-
-    if (DEFAULTNAVIGATION.length > 0) {
-      if (sectionNavigation.length > 0) {
-        sectionNavigation.push({ kind: "divider" });
-      }
-      sectionNavigation = [...sectionNavigation, ...DEFAULTNAVIGATION];
-    }
-
-    // Log navigation structure for debugging
-    const pagesWithChildren = sectionNavigation.filter(
-      (item): item is NavigationPageStoreItem => 
-        item.kind === "page" && !!(item.children && item.children.length > 0)
+    const sectionNavigation = calculateNavigationFromSections(
+      state.sections,
+      state.sectionOrder,
+      state.visibleSections
     );
-    if (pagesWithChildren.length > 0) {
-      console.log("[recalculateNavigation] Pages with children:", pagesWithChildren.slice(0, 3).map(p => ({
-        segment: p.segment,
-        children: p.children?.map(c => ({
-          segment: c.segment,
-          grandchildren: c.children?.map(gc => gc.segment)
-        }))
-      })));
-    }
 
     if (
       JSON.stringify(state.navigation) !== JSON.stringify(sectionNavigation)
     ) {
-      console.log("[recalculateNavigation] Navigation changed, updating state");
+      console.log("[recalculateNavigation] Navigation changed, updating state. Total items:", sectionNavigation.length);
       set({ navigation: sectionNavigation });
+    } else {
+      console.log("[recalculateNavigation] No navigation changes");
     }
   },
 
@@ -369,6 +492,11 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
     try {
       const result = set((state) => {
         try {
+          // Get current visibleSections - use the state's visibleSections
+          // If visibleSections is empty but we have sections, this means no sections are marked as visible
+          // In that case, we should still calculate navigation but it will be empty (all sections skipped)
+          const effectiveVisibleSections = { ...state.visibleSections };
+          
           const newSections = { ...state.sections };
           let hasChanges = false;
 
@@ -386,14 +514,31 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
 
           Object.keys(newSections).forEach((sectionKey) => {
             // Deep clone the section to avoid mutation issues
+            // Need to deep clone pages and their nested children structure
+            const originalSection = newSections[sectionKey];
             let currentSection = {
-              ...newSections[sectionKey],
-              pages: { ...newSections[sectionKey].pages },
+              ...originalSection,
+              pages: Object.keys(originalSection.pages).reduce((acc, pageKey) => {
+                const page = originalSection.pages[pageKey];
+                // Deep clone page with nested children structure
+                acc[pageKey] = {
+                  ...page,
+                  children: page.children?.map(child => ({
+                    ...child,
+                    children: child.children ? [...child.children] : undefined
+                  }))
+                };
+                return acc;
+              }, {} as Record<string, NavigationPageStoreItem>),
             };
             let sectionHasChanges = false;
             
+            console.log(`[updateMicroserviceNavigationForSections] Processing section: ${sectionKey}, pages:`, Object.keys(currentSection.pages));
+            
             Object.keys(currentSection.pages).forEach((pageKey) => {
               const page = currentSection.pages[pageKey];
+              
+              console.log(`[updateMicroserviceNavigationForSections] Page ${pageKey}: metadata.microservices=${page.metadata?.microservices}, children=${page.children?.length || 0}`);
               
               if (page.metadata?.microservices) {
                 // Page directly expects microservices
@@ -407,6 +552,8 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
                 );
                 const newChildren = [...originalChildren, ...msItems];
                 
+                console.log(`[updateMicroserviceNavigationForSections] Page ${pageKey} direct microservices: msItems=`, msItems.map(m => m.segment));
+                
                 if (JSON.stringify(page.children) !== JSON.stringify(newChildren)) {
                   currentSection.pages[pageKey] = { ...page, children: newChildren };
                   sectionHasChanges = true;
@@ -415,30 +562,59 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
               } else if (page.children && page.children.length > 0) {
                 // Process children - must create new objects for immutable update
                 let pageHasChanges = false;
-                const updatedChildren = page.children.map((child) => {
+                
+                console.log(`[updateMicroserviceNavigationForSections] Page ${pageKey} has children (instances):`, (page.children || []).map(c => ({
+                  segment: c.segment,
+                  microservices: c.metadata?.microservices
+                })));
+                
+                // Ensure we always have an array to map over
+                const updatedChildren = (page.children || []).map((child) => {
                   if (child.metadata?.microservices) {
+                    console.log(`[updateMicroserviceNavigationForSections] Child ${child.segment} expects microservices:`, child.metadata.microservices);
+                    
                     const originalSubChildren =
-                      child.children?.filter(
+                      (child.children || []).filter(
                         (subChild) =>
                           !allMicroservices.some((ms) => ms.segment === subChild.segment)
-                      ) || [];
+                      );
                     const msItems = allMicroservices.filter((ms) =>
                       child.metadata!.microservices!.includes(ms.segment)
                     );
+                    
+                    console.log(`[updateMicroserviceNavigationForSections] Child ${child.segment} matched microservices:`, msItems.map(m => m.segment));
+                    
                     const newSubChildren = [...originalSubChildren, ...msItems];
                     
-                    if (JSON.stringify(child.children) !== JSON.stringify(newSubChildren)) {
+                    // Compare lengths and segments to avoid expensive JSON.stringify
+                    const currentChildren = child.children || [];
+                    const hasChanged = 
+                      currentChildren.length !== newSubChildren.length ||
+                      !currentChildren.every((c, i) => c.segment === newSubChildren[i]?.segment);
+                    
+                    if (hasChanged) {
+                      console.log(`[updateMicroserviceNavigationForSections] Child ${child.segment} children CHANGED:`, currentChildren.length, '->', newSubChildren.length);
                       pageHasChanges = true;
+                      // Create new child object with new children array
                       return { ...child, children: newSubChildren };
+                    } else {
+                      console.log(`[updateMicroserviceNavigationForSections] Child ${child.segment} children unchanged`);
+                      // Still return a new object reference to ensure immutability
+                      return { ...child };
                     }
                   }
-                  return child;
+                  // Return new object reference even if no changes
+                  return { ...child };
                 });
                 
                 if (pageHasChanges) {
+                  // Create new page object with new children array
                   currentSection.pages[pageKey] = { ...page, children: updatedChildren };
                   sectionHasChanges = true;
                   hasChanges = true;
+                } else if (page.children) {
+                  // Even if no changes, ensure we have a new array reference for immutability
+                  currentSection.pages[pageKey] = { ...page, children: [...updatedChildren] };
                 }
               }
             });
@@ -449,7 +625,46 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
           });
           
           console.log("[updateMicroserviceNavigationForSections] Done, hasChanges:", hasChanges);
-          return hasChanges ? { sections: newSections } : state;
+          if (hasChanges) {
+            // Verify the updated sections before returning
+            const sectionsWithUpdates = Object.entries(newSections).map(([key, section]) => ({
+              sectionKey: key,
+              pages: Object.entries(section.pages).map(([pageKey, page]) => ({
+                pageKey,
+                segment: page.segment,
+                childrenCount: page.children?.length || 0,
+                firstChild: page.children?.[0] ? {
+                  segment: page.children[0].segment,
+                  childrenCount: page.children[0].children?.length || 0,
+                  microservices: page.children[0].metadata?.microservices
+                } : null
+              }))
+            }));
+            console.log("[updateMicroserviceNavigationForSections] State after update - sections with children:", 
+              sectionsWithUpdates.filter(s => s.pages.some(p => (p.firstChild?.childrenCount ?? 0) > 0))
+                .map(s => ({
+                  section: s.sectionKey,
+                  pages: s.pages.filter(p => p.firstChild && (p.firstChild.childrenCount ?? 0) > 0)
+                }))
+            );
+            
+            // Calculate navigation from the updated sections immediately (within the same set() callback)
+            // Use effectiveVisibleSections to ensure we use the updated state, not stale state
+            const updatedNavigation = calculateNavigationFromSections(
+              newSections,
+              state.sectionOrder,
+              effectiveVisibleSections
+            );
+            
+            console.log("[updateMicroserviceNavigationForSections] Calculated navigation with", updatedNavigation.length, "items");
+            
+            // Return both updated sections and navigation in the same state update
+            return { 
+              sections: newSections,
+              navigation: updatedNavigation
+            };
+          }
+          return state;
         } catch (error) {
           console.error(
             "[updateMicroserviceNavigationForSections] Error:",
@@ -508,6 +723,8 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
 }));
 
 // Component for section toggle action (defined after store to avoid circular dependency)
+// Note: Currently unused but kept for potential future use
+// @ts-expect-error - Intentionally unused, kept for future use
 const SectionToggleAction: React.FC<{ sectionKey: string }> = ({ sectionKey }) => {
   const handleClick = () => {
     const store = useNavigationStore.getState();
