@@ -17,7 +17,7 @@ const baseConstraints = {
 export const homePresetLayouts: Record<string, Layouts> = {
   default: {
     lg: [
-      createGridItem("course-list", 0, 0, 6, 3, baseConstraints),
+      createGridItem("course-list", 2, 1, 6, 3, baseConstraints),
       createGridItem("calendar", 6, 0, 6, 3, baseConstraints),
       createGridItem("mindmap", 0, 3, 12, 3, baseConstraints),
     ],
