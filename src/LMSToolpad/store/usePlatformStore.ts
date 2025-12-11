@@ -3,7 +3,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Layouts } from "react-grid-layout";
-import { homePresetLayouts } from "../components/Common/GridLayout/presetLayouts";
 
 export interface AuthSettings {
   allowedAuthMethods: ("local" | "google" | "microsoft" | "shibboleth")[];
@@ -286,7 +285,7 @@ const DEFAULT_SETTINGS: Platform = {
     },
   },
   interface: {
-    layout: homePresetLayouts.default,
+    layout: { lg: [], md: [], sm: [], xs: [] },
   },
 };
 
