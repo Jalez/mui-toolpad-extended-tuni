@@ -45,9 +45,6 @@ const CalendarManager = () => {
       maxW: 15,
       maxH: 15,
     });
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CalendarManager.tsx:45',message:'Registering calendar grid item',data:{layout:gridItemLayout},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-    // #endregion
     registerGridItem("calendar", <Calendar />, gridItemLayout);
 
     return () => {

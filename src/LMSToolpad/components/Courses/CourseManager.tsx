@@ -55,9 +55,6 @@ const CourseManager = () => {
     });
 
     registerGridItem("course-list", <CourseList displayMode="instance" containerHeight="100%" />, courseListLayout);
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CourseManager.tsx:52',message:'Registering course-list grid item',data:{layout:courseListLayout},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'D'})}).catch(()=>{});
-    // #endregion
 
     return () => {
       unregisterGridItem("course-list");
