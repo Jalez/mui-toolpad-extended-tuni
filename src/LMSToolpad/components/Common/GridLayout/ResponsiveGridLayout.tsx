@@ -13,6 +13,7 @@ const ReactGridLayout = WidthProvider(Responsive);
 export interface GridItem {
   id: string;
   content: ReactNode;
+  layout?: Layout;
 }
 
 export interface GridLayoutProps {
@@ -33,16 +34,81 @@ const ResponsiveGridLayout: React.FC<GridLayoutProps> = ({
   const [containerWidth, setContainerWidth] = useState(1200);
   const { editMode } = useGridLayout();
 
+  // #region agent log
+  useEffect(() => {
+    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ResponsiveGridLayout.tsx:36',message:'Items received',data:{itemIds:items.map(i=>i.id),itemsWithLayouts:items.filter(i=>i.layout).map(i=>({id:i.id,layout:i.layout}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+  }, [items]);
+  // #endregion
+
+  // Merge registered item layouts into layouts, using saved layouts when available
   useEffect(() => {
     try {
       const savedLayouts = localStorage.getItem(storageKey);
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ResponsiveGridLayout.tsx:42',message:'Loading saved layouts',data:{storageKey,hasSavedLayouts:!!savedLayouts,savedLayouts:savedLayouts?JSON.parse(savedLayouts):null},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
+      // #endregion
+      
+      const breakpoints = ['lg', 'md', 'sm', 'xs'];
+      const mergedLayouts: Layouts = { lg: [], md: [], sm: [], xs: [] };
+      
+      // Start with saved layouts if they exist, otherwise use defaultLayouts
+      let baseLayouts: Layouts = defaultLayouts;
       if (savedLayouts) {
-        setCurrentLayouts(JSON.parse(savedLayouts));
+        try {
+          baseLayouts = JSON.parse(savedLayouts);
+        } catch (e) {
+          console.error("Failed to parse saved layouts:", e);
+        }
       }
+      
+      // For each breakpoint, merge saved/default layouts with registered item layouts
+      for (const breakpoint of breakpoints) {
+        const savedBreakpointLayouts = baseLayouts[breakpoint] || [];
+        const savedLayoutMap = new Map(savedBreakpointLayouts.map(l => [l.i, l]));
+        
+        // Process each item
+        items.forEach(item => {
+          const savedLayout = savedLayoutMap.get(item.id);
+          
+          if (savedLayout) {
+            // Item has saved layout - check if it's unreasonably small (w:1, h:1)
+            // If so and we have a registered layout, use the registered layout instead
+            if (savedLayout.w === 1 && savedLayout.h === 1 && item.layout) {
+              // Replace unreasonably small saved layout with registered layout
+              mergedLayouts[breakpoint].push({ ...item.layout });
+              // #region agent log
+              fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ResponsiveGridLayout.tsx:65',message:'Replacing small saved layout with registered layout',data:{breakpoint,itemId:item.id,savedLayout,registeredLayout:item.layout},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+              // #endregion
+            } else {
+              // Use saved layout (preserves user customizations)
+              mergedLayouts[breakpoint].push({ ...savedLayout });
+            }
+          } else if (item.layout) {
+            // Item has registered layout and no saved layout - use registered layout
+            // The component that registered this item chose its default size
+            mergedLayouts[breakpoint].push({ ...item.layout });
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ResponsiveGridLayout.tsx:87',message:'Using registered layout for item',data:{breakpoint,itemId:item.id,layout:item.layout},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
+          } else {
+            // Item has no layout - this should not happen if components register properly
+            // Log warning but don't create automatic defaults (components should register with layouts)
+            console.warn(`Grid item "${item.id}" has no registered layout. Components should register with default sizes via registerGridItem().`);
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ResponsiveGridLayout.tsx:93',message:'Item missing registered layout',data:{breakpoint,itemId:item.id},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+            // #endregion
+          }
+        });
+      }
+      
+      // #region agent log
+      fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ResponsiveGridLayout.tsx:85',message:'Setting merged layouts',data:{mergedLayouts},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'C'})}).catch(()=>{});
+      // #endregion
+      setCurrentLayouts(mergedLayouts);
     } catch (e) {
       console.error("Failed to load layouts:", e);
     }
-  }, [storageKey]);
+  }, [storageKey, items, defaultLayouts]);
 
   const onLayoutChange = useCallback(
     (_: Layout[], allLayouts: Layouts) => {
@@ -112,6 +178,12 @@ const ResponsiveGridLayout: React.FC<GridLayoutProps> = ({
         onLayoutChange={onLayoutChange}
         resizeHandles={["se", "sw", "ne", "nw"]}
       >
+        {/* #region agent log */}
+        {(() => {
+          fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ResponsiveGridLayout.tsx:114',message:'Rendering items with currentLayouts',data:{currentLayouts,itemIds:items.map(i=>i.id),itemsWithLayouts:items.filter(i=>i.layout).map(i=>({id:i.id,layout:i.layout}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+          return null;
+        })()}
+        {/* #endregion */}
         {items.map((item) => (
           <Box
             key={item.id}
