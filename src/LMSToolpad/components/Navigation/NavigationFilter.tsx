@@ -6,6 +6,7 @@ import {
   Checkbox,
   ListItemText,
   Box,
+  Tooltip,
 } from "@mui/material";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -96,19 +97,21 @@ export const NavigationFilter = () => {
 
   return (
     <Box>
-      <IconButton
-        disabled={Object.keys(localFilterOptions).length === 0}
-        onClick={handleClick}
-        size="small"
-      >
-        <FilterListIcon
-          htmlColor={
-            Object.keys(localFilterOptions).length === 0
-              ? theme.palette.text.disabled
-              : theme.palette.text.primary
-          }
-        />
-      </IconButton>
+      <Tooltip title="Filter navigation sections">
+        <IconButton
+          disabled={Object.keys(localFilterOptions).length === 0}
+          onClick={handleClick}
+          size="small"
+        >
+          <FilterListIcon
+            htmlColor={
+              Object.keys(localFilterOptions).length === 0
+                ? theme.palette.text.disabled
+                : theme.palette.text.primary
+            }
+          />
+        </IconButton>
+      </Tooltip>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
