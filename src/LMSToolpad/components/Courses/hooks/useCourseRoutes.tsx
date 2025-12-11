@@ -2,48 +2,14 @@
 
 import React, { useMemo } from "react";
 import type { ReactElement } from "react";
-import { Route, useNavigate, useLocation } from "react-router-dom";
+import { Route } from "react-router-dom";
 import CourseCodeLoader from "../CourseCodeLoader";
 import CourseInstanceSelector from "../CourseInstanceSelector";
 import CourseInstanceLoader from "../CourseInstanceLoader";
 import CourseTools from "../CourseTools";
 import { NavigationPageStoreItem } from "../../Navigation/store/useNavigationStore";
 import { useCourseNavigationStore } from "../store/useCourseNavigationStore";
-import { Typography, IconButton, Box } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SubSections from "../../Microservices/MicroserviceSubsections";
-
-/**
- * Page header component with back button and title
- */
-const PageHeader: React.FC<{ title: string; onBack?: () => void }> = ({
-  title,
-  onBack,
-}) => (
-  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-    {onBack && (
-      <IconButton
-        onClick={onBack}
-        sx={{ mr: 1, color: "primary.main" }}
-        aria-label="Go back"
-      >
-        <ArrowBackIcon />
-      </IconButton>
-    )}
-    <Typography variant="h2" sx={{ color: "primary.main" }}>
-      {title}
-    </Typography>
-  </Box>
-);
-
-/**
- * Helper function to get parent path for back navigation
- */
-const getParentPath = (currentPath: string) => {
-  const pathSegments = currentPath.split("/").filter(Boolean);
-  pathSegments.pop();
-  return "/" + pathSegments.join("/");
-};
 
 /**
  * Component wrapper that provides navigation context for course routes
@@ -52,21 +18,8 @@ const CourseRouteWrapper: React.FC<{
   children: React.ReactNode;
   title?: string;
   showTitle?: boolean;
-}> = ({ children, title, showTitle }) => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  return (
-    <>
-      {title && showTitle !== false && (
-        <PageHeader
-          title={title}
-          onBack={() => navigate(getParentPath(location.pathname))}
-        />
-      )}
-      {children}
-    </>
-  );
+}> = ({ children }) => {
+  return <>{children}</>;
 };
 
 /**
