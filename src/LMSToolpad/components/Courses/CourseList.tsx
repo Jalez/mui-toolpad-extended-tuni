@@ -1,9 +1,9 @@
 /** @format */
 import useCourseStore, { Course } from "./store/useCourseStore";
 import CourseItem from "./CourseItem/CourseItem";
-import { useUserStore } from "../../store/useUserStore";
 import Scroller from "../Common/Panel/Scrollable/Scroller"; // Our unified scroller
 import { useNavigate } from "react-router-dom";
+import { useNavigationStore } from "../Navigation/store/useNavigationStore";
 
 import { Box } from "@mui/material";
 
@@ -27,10 +27,18 @@ const CourseList = ({
     availableCourses,
   } = useCourseStore();
   const navigate = useNavigate();
-  const { user } = useUserStore();
+  // Subscribe to navigation store to get visible sections from the navigation filter
+  const { visibleSections } = useNavigationStore();
   const minHeight = 200;
   const minWidth = 300;
-  const visibleLists = user?.preferences.visibleCourseLists;
+  
+  // Map navigation section names to course list sections
+  // Navigation sections: "Courses", "Courses (Old)", "Teaching Courses", "Teaching Courses (Old)", "Available Courses"
+  const isCoursesVisible = visibleSections["Courses"] === true;
+  const isCoursesOldVisible = visibleSections["Courses (Old)"] === true;
+  const isTeachingVisible = visibleSections["Teaching Courses"] === true;
+  const isTeachingOldVisible = visibleSections["Teaching Courses (Old)"] === true;
+  const isAvailableVisible = visibleSections["Available Courses"] === true;
 
   const handleCourseClick = (course: Course) => {
     navigate(`/${course.code}/${course.instance}`);
@@ -75,24 +83,26 @@ const CourseList = ({
         itemSize={minHeight}
         containerSize={containerHeight}
       >
-        {visibleLists?.isStudent &&
-          learningCourses.length !== 0 &&
+        {/* Only render sections that are both visible in navigation filter AND have courses */}
+        {/* Navigation filter controls: "Courses", "Courses (Old)", "Teaching Courses", "Teaching Courses (Old)", "Available Courses" */}
+        {isCoursesVisible &&
+          learningCourses.length > 0 &&
           renderCourseSection("My Enrolled Courses", learningCourses, "high")}
-        {visibleLists?.isStudentOld &&
-          learningCoursesOld.length !== 0 &&
+        {isCoursesOldVisible &&
+          learningCoursesOld.length > 0 &&
           renderCourseSection(
             "My Completed Courses",
             learningCoursesOld,
             "low"
           )}
-        {visibleLists?.isTeacher &&
-          teachingCourses.length !== 0 &&
+        {isTeachingVisible &&
+          teachingCourses.length > 0 &&
           renderCourseSection("My Teaching Courses", teachingCourses, "low")}
-        {visibleLists?.isTeacherOld &&
-          teachingCoursesOld.length !== 0 &&
+        {isTeachingOldVisible &&
+          teachingCoursesOld.length > 0 &&
           renderCourseSection("My Past Teaching", teachingCoursesOld, "low")}
-        {visibleLists?.available &&
-          availableCourses.length !== 0 &&
+        {isAvailableVisible &&
+          availableCourses.length > 0 &&
           renderCourseSection("Available Courses", availableCourses, "low")}
       </Scroller>
     </Box>
