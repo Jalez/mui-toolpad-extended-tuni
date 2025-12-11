@@ -32,16 +32,22 @@ const CalendarManager = () => {
 
   // Register grid item on mount
   useEffect(() => {
-    const baseConstraints = {
+    // Create grid item with default layout
+    // Calendar chooses its own default size: full width (15 cols), 2 rows height
+    const gridItemLayout = createGridItem({
+      id: "calendar",
+      x: 0,
+      y: 0,
+      w: 15,
+      h: 2,
       minW: 1,
       minH: 1,
-      maxW: 12,
-      maxH: 12,
-    };
-
-    // Create grid item with default layout
-    const gridItemLayout = createGridItem("calendar", 6, 0, 6, 4, baseConstraints);
-
+      maxW: 15,
+      maxH: 15,
+    });
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CalendarManager.tsx:45',message:'Registering calendar grid item',data:{layout:gridItemLayout},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    // #endregion
     registerGridItem("calendar", <Calendar />, gridItemLayout);
 
     return () => {
