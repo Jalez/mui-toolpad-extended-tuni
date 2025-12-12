@@ -66,3 +66,4 @@ export function getEffectiveColorScheme(preference: ColorSchemePreference): 'lig
   }
   return preference;
 }
+
