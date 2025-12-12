@@ -11,7 +11,7 @@ import LtiLoginUrlForm from "./LtiLoginUrlForm";
 import {
   NavigationPageStoreItem,
 } from "../Navigation/store/useNavigationStore";
-import { useCourseNavigationStore } from "./store/useCourseNavigationStore";
+import { useCourseMicroserviceRegistration } from "./CourseMicroservice";
 
 interface CourseToolsProps {
   microservices?: NavigationPageStoreItem[];
@@ -37,7 +37,7 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
   const { updateStateCourse, currentCourse } = useCourseStore();
   const { addNotificationData } = useNotificationStore();
   const [show, setShow] = useState(true);
-  const { allCourseMicroserviceNavigation } = useCourseNavigationStore();
+  const { allCourseMicroserviceNavigation } = useCourseMicroserviceRegistration();
   const [currentMicroservices, setCurrentMicroservices] = useState<
     NavigationPageStoreItem[] | undefined
   >(microservices);

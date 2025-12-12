@@ -1,10 +1,12 @@
 /** @format */
 
-import React, { createContext, useContext, ReactNode } from "react";
+import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect, useMemo } from "react";
 import {
   NavigationPageStoreItem,
+  useNavigationStore,
 } from "../Navigation/store/useNavigationStore";
-import { useCourseNavigationStore } from "./store/useCourseNavigationStore";
+import CourseRoutesProvider from "./CourseRoutesProvider";
+import CourseManager from "./CourseManager";
 
 /**
  * Context for course microservices to register themselves
@@ -12,6 +14,7 @@ import { useCourseNavigationStore } from "./store/useCourseNavigationStore";
 interface CourseMicroserviceContextValue {
   registerCourseMicroservice: (navigation: NavigationPageStoreItem) => void;
   unregisterCourseMicroservice: (segment: string) => void;
+  allCourseMicroserviceNavigation: NavigationPageStoreItem[];
   isInsideCourseMicroservice: boolean;
 }
 
@@ -23,6 +26,7 @@ const defaultContextValue: CourseMicroserviceContextValue = {
   unregisterCourseMicroservice: () => {
     console.warn("unregisterCourseMicroservice called outside CourseMicroservice context");
   },
+  allCourseMicroserviceNavigation: [],
   isInsideCourseMicroservice: false,
 };
 
@@ -43,12 +47,15 @@ interface CourseMicroserviceProps {
 /**
  * CourseMicroservice Component
  *
- * @version 1.0.0
+ * @version 3.0.0
  *
- * Self-contained microservice that handles all course-related functionality:
+ * Fully self-contained microservice that handles all course-related functionality:
+ * - Course data fetching and management (via CourseManager)
+ * - Course navigation building
  * - Course code and instance routing (/:code, /:code/:instance)
  * - Course tools display
  * - Course microservice registration and routing (/:code/:instance/:microservice)
+ * - Route registration with NavigationRegistry (via CourseRoutesProvider)
  *
  * Course microservices (like EduTest) are passed as children and register
  * themselves through the CourseMicroserviceContext.
@@ -57,6 +64,12 @@ interface CourseMicroserviceProps {
  * - /:code - Course code selection (CourseCodeLoader + CourseInstanceSelector)
  * - /:code/:instance - Course instance (CourseInstanceLoader + CourseTools)
  * - /:code/:instance/:microservice/* - Course microservice routes
+ *
+ * @breaking-changes
+ * - v3.0.0: Now fully self-contained - includes CourseManager and CourseRoutesProvider
+ * - v2.0.0: Uses local state instead of Zustand store
+ * - Context provides allCourseMicroserviceNavigation array
+ * - Integrates with useNavigationStore to notify about course microservices
  *
  * @example
  * ```tsx
@@ -67,30 +80,68 @@ interface CourseMicroserviceProps {
  * ```
  */
 const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => {
-  const {
-    addCourseMicroserviceNavigation,
-    removeCourseMicroserviceNavigation,
-  } = useCourseNavigationStore();
+  const [allCourseMicroserviceNavigation, setAllCourseMicroserviceNavigation] = useState<NavigationPageStoreItem[]>([]);
 
-  // Registration functions for course microservices
-  const registerCourseMicroservice = (navigation: NavigationPageStoreItem) => {
-    addCourseMicroserviceNavigation(navigation);
-  };
+  // Sync with navigation store whenever local state changes
+  // This decouples the registration from the store notification
+  useEffect(() => {
+    const navStore = useNavigationStore.getState();
+    navStore.setExternalMicroservices(allCourseMicroserviceNavigation);
+  }, [allCourseMicroserviceNavigation]);
 
-  const unregisterCourseMicroservice = (segment: string) => {
-    removeCourseMicroserviceNavigation(segment);
-  };
+  // Memoized registration functions to prevent infinite loops
+  // These functions maintain stable references across renders
+  const registerCourseMicroservice = useCallback((navigation: NavigationPageStoreItem) => {
+    setAllCourseMicroserviceNavigation((prev) => {
+      // Check if already exists
+      if (prev.find((ms) => ms.segment === navigation.segment)) {
+        console.log(
+          "[CourseMicroservice] Course microservice already exists:",
+          navigation.segment
+        );
+        return prev;
+      }
 
-  const contextValue: CourseMicroserviceContextValue = {
+      const updated = [...prev, navigation];
+
+      return updated;
+    });
+  }, []);
+
+  const unregisterCourseMicroservice = useCallback((segment: string) => {
+    setAllCourseMicroserviceNavigation((prev) => {
+      console.log(
+        "[CourseMicroservice] Unregistering course microservice:",
+        segment
+      );
+      const updated = prev.filter((ms) => ms.segment !== segment);
+      
+      console.log(
+        "[CourseMicroservice] Remaining course microservices:",
+        updated.length,
+        updated.map((ms) => ms.segment)
+      );
+      
+      return updated;
+    });
+  }, []);
+
+  // Memoize context value to prevent unnecessary re-renders of consumers
+  const contextValue = useMemo<CourseMicroserviceContextValue>(() => ({
     registerCourseMicroservice,
     unregisterCourseMicroservice,
+    allCourseMicroserviceNavigation,
     isInsideCourseMicroservice: true,
-  };
+  }), [registerCourseMicroservice, unregisterCourseMicroservice, allCourseMicroserviceNavigation]);
 
   return (
     <CourseMicroserviceContext.Provider value={contextValue}>
+      {/* Course infrastructure - must be inside context */}
+      <CourseManager />
       {/* Render children (course microservices like EduTest) so they can register */}
       {children}
+      {/* CourseRoutesProvider must be inside context to access registered microservices */}
+      <CourseRoutesProvider />
     </CourseMicroserviceContext.Provider>
   );
 };

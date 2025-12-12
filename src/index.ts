@@ -34,8 +34,6 @@ export * from "./LMSToolpad/store/useUserStore";
 
 export * from "./LMSToolpad/components/Navigation/store/useNavigationStore";
 
-export * from "./LMSToolpad/components/Courses/store/useCourseNavigationStore";
-
 export * from "./LMSToolpad/components/Notifications/store/useNotificationsStore";
 
 /**
