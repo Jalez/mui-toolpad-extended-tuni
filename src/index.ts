@@ -49,7 +49,7 @@ export { default as CourseTools } from "./LMSToolpad/components/Courses/CourseTo
 export { default as CourseMicroservice } from "./LMSToolpad/components/Courses/CourseMicroservice";
 export { useCourseMicroserviceRegistration } from "./LMSToolpad/components/Courses/CourseMicroservice";
 
-export { default as LoadingScreen } from "./LMSToolpad/components/LoadingScreen";
+export { default as LoadingScreen } from "./common/components/ui/LoadingScreen/LoadingScreen";
 
 export { default as ToolSelector } from "./LMSToolpad/components/Tool/ToolSelector";
 export type { ToolSelectorItem } from "./LMSToolpad/components/Tool/ToolSelector";
@@ -62,7 +62,7 @@ export { default as IconWithBadge } from "./LMSToolpad/components/IconWithBadge"
 
 export { default as ExtendedDialog } from "./LMSToolpad/components/Dialogs/ExtendedDialog";
 
-export { default as CenteredHeading } from "./LMSToolpad/components/CenteredHeading";
+export { default as CenteredHeading } from "./common/components/ui/CenteredHeading/CenteredHeading";
 
 /**
  * **TOOLS**
