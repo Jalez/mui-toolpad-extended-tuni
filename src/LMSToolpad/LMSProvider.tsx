@@ -16,8 +16,6 @@ import { Logo } from "./layout/Toolbars/AppToolbar/Logo";
 import { ToolbarAccount } from "./layout/Toolbars/AppToolbar/Account";
 import SidebarFooter from "./layout/sidebar/Footer";
 import AuthenticationManager from "./components/AuthenticationManager";
-import CourseManager from "./components/Courses/CourseManager";
-import CourseRoutesProvider from "./components/Courses/CourseRoutesProvider";
 
 import Dialogs from "./components/Dialogs/Dialogs";
 import { useThemeStore } from "./store/useThemeStore";
@@ -230,8 +228,6 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
             >
             <AuthenticationManager />
             <UserManager />
-            <CourseManager />
-            <CourseRoutesProvider />
             <CalendarManager />
             <CalendarEventAggregator />
             <DashboardLayout

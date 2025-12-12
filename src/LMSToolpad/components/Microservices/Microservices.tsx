@@ -7,7 +7,6 @@ import {
 import Home from "../Routes/Home/Home";
 import React, { useEffect, useRef, useCallback } from "react";
 import { useMicroserviceRoutes } from "../Navigation/hooks/useMicroserviceRoutes";
-import { useCourseNavigationStore } from "../Courses/store/useCourseNavigationStore";
 
 /**
  * Core component for handling top-level app routing and microservices.
@@ -23,6 +22,7 @@ import { useCourseNavigationStore } from "../Courses/store/useCourseNavigationSt
  * - Course routes register themselves as route providers via CourseRoutesProvider
  * - All routes are retrieved through useMicroserviceRoutes() which includes route providers
  * - CourseMicroservice handles: /:code, /:code/:instance, /:code/:instance/:microservice
+ * - Course microservices are managed by CourseMicroservice component via context (not tightly coupled here)
  *
  * @component
  * @param {Object} props
@@ -32,32 +32,21 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
   // Get dynamic microservice routes (includes both app-level microservices and route providers like course routes)
   const microserviceRoutes = useMicroserviceRoutes();
   
-  // Subscribe to course navigation store to ensure re-render when microservices register
-  // This is needed because the routes need to re-render when new microservices are added
-  const courseMicroserviceCount = useCourseNavigationStore(
-    (state) => state.allCourseMicroserviceNavigation.length
-  );
-  
   // Track if we've already done initial navigation setup
   const hasInitializedRef = useRef(false);
   const lastSectionsCountRef = useRef(0);
-  const lastCourseMsCountRef = useRef(0);
   
   // Stable function refs to avoid re-triggering effects
   const updateNavigation = useCallback(() => {
     const navStore = useNavigationStore.getState();
-    const courseStore = useCourseNavigationStore.getState();
     
     const sectionsCount = Object.keys(navStore.sections).length;
-    const courseMsCount = courseStore.allCourseMicroserviceNavigation.length;
     const visibleSectionsCount = Object.values(navStore.visibleSections).filter(Boolean).length;
     
-    // Only update if we have both sections and course microservices
-    // Also check if there are visible sections to avoid unnecessary updates
-    if (sectionsCount > 0 && courseMsCount > 0 && visibleSectionsCount > 0) {
+    // Only update if we have sections and visible sections
+    if (sectionsCount > 0 && visibleSectionsCount > 0) {
       console.log("[Microservices] Updating navigation structure...", { 
         sectionsCount, 
-        courseMsCount, 
         visibleSectionsCount,
         visibleSections: Object.keys(navStore.visibleSections).filter(k => navStore.visibleSections[k])
       });
@@ -67,12 +56,11 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
     } else {
       console.log("[Microservices] Skipping navigation update - conditions not met:", {
         sectionsCount,
-        courseMsCount,
         visibleSectionsCount
       });
     }
   }, []);
-
+  
   // Subscribe to store changes outside of React's render cycle for navigation updates
   useEffect(() => {
     console.log("[Microservices] Setting up subscriptions...");
@@ -83,18 +71,6 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
       hasInitializedRef.current = true;
       updateNavigation();
     }, 100);
-    
-    // Subscribe to ALL store changes (not using selector since subscribeWithSelector isn't configured)
-    const unsubscribeCourse = useCourseNavigationStore.subscribe((state) => {
-      const newCount = state.allCourseMicroserviceNavigation.length;
-      if (newCount !== lastCourseMsCountRef.current) {
-        console.log("[Microservices] Course microservices changed:", lastCourseMsCountRef.current, "->", newCount);
-        lastCourseMsCountRef.current = newCount;
-        if (hasInitializedRef.current) {
-          updateNavigation();
-        }
-      }
-    });
     
     // Subscribe to navigation store changes
     const unsubscribeNav = useNavigationStore.subscribe((state) => {
@@ -110,13 +86,9 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
     
     return () => {
       clearTimeout(timeoutId);
-      unsubscribeCourse();
       unsubscribeNav();
     };
   }, [updateNavigation]);
-
-  // Log for debugging - can remove later
-  console.log("[Microservices] Rendering with", courseMicroserviceCount, "course microservices");
 
   return (
     <>
@@ -127,8 +99,6 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
         <Route path="" element={<Home />} index />
         {/* Dynamic microservice routes (includes app-level microservices and route providers) */}
         {microserviceRoutes}
-        <Route path="help" element={<div>Help</div>} />
-        <Route path="contact" element={<div>Contact</div>} />
       </Routes>
     </>
   );

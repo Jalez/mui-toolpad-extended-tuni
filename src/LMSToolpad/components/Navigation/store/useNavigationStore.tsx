@@ -2,14 +2,8 @@
 
 import { SvgIconComponent } from "@mui/icons-material";
 import { create } from "zustand";
-import HelpIcon from "@mui/icons-material/Help";
-import ContactPageIcon from "@mui/icons-material/ContactPage";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import React from "react";
-
-// Import course navigation store for aggregating microservices
-// This is the only place we reference the course store - the rest is generic
-import { useCourseNavigationStore } from "../../Courses/store/useCourseNavigationStore";
 
 // Base interface for common properties
 interface NavigationItemBase {
@@ -70,21 +64,7 @@ export type addSectionProps = {
   }>;
 };
 
-const DEFAULTNAVIGATION: NavigationStoreItem[] = [
-  { kind: "header", title: "Other" },
-  {
-    kind: "page", // Added kind here
-    segment: "help",
-    title: "Help",
-    iconFC: HelpIcon,
-  },
-  {
-    kind: "page", // Added kind here
-    segment: "contact",
-    title: "Contact",
-    iconFC: ContactPageIcon,
-  },
-];
+const DEFAULTNAVIGATION: NavigationStoreItem[] = [];
 
 /**
  * New interface for a navigation section.
@@ -108,7 +88,6 @@ type ViewStore = {
   sectionOrder: string[];
   /**
    * App-level microservice navigation items only.
-   * Course microservices are handled by useCourseNavigationStore.
    * These are typically registered via NavigationRegistry for app-level routes.
    */
   allMicroserviceNavigation: NavigationPageStoreItem[];
@@ -130,6 +109,14 @@ type ViewStore = {
   setCollapsedSections: (options: Record<string, boolean>) => void;
   // New: toggle section collapse state
   toggleSectionCollapse: (sectionKey: string) => void;
+  /**
+   * Externally registered microservice navigation items.
+   * These are provided by external components (like CourseMicroservice) via setExternalMicroservices.
+   * The store is microservice-agnostic - it doesn't know or care about specific microservice types.
+   */
+  externalMicroservices: NavigationPageStoreItem[];
+  // Setter for external microservices (called by external components like CourseMicroservice)
+  setExternalMicroservices: (microservices: NavigationPageStoreItem[]) => void;
 };
 
 /**
@@ -153,10 +140,10 @@ type ViewStore = {
  * - Changed microservice update mechanism to be section-aware
  *
  * @scope
- * This store handles **app-level navigation only**:
+ * This store handles navigation for the application:
  * - Global sections (Help, Contact, etc.)
  * - App-level microservices registered via NavigationRegistry
- * - Course microservices are handled by useCourseNavigationStore (separate store)
+ * - External microservices provided via setExternalMicroservices (e.g., from CourseMicroservice)
  *
  * @structure
  * Navigation is now organized into sections:
@@ -292,29 +279,15 @@ const calculateNavigationFromSections = (
 };
 
 const getAllMicroservices = (state: ViewStore): NavigationPageStoreItem[] => {
-  const sources: NavigationPageStoreItem[][] = [
-    state.allMicroserviceNavigation, // App-level
+  const result = [
+    ...state.allMicroserviceNavigation, // App-level
+    ...state.externalMicroservices, // External (e.g., from CourseMicroservice context)
   ];
 
   console.log("[getAllMicroservices] App-level microservices:", state.allMicroserviceNavigation.length);
-
-  // Add course microservices if course navigation store exists
-  if (useCourseNavigationStore) {
-    try {
-      const courseStore = useCourseNavigationStore.getState();
-      console.log("[getAllMicroservices] Course store state:", courseStore);
-      console.log("[getAllMicroservices] Course microservices from store:", courseStore?.allCourseMicroserviceNavigation?.length, courseStore?.allCourseMicroserviceNavigation?.map(m => m.segment));
-      if (courseStore?.allCourseMicroserviceNavigation) {
-        sources.push(courseStore.allCourseMicroserviceNavigation);
-      }
-    } catch (e) {
-      console.error("[getAllMicroservices] Error accessing course store:", e);
-      // Course store not available - continue without it
-    }
-  }
-
-  const result = sources.flat();
+  console.log("[getAllMicroservices] External microservices:", state.externalMicroservices.length, state.externalMicroservices.map(m => m.segment));
   console.log("[getAllMicroservices] Total microservices:", result.length, result.map(m => m.segment));
+  
   return result;
 };
 
@@ -323,6 +296,7 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
   sections: {},
   sectionOrder: [],
   allMicroserviceNavigation: [],
+  externalMicroservices: [],
   visibleSections: {},
   collapsedSections: {},
 
@@ -433,21 +407,11 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
         visibleSections: newVisibleSections,
       };
 
-      // If this section is visible and we have course microservices, 
-      // trigger microservice navigation update immediately
-      // This ensures microservices are added right away
+      // If this section is visible, trigger microservice navigation update
+      // External microservices are stored in this store's state
       if (newVisibleSections[sectionKey]) {
-        // Check if there are course microservices available
-        try {
-          const courseStore = useCourseNavigationStore?.getState();
-          if (courseStore?.allCourseMicroserviceNavigation?.length > 0) {
-            // We'll update microservices in a separate call to avoid circular dependencies
-            // The Microservices.tsx subscription will handle this
-            console.log(`[addSection] Section ${sectionKey} is visible and course microservices exist, will be updated by subscription`);
-          }
-        } catch (e) {
-          // Course store not available - ignore
-        }
+        // Navigation update will be triggered by updateMicroserviceNavigationForSections
+        // which reads from state.externalMicroservices
       }
 
       return updatedState;
@@ -473,7 +437,7 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
 
   /**
    * Add an app-level microservice navigation item.
-   * Note: Course microservices should use useCourseNavigationStore.addCourseMicroserviceNavigation instead.
+   * Note: Course microservices should be registered via CourseMicroservice component context.
    */
   addMicroserviceNavigation: (item) =>
     set((state) => {
@@ -720,6 +684,12 @@ export const useNavigationStore = create<ViewStore>((set, get) => ({
       );
       return { sections: newSections, sectionOrder: newSectionOrder };
     }),
+
+  setExternalMicroservices: (microservices) => {
+    set({ externalMicroservices: microservices });
+    // Trigger navigation update when external microservices change
+    get().updateMicroserviceNavigationForSections();
+  },
 }));
 
 // Component for section toggle action (defined after store to avoid circular dependency)
