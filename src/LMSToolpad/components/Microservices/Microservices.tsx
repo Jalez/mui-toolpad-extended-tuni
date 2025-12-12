@@ -7,20 +7,21 @@ import {
 import Home from "../Routes/Home/Home";
 import React, { useEffect, useRef, useCallback } from "react";
 import { useMicroserviceRoutes } from "../Navigation/hooks/useMicroserviceRoutes";
-import { useCourseRoutes } from "../Courses/hooks/useCourseRoutes";
 import { useCourseNavigationStore } from "../Courses/store/useCourseNavigationStore";
 
 /**
  * Core component for handling top-level app routing and microservices.
  *
- * @version 3.0.0
+ * @version 3.1.0
  * @breaking-changes
  * - Course routing has been moved to CourseMicroservice component
- * - This component now only handles app-level routes (Home, Help, Contact)
- * - Course microservices should be nested inside CourseMicroservice
+ * - This component is now microservice-agnostic - it doesn't directly import course routes
+ * - Course routes register themselves via CourseRoutesProvider using NavigationRegistry
  *
  * Architecture:
- * - Microservices handles: /, /help, /contact, dynamic app microservices
+ * - Microservices handles: /, /help, /contact, dynamic microservices (via NavigationRegistry)
+ * - Course routes register themselves as route providers via CourseRoutesProvider
+ * - All routes are retrieved through useMicroserviceRoutes() which includes route providers
  * - CourseMicroservice handles: /:code, /:code/:instance, /:code/:instance/:microservice
  *
  * @component
@@ -28,10 +29,8 @@ import { useCourseNavigationStore } from "../Courses/store/useCourseNavigationSt
  * @param {React.ReactNode} props.children - Child components (e.g., CourseMicroservice)
  */
 const Microservices = ({ children }: { children: React.ReactNode }) => {
-  // Get dynamic microservice routes (for app-level microservices registered via NavigationRegistry)
+  // Get dynamic microservice routes (includes both app-level microservices and route providers like course routes)
   const microserviceRoutes = useMicroserviceRoutes();
-  // Get course routes (for course microservices) - this triggers re-render when routes change
-  const courseRoutes = useCourseRoutes();
   
   // Subscribe to course navigation store to ensure re-render when microservices register
   // This is needed because the routes need to re-render when new microservices are added
@@ -126,10 +125,8 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
       {/* App-level routes */}
       <Routes>
         <Route path="" element={<Home />} index />
-        {/* Dynamic app-level microservice routes */}
+        {/* Dynamic microservice routes (includes app-level microservices and route providers) */}
         {microserviceRoutes}
-        {/* Course routes */}
-        {courseRoutes}
         <Route path="help" element={<div>Help</div>} />
         <Route path="contact" element={<div>Contact</div>} />
       </Routes>

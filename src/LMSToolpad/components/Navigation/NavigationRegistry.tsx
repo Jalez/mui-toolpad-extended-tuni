@@ -1,5 +1,6 @@
 /** @format */
 import { ComponentType, ReactNode } from "react";
+import type { ReactElement } from "react";
 import { create } from "zustand";
 import { shallow } from "zustand/shallow";
 import { SvgIconComponent } from "@mui/icons-material";
@@ -9,12 +10,19 @@ import { useNavigationFilterStore } from "./store/useNavigationFilterStore";
 /**
  * Microservice Registry System
  *
- * @version 1.2.0
+ * @version 1.3.0
  *
  * A flexible system for registering and managing microservices for grid layouts.
  * Supports dynamic registration, unregistration, and automatic re-rendering.
  * Optimized to prevent excessive re-rendering.
+ * 
+ * Now supports route providers for microservice-agnostic route registration.
  */
+
+/**
+ * Route provider function that returns Route elements
+ */
+export type RouteProvider = () => ReactElement[];
 
 /**
  * Microservice entry containing both the component and optional props
@@ -45,9 +53,12 @@ export interface MicroserviceEntry {
  */
 interface MicroserviceRegistryStore {
   microservices: Map<string, MicroserviceEntry>;
+  routeProviders: Map<string, RouteProvider>;
   lastUpdate: number;
   registerMicroservice: (id: string, entry: MicroserviceEntry) => void;
   unregisterMicroservice: (id: string) => void;
+  registerRouteProvider: (id: string, provider: RouteProvider) => void;
+  unregisterRouteProvider: (id: string) => void;
   getRoutes: () => Array<{
     path: string;
     element: ReactNode;
@@ -57,6 +68,8 @@ interface MicroserviceRegistryStore {
 
 // Create a singleton instance of the microservice registry
 const microserviceRegistry = new Map<string, MicroserviceEntry>();
+// Create a singleton instance of the route providers registry
+const routeProvidersRegistry = new Map<string, RouteProvider>();
 
 // Function to update navigation with current microservice state
 const updateMicroserviceNavigation = () => {
@@ -115,6 +128,7 @@ const updateMicroserviceNavigation = () => {
 // Create the store with optimized structure and singleton registry
 const useMicroserviceRegistryStoreRaw = create<MicroserviceRegistryStore>((set) => ({
   microservices: microserviceRegistry,
+  routeProviders: routeProvidersRegistry,
   lastUpdate: Date.now(),
   registerMicroservice: (id, entry) => {
     microserviceRegistry.set(id, entry);
@@ -132,6 +146,22 @@ const useMicroserviceRegistryStoreRaw = create<MicroserviceRegistryStore>((set) 
         lastUpdate: Date.now(),
       });
       updateMicroserviceNavigation();
+    }
+  },
+  registerRouteProvider: (id, provider) => {
+    routeProvidersRegistry.set(id, provider);
+    set({
+      routeProviders: new Map(routeProvidersRegistry),
+      lastUpdate: Date.now(),
+    });
+  },
+  unregisterRouteProvider: (id) => {
+    if (routeProvidersRegistry.has(id)) {
+      routeProvidersRegistry.delete(id);
+      set({
+        routeProviders: new Map(routeProvidersRegistry),
+        lastUpdate: Date.now(),
+      });
     }
   },
   getRoutes: () => {
@@ -163,6 +193,7 @@ export const useMicroserviceRegistryStore = () =>
   useMicroserviceRegistryStoreRaw(
     (state) => ({
       microservices: state.microservices,
+      routeProviders: state.routeProviders,
       lastUpdate: state.lastUpdate,
     }),
     shallow
@@ -259,4 +290,25 @@ export function getMicroserviceIds(): string[] {
  */
 export function isMicroserviceRegistered(id: string): boolean {
   return microserviceRegistry.has(id);
+}
+
+/**
+ * Register a route provider.
+ * Route providers are functions that return Route elements, allowing microservices
+ * to register complex nested route structures.
+ *
+ * @param id - The unique identifier for this route provider.
+ * @param provider - Function that returns an array of Route elements.
+ */
+export function registerRouteProvider(id: string, provider: RouteProvider) {
+  useMicroserviceRegistryStoreRaw.getState().registerRouteProvider(id, provider);
+}
+
+/**
+ * Unregister a route provider.
+ *
+ * @param id - The unique identifier for the route provider to remove.
+ */
+export function unregisterRouteProvider(id: string) {
+  useMicroserviceRegistryStoreRaw.getState().unregisterRouteProvider(id);
 }

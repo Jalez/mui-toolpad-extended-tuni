@@ -8,13 +8,14 @@ import { useMicroserviceRegistryStore } from "../NavigationRegistry";
  * @returns Array of Route elements based on registered microservice routes
  */
 export const useMicroserviceRoutes = () => {
-  const { lastUpdate, microservices } = useMicroserviceRegistryStore();
+  const { lastUpdate, microservices, routeProviders } = useMicroserviceRegistryStore();
 
   return useMemo(() => {
     const routes: ReactElement[] = [];
 
     console.log("microservices", microservices);
 
+    // Add routes from registered microservices
     microservices.forEach((microservice) => {
       if (microservice.metadata?.route) {
         const Component = microservice.Component;
@@ -31,6 +32,16 @@ export const useMicroserviceRoutes = () => {
       }
     });
 
+    // Add routes from route providers
+    routeProviders.forEach((provider, id) => {
+      try {
+        const providerRoutes = provider();
+        routes.push(...providerRoutes);
+      } catch (error) {
+        console.error(`Error getting routes from route provider "${id}":`, error);
+      }
+    });
+
     return routes;
-  }, [microservices, lastUpdate]);
+  }, [microservices, routeProviders, lastUpdate]);
 };
