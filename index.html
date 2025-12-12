@@ -7,6 +7,63 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MUI-TOOLPAD-EXTENDED</title>
+  <script>
+    (function() {
+      try {
+        // Get color scheme preference from cookie
+        function getCookie(name) {
+          var cookies = document.cookie.split(';');
+          for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + '=') {
+              return decodeURIComponent(cookie.substring(name.length + 1));
+            }
+          }
+          return null;
+        }
+        
+        var preference = getCookie('color-scheme') || 'system';
+        var finalMode;
+        
+        if (preference === 'system') {
+          var systemDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          finalMode = systemDark ? 'dark' : 'light';
+        } else {
+          finalMode = preference;
+        }
+        
+        // Set data attribute before first paint to prevent flash
+        document.documentElement.setAttribute('data-mui-color-scheme', finalMode);
+        document.documentElement.setAttribute('data-color-scheme', finalMode);
+      } catch (e) {
+        // Fallback to light if anything fails
+        document.documentElement.setAttribute('data-mui-color-scheme', 'light');
+        document.documentElement.setAttribute('data-color-scheme', 'light');
+      }
+    })();
+  </script>
+  <style>
+    /* Prevent flash by setting background color immediately based on data attribute */
+    html {
+      background-color: #f5f5f5; /* light mode default */
+    }
+    html[data-color-scheme="dark"] {
+      background-color: #000000; /* dark mode default */
+    }
+    body {
+      background-color: #f5f5f5; /* light mode default */
+    }
+    body[data-color-scheme="dark"],
+    html[data-color-scheme="dark"] body {
+      background-color: #000000; /* dark mode default */
+    }
+    #root {
+      background-color: #f5f5f5; /* light mode default */
+    }
+    html[data-color-scheme="dark"] #root {
+      background-color: #000000; /* dark mode default */
+    }
+  </style>
 </head>
 
 <body>
