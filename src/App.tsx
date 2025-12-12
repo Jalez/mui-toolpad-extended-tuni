@@ -6,6 +6,8 @@ import Microservices from "./LMSToolpad/components/Microservices/Microservices";
 import CourseMicroservice from "./LMSToolpad/components/Courses/CourseMicroservice";
 import EduTest from "./test/EduTest";
 import EduTest2 from "./test/EduTest2";
+import Contact from "./test/Contact";
+import Help from "./test/Help";
 
 /**
  * Root application component.
@@ -26,6 +28,8 @@ const App = () => {
     <BrowserRouter>
       <LMSProvider>
         <Microservices>
+          <Contact />
+          <Help />
           <CourseMicroservice>
             <EduTest />
             <EduTest2 />
