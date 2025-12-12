@@ -95,10 +95,6 @@ const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => 
     setAllCourseMicroserviceNavigation((prev) => {
       // Check if already exists
       if (prev.find((ms) => ms.segment === navigation.segment)) {
-        console.log(
-          "[CourseMicroservice] Course microservice already exists:",
-          navigation.segment
-        );
         return prev;
       }
 
@@ -110,18 +106,7 @@ const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => 
 
   const unregisterCourseMicroservice = useCallback((segment: string) => {
     setAllCourseMicroserviceNavigation((prev) => {
-      console.log(
-        "[CourseMicroservice] Unregistering course microservice:",
-        segment
-      );
       const updated = prev.filter((ms) => ms.segment !== segment);
-      
-      console.log(
-        "[CourseMicroservice] Remaining course microservices:",
-        updated.length,
-        updated.map((ms) => ms.segment)
-      );
-      
       return updated;
     });
   }, []);
