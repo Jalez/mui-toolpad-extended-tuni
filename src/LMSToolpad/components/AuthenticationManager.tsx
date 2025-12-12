@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useUserStore } from "../store/useUserStore";
-import { useRetry } from "../hooks/useRetry";
+import { useRetry } from "../../common/hooks/useRetry";
 
 const AuthenticationManager = () => {
   const { user, getUser } = useUserStore();

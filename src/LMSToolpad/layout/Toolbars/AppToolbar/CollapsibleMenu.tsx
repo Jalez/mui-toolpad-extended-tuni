@@ -13,8 +13,8 @@ import { useEffect } from "react";
 import DevelopmentTools from "../../../components/DevTools/DevelopmentTools";
 import { useUserStore } from "../../../store/useUserStore";
 import useDialogStore from "../../../store/useDialogStore";
-import { CollapsingButtons } from "../../../components/Common/CollapsingButtons";
-import ThemeToggle from "../../../components/Common/ThemeToggle";
+import { CollapsingButtons } from "../../../../common/components/ui/CollapsingButtons/CollapsingButtons";
+import ThemeToggle from "../../../../common/components/ui/ThemeToggle/ThemeToggle";
 
 export const CollapsibleMenu = () => {
   // const [isExpanded, setIsExpanded] = useState(false);

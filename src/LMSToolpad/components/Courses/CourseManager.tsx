@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import useCourseStore from "./store/useCourseStore";
 import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
-import { useRetry } from "../../hooks/useRetry";
+import { useRetry } from "../../../common/hooks/useRetry";
 import CourseEventPublisher from "./CourseEventPublisher";
 import CourseList from "./CourseList";
-import { useGridItemContext, createGridItem } from "../Common/GridLayout";
+import { useGridItemContext } from "../../../common/components/layout/GridLayout/GridItemContext";
+import { createGridItem } from "../../../common/components/layout/GridLayout/layoutUtils";
 
 
 const CourseManager = () => {

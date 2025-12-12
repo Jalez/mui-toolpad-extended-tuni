@@ -5,13 +5,13 @@ import { useParams } from "react-router-dom";
 import useCourseStore, { Course } from "./store/useCourseStore";
 import { useNotificationStore } from "../Notifications/store/useNotificationsStore";
 
-import CenteredHeading from "../CenteredHeading";
+import CenteredHeading from "../../../common/components/ui/CenteredHeading/CenteredHeading";
+import ToolDisplayer from "../../../common/components/ui/ToolDisplayer/ToolDisplayer";
 import LtiLoginUrlForm from "./LtiLoginUrlForm";
 import {
   NavigationPageStoreItem,
 } from "../Navigation/store/useNavigationStore";
 import { useCourseNavigationStore } from "./store/useCourseNavigationStore";
-import ToolDisplayer from "../Tool/ToolDisplayer";
 
 interface CourseToolsProps {
   microservices?: NavigationPageStoreItem[];
@@ -115,7 +115,7 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
             title="Enabled Tools"
             navItems={usedTools}
             roleCheck={true}
-            onToggleService={(path) => handleToggleService(path, true)}
+            onToggleService={(path: string) => handleToggleService(path, true)}
             isUsed={true}
           />
           <CenteredHeading
@@ -127,7 +127,7 @@ const CourseTools = ({ microservices }: CourseToolsProps) => {
             title="Available Tools"
             navItems={availableTools}
             roleCheck={true}
-            onToggleService={(path) => handleToggleService(path, false)}
+            onToggleService={(path: string) => handleToggleService(path, false)}
             isUsed={false}
           />
         </>

@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import Calendar from "./Calendar";
 
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { createGridItem, useGridItemContext } from "../Common/GridLayout";
+import { useGridItemContext } from "../../../common/components/layout/GridLayout/GridItemContext";
+import { createGridItem } from "../../../common/components/layout/GridLayout/layoutUtils";
 import { registerMicroservice, unregisterMicroservice } from "../Navigation/NavigationRegistry";
 
 const CalendarManager = () => {

@@ -431,15 +431,18 @@ export const useThemeStore = create<ThemeStore>()((set, get) => {
       // We merge customizations with ThemeTemplate but keep color scheme preference separate
       const { colorSchemePreference } = get();
       const effectiveScheme = getEffectiveColorScheme(colorSchemePreference);
-      const mergedTheme: AppTheme = {
-        ...ThemeTemplate,
-        ...updatedTheme,
-        defaultColorScheme: effectiveScheme,
-        // Ensure color schemes come from ThemeTemplate, not custom theme
-        colorSchemes: ThemeTemplate.colorSchemes,
-      };
       // Note: We don't persist the full theme anymore, only the color scheme preference
       // Custom theme changes would need to be handled differently if needed
+      // The merged theme would be:
+      // {
+      //   ...ThemeTemplate,
+      //   ...updatedTheme,
+      //   defaultColorScheme: effectiveScheme,
+      //   colorSchemes: ThemeTemplate.colorSchemes,
+      // }
+      // But it's not currently persisted or used
+      void updatedTheme;
+      void effectiveScheme;
     },
     resetTheme: () => {
       setColorSchemeCookie('system');

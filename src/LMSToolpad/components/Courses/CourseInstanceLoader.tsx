@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { Outlet, useNavigate, useParams } from "react-router-dom";
 import useCourseStore, { Course } from "./store/useCourseStore";
 import { useNotificationStore } from "../Notifications/store/useNotificationsStore";
-import LoadingScreen from "../LoadingScreen";
+import LoadingScreen from "../../../common/components/ui/LoadingScreen/LoadingScreen";
 
 /**
  * Component for loading specific course instance data.

@@ -29,7 +29,7 @@ import { UserManager } from "./components/UserManager";
 import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/RegisteredPageTools";
 import { PageContainer } from "@toolpad/core";
 import { useMicroserviceNavigation } from "./components/Navigation/hooks/useMicroserviceNavigation";
-import { GridItemProvider } from "./components/Common/GridLayout/GridItemContext";
+import { GridItemProvider } from "../common/components/layout/GridLayout/GridItemContext";
 import { CalendarManager, CalendarEventAggregator } from "./components/Calendar";
 
 export interface LMSProviderProps {

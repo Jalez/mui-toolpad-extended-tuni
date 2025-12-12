@@ -2,7 +2,7 @@
 
 import { Box } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
-import CenteredHeading from "../CenteredHeading";
+import CenteredHeading from "../../../common/components/ui/CenteredHeading/CenteredHeading";
 import useCourseStore, { Course } from "./store/useCourseStore";
 import CourseItem from "./CourseItem/CourseItem";
 

@@ -7,7 +7,7 @@ import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import ViewDayIcon from "@mui/icons-material/ViewDay";
-import { SpeedDialButton } from "../Common/SpeedDialButton";
+import { SpeedDialButton } from "../../../common/components/ui/SpeedDialButton/SpeedDialButton";
 
 const viewActions = [
   { icon: <CalendarMonthIcon />, name: "Month", value: "dayGridMonth" },

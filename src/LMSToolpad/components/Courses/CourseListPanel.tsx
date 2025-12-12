@@ -4,11 +4,7 @@ import useCourseStore, { Course } from "./store/useCourseStore";
 import { useUserStore } from "../../store/useUserStore";
 import CourseItem from "./CourseItem/CourseItem";
 import { useNavigate } from "react-router-dom";
-import {
-  CompoundPanel,
-  Section,
-  CompoundPanelProps,
-} from "../Common/Panel/CompoundPanel";
+import CompoundPanel, { Section, type CompoundPanelProps } from "../../../common/components/ui/CompoundPanel/CompoundPanel";
 
 export type CourseDisplayMode = "course" | "instance" | "instanceList";
 

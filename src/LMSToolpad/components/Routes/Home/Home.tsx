@@ -4,9 +4,8 @@ import {
   registerPageToolbarAction,
   unregisterPageToolbarAction,
 } from "../../../layout/Toolbars/toolbarRegistry";
-import EditModeToggler from "../../Common/GridLayout/Tools/EditModeToggler";
+import { EditModeToggler, ResponsiveGridLayout, useGridItemContext } from "../../../../common/components/layout/GridLayout";
 import { Box } from "@mui/material";
-import { ResponsiveGridLayout, useGridItemContext } from "../../Common/GridLayout";
 
 // Storage key for layouts
 const STORAGE_KEY = "home-layout-v2";
