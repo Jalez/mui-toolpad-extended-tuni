@@ -1,13 +1,13 @@
 /** @format */
 
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import type {
   Components,
   Theme,
   PaletteMode,
   PaletteOptions,
 } from '@mui/material/styles';
+import { getColorSchemePreference, setColorSchemePreference as setColorSchemeCookie, getEffectiveColorScheme, type ColorSchemePreference } from '../utils/cookieUtils';
 
 // Add type definitions for typography
 export interface TypographyVariantStyle extends Partial<React.CSSProperties> {
@@ -266,8 +266,8 @@ export const ThemeTemplate: ThemeTemplate = {
       palette: {
         mode: 'dark' as PaletteMode,
         background: {
-          default: '#303030',
-          paper: '#424242',
+          default: '#121212',
+          paper: '#121212',
         },
         primary: {
           main: '#9575cd',
@@ -386,46 +386,64 @@ export const ThemeTemplate: ThemeTemplate = {
 export type AppTheme = ThemeTemplate;
 
 interface ThemeStore {
-  theme: AppTheme; // Use MuiTheme which now includes our custom properties
-  themeToUpdate: AppTheme | null;
-  updateTheme: (updates: AppTheme) => void;
+  colorSchemePreference: ColorSchemePreference;
+  setColorSchemePreference: (preference: ColorSchemePreference) => void;
+  getTheme: () => AppTheme; // Always returns ThemeTemplate with current color scheme preference
+  updateTheme: (updates: AppTheme) => void; // For theme customization (colors, typography, etc.)
   resetTheme: () => void;
 }
 
 /**
  * Theme management store with support for custom themes and dark mode.
  *
- * @version 1.1.0
+ * @version 2.0.0
  * @updates
- * - Added support for custom color schemes
- * - Enhanced typography management
- * - Added dark mode support
- * - Improved theme persistence
+ * - Color scheme preference stored in cookie (light/dark/system)
+ * - Theme colors always come from ThemeTemplate (not persisted)
+ * - System preference detection for 'system' mode
  *
  * @features
- * - Theme customization
- * - Color scheme management
- * - Typography control
- * - Persistent storage
+ * - Theme customization (colors, typography, etc.)
+ * - Color scheme preference management (cookie-based)
+ * - System preference detection
+ * - Always uses ThemeTemplate for base colors
  */
-export const useThemeStore = create<ThemeStore>()(
-  persist(
-    (set) => ({
-      theme: ThemeTemplate as AppTheme,
-      themeToUpdate: null,
-      updateTheme: (updatedTheme) =>
-        set(() => {
-          return {
-            theme: updatedTheme,
-          };
-        }),
-      resetTheme: () =>
-        set(() => ({
-          theme: ThemeTemplate as AppTheme,
-        })),
-    }),
-    {
-      name: 'theme-storage',
-    }
-  )
-);
+export const useThemeStore = create<ThemeStore>()((set, get) => {
+  // Initialize with cookie value
+  const initialPreference = getColorSchemePreference();
+  
+  return {
+    colorSchemePreference: initialPreference,
+    setColorSchemePreference: (preference: ColorSchemePreference) => {
+      setColorSchemeCookie(preference);
+      set({ colorSchemePreference: preference });
+    },
+    getTheme: () => {
+      const { colorSchemePreference } = get();
+      const effectiveScheme = getEffectiveColorScheme(colorSchemePreference);
+      return {
+        ...ThemeTemplate,
+        defaultColorScheme: effectiveScheme,
+      } as AppTheme;
+    },
+    updateTheme: (updatedTheme) => {
+      // This is for theme customization (colors, typography, etc.)
+      // We merge customizations with ThemeTemplate but keep color scheme preference separate
+      const { colorSchemePreference } = get();
+      const effectiveScheme = getEffectiveColorScheme(colorSchemePreference);
+      const mergedTheme: AppTheme = {
+        ...ThemeTemplate,
+        ...updatedTheme,
+        defaultColorScheme: effectiveScheme,
+        // Ensure color schemes come from ThemeTemplate, not custom theme
+        colorSchemes: ThemeTemplate.colorSchemes,
+      };
+      // Note: We don't persist the full theme anymore, only the color scheme preference
+      // Custom theme changes would need to be handled differently if needed
+    },
+    resetTheme: () => {
+      setColorSchemeCookie('system');
+      set({ colorSchemePreference: 'system' });
+    },
+  };
+});

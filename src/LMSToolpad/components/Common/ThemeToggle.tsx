@@ -6,28 +6,16 @@ import { useThemeStore } from '../../store/useThemeStore';
 import { AppTheme } from '../../store/useThemeStore';
 
 export const ThemeToggle = () => {
-  const { theme: currentTheme, updateTheme } = useThemeStore();
-
+  const { colorSchemePreference, setColorSchemePreference, getTheme } = useThemeStore();
+  const currentTheme = getTheme();
   const currentMode = currentTheme?.defaultColorScheme || 'light';
 
   const toggleTheme = () => {
-    const newMode = currentMode === 'light' ? 'dark' : 'light';
-
-    console.log('Current mode:', currentMode, 'New mode:', newMode);
-
-    // Update the default color scheme and the active color scheme
-    const updatedTheme: AppTheme = {
-      ...currentTheme,
-      defaultColorScheme: newMode,
-      colorSchemes: {
-        ...currentTheme.colorSchemes,
-        [newMode]: currentTheme.colorSchemes[newMode],
-        [currentMode === 'light' ? 'dark' : 'light']: currentTheme.colorSchemes[currentMode === 'light' ? 'dark' : 'light'],
-      }
-    };
-
-    console.log('Updating theme:', updatedTheme);
-    updateTheme(updatedTheme);
+    // Toggle between light and dark (skip system for now, or cycle through all three)
+    const newPreference: 'light' | 'dark' = currentMode === 'light' ? 'dark' : 'light';
+    
+    console.log('Current mode:', currentMode, 'New preference:', newPreference);
+    setColorSchemePreference(newPreference);
   };
 
   const getThemeIcon = () => {

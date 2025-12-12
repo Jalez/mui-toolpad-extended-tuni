@@ -32,16 +32,16 @@ const PlatformSettings = () => {
   const { closeDialog } = useDialogStore();
   const { platform, updatePlatform } = usePlatformStore();
   const { addNotificationData } = useNotificationStore();
-  const { theme, updateTheme } = useThemeStore();
+  const { getTheme, updateTheme } = useThemeStore();
   const [localPlatformSettings, setLocalPlatformSettings] = useState(platform); // Initialize with current settings
-  const [localThemeSettings, setLocalThemeSettings] = useState(theme);
+  const [localThemeSettings, setLocalThemeSettings] = useState(getTheme());
   const [isDirty, setIsDirty] = useState(false);
 
   // Store initial settings
   useEffect(() => {
     setLocalPlatformSettings(platform);
-    setLocalThemeSettings(theme);
-  }, [platform, theme]);
+    setLocalThemeSettings(getTheme());
+  }, [platform, getTheme]);
 
   // Compare current settings with original settings
   const checkIfPlatformDirty = useCallback(
@@ -53,9 +53,9 @@ const PlatformSettings = () => {
 
   const checkIfThemeDirty = useCallback(
     (updatedTheme: any) => {
-      return !isEqual(updatedTheme, theme);
+      return !isEqual(updatedTheme, getTheme());
     },
-    [theme]
+    [getTheme]
   );
 
   const handleSave = async (event: React.FormEvent<HTMLFormElement>) => {
