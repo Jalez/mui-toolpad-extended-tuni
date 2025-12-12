@@ -82,15 +82,11 @@ interface CourseMicroserviceProps {
 const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => {
   const [allCourseMicroserviceNavigation, setAllCourseMicroserviceNavigation] = useState<NavigationPageStoreItem[]>([]);
 
-  // Sync with navigation store whenever local state changes
-  // This decouples the registration from the store notification
   useEffect(() => {
     const navStore = useNavigationStore.getState();
     navStore.setExternalMicroservices(allCourseMicroserviceNavigation);
   }, [allCourseMicroserviceNavigation]);
 
-  // Memoized registration functions to prevent infinite loops
-  // These functions maintain stable references across renders
   const registerCourseMicroservice = useCallback((navigation: NavigationPageStoreItem) => {
     setAllCourseMicroserviceNavigation((prev) => {
       // Check if already exists
@@ -121,11 +117,8 @@ const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => 
 
   return (
     <CourseMicroserviceContext.Provider value={contextValue}>
-      {/* Course infrastructure - must be inside context */}
       <CourseManager />
-      {/* Render children (course microservices like EduTest) so they can register */}
       {children}
-      {/* CourseRoutesProvider must be inside context to access registered microservices */}
       <CourseRoutesProvider />
     </CourseMicroserviceContext.Provider>
   );
