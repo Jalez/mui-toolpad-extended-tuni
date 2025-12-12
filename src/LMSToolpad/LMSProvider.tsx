@@ -322,15 +322,13 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
                 flexDirection: "column",
                 padding: 0,
                 margin: 0,
-                width: "100%",
                 maxWidth: "100%",
               },
               "& .MuiContainer-maxWidthLg": {
                 padding: 0,
                 margin: 0,
-                marginLeft: 2,
                 width: "100%",
-                // paddingLeft: 1,
+                paddingLeft: 2,
               },
               "& nav.MuiBox-root": {
                 margin: 0,

@@ -26,7 +26,6 @@ const App = () => {
     <BrowserRouter>
       <LMSProvider>
         <Microservices>
-          {/* Course as a top-level microservice with its own child microservices */}
           <CourseMicroservice>
             <EduTest />
             <EduTest2 />
