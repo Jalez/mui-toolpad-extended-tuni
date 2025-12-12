@@ -5,17 +5,17 @@ import ScienceIcon from "@mui/icons-material/Science";
 import {
   NavigationPageStoreItem,
 } from "../LMSToolpad/components/Navigation/store/useNavigationStore";
-import { useCourseNavigationStore } from "../LMSToolpad/components/Courses/store/useCourseNavigationStore";
+import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/CourseMicroservice";
 
 /**
  * EduTest2 Course Microservice
  *
  * This is another example course microservice demonstrating the registration pattern.
  *
- * Registers directly with the course navigation store.
+ * Registers through CourseMicroservice context (must be a child of CourseMicroservice).
  */
 const EduTest2 = () => {
-  const { addCourseMicroserviceNavigation } = useCourseNavigationStore();
+  const { registerCourseMicroservice, unregisterCourseMicroservice } = useCourseMicroserviceRegistration();
 
   const eduTest2Navigation: NavigationPageStoreItem = useMemo(
     () => ({
@@ -52,8 +52,11 @@ const EduTest2 = () => {
   );
 
   useEffect(() => {
-    addCourseMicroserviceNavigation(eduTest2Navigation);
-  }, [addCourseMicroserviceNavigation, eduTest2Navigation]);
+    registerCourseMicroservice(eduTest2Navigation);
+    return () => {
+      unregisterCourseMicroservice(eduTest2Navigation.segment);
+    };
+  }, [registerCourseMicroservice, unregisterCourseMicroservice, eduTest2Navigation]);
 
   return <></>;
 };

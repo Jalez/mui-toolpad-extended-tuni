@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import {
   NavigationPageStoreItem,
 } from "../LMSToolpad/components/Navigation/store/useNavigationStore";
-import { useCourseNavigationStore } from "../LMSToolpad/components/Courses/store/useCourseNavigationStore";
+import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/CourseMicroservice";
 
 /**
  * EduTest Course Microservice
@@ -12,15 +12,13 @@ import { useCourseNavigationStore } from "../LMSToolpad/components/Courses/store
  * This is an example course microservice that demonstrates how to create
  * a self-contained tool that integrates with the Course system.
  *
- * Registers directly with the course navigation store.
+ * Registers through CourseMicroservice context (must be a child of CourseMicroservice).
  */
 const EduTest = () => {
   const {
-    addCourseMicroserviceNavigation,
-    removeCourseMicroserviceNavigation,
-  } = useCourseNavigationStore();
-
-    console.log("[EduTest] Component rendering");
+    registerCourseMicroservice,
+    unregisterCourseMicroservice,
+  } = useCourseMicroserviceRegistration();
 
   // Define navigation structure
   // - "edutest" root: no view, shows tool selector (no title needed)
@@ -78,13 +76,11 @@ const EduTest = () => {
   );
 
   useEffect(() => {
-    console.log("[EduTest] useEffect - registering navigation:", eduTestNavigation.segment);
-    addCourseMicroserviceNavigation(eduTestNavigation);
+    registerCourseMicroservice(eduTestNavigation);
     return () => {
-      console.log("[EduTest] useEffect cleanup - unregistering");
-      removeCourseMicroserviceNavigation(eduTestNavigation.segment);
+      unregisterCourseMicroservice(eduTestNavigation.segment);
     };
-  }, [addCourseMicroserviceNavigation, removeCourseMicroserviceNavigation, eduTestNavigation]);
+  }, [registerCourseMicroservice, unregisterCourseMicroservice, eduTestNavigation]);
 
   return <></>;
 };
