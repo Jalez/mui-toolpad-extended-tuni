@@ -29,8 +29,7 @@
     "esModuleInterop": true
   },
   "include": [
-    "src",
-    "src/LMSToolpad/components/Common/GridLayout/Tools/ResizeToggler.tsx"
+    "src"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
