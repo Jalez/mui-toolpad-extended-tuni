@@ -13,7 +13,7 @@
  */
 
 import { Typography } from "@mui/material";
-import { Stack } from "@mui/material";
+import { Stack, useTheme } from "@mui/material";
 
 import tuniSmallIcon from "/static/images/tuni/face-purple-small.png";
 import tuniSvg from "/static/images/tuni/Tampere_University_logo.svg";
@@ -21,6 +21,8 @@ import { SidebarFooterProps } from "@toolpad/core";
 import { MTETVERSION } from "../../constants";
 
 function SidebarFooter({ mini }: SidebarFooterProps) {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
   return (
     <Stack direction="column" alignItems="center" spacing={1}>
       <div
@@ -62,8 +64,9 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
             width: "48px",
             objectFit: "contain",
             opacity: mini ? 1 : 0,
-            transition: "opacity 0.2s ease-in-out",
+            transition: "opacity 0.2s ease-in-out, filter 0.2s ease-in-out",
             pointerEvents: mini ? "auto" : "none",
+            filter: isDarkMode ? "brightness(0) invert(1)" : "none",
           }}
           alt="Tampere University"
           src={tuniSmallIcon}
@@ -77,8 +80,9 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
             width: "160px",
             objectFit: "contain",
             opacity: mini ? 0 : 1,
-            transition: "opacity 0.2s ease-in-out",
+            transition: "opacity 0.2s ease-in-out, filter 0.2s ease-in-out",
             pointerEvents: mini ? "none" : "auto",
+            filter: isDarkMode ? "brightness(0) invert(1)" : "none",
           }}
           alt="Tampere University"
           src={tuniSvg}

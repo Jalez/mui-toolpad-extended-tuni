@@ -24,9 +24,15 @@ export const Logo = () => {
       }}
     >
       {isMobile ? (
-        <SchoolIcon sx={{ fontSize: "2rem" }} />
+        <SchoolIcon sx={{ fontSize: "2rem", color: theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.primary.main }} />
       ) : (
-        <Typography variant="h1" component="h1">
+        <Typography 
+          variant="h1" 
+          component="h1"
+          sx={{
+            color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : theme.palette.primary.main,
+          }}
+        >
           {platform.name}
         </Typography>
       )}

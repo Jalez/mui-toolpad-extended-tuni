@@ -9,8 +9,6 @@ import {
 
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import MicIcon from "@mui/icons-material/Mic";
 import { useEffect } from "react";
 import DevelopmentTools from "../../../components/DevTools/DevelopmentTools";
 import { useUserStore } from "../../../store/useUserStore";
@@ -37,33 +35,6 @@ export const CollapsibleMenu = () => {
       tooltipTitle="More actions"
     >
       <Stack direction="row" spacing={1}>
-        <Tooltip title="No Notifications">
-          <IconButton size="small">
-            <NotificationsIcon />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Voice Command">
-          <IconButton
-            size="small"
-            onClick={() => {
-              if ("webkitSpeechRecognition" in window) {
-                const recognition = new (
-                  window as any
-                ).webkitSpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
-                recognition.onresult = (event: any) => {
-                  console.log("Voice command:", event.results[0][0].transcript);
-                };
-                recognition.start();
-              } else {
-                alert("Speech recognition not supported");
-              }
-            }}
-          >
-            <MicIcon />
-          </IconButton>
-        </Tooltip>
         <DevelopmentTools />
         <ThemeToggle />
         <PlatformSettingsOpener />
