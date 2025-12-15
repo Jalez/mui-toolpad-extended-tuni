@@ -5,7 +5,7 @@ import ScienceIcon from "@mui/icons-material/Science";
 import {
   NavigationPageStoreItem,
 } from "../LMSToolpad/components/Navigation/store/useNavigationStore";
-import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/CourseMicroservice";
+import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/context/CourseMicroserviceContext";
 
 /**
  * EduTest2 Course Microservice

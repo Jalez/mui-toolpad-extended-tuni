@@ -2,9 +2,6 @@
 
 export { default as LMSProvider } from "./LMSToolpad/LMSProvider";
 
-//as of v3, No longer exists
-// export type { EduMLProviderProps } from './LMSToolpad/EduMLProvider';
-
 // Re-export router dependencies that consumers might need
 export {
   BrowserRouter,
@@ -45,12 +42,9 @@ export { default as Home } from "./LMSToolpad/components/Routes/Home/Home";
 export { default as CourseTools } from "./LMSToolpad/components/Courses/CourseTools";
 
 export { default as CourseMicroservice } from "./LMSToolpad/components/Courses/CourseMicroservice";
-export { useCourseMicroserviceRegistration } from "./LMSToolpad/components/Courses/CourseMicroservice";
+export { useCourseMicroserviceRegistration } from "./LMSToolpad/components/Courses/context/CourseMicroserviceContext";
 
 export { default as LoadingScreen } from "./common/components/ui/LoadingScreen/LoadingScreen";
-
-export { default as ToolSelector } from "./LMSToolpad/components/Tool/ToolSelector";
-export type { ToolSelectorItem } from "./LMSToolpad/components/Tool/ToolSelector";
 
 export { default as DialogOpener } from "./LMSToolpad/components/Dialogs/DialogOpener";
 
@@ -75,8 +69,7 @@ export {
   convertObjectKeysToUnderscore,
 } from "./LMSToolpad/utils/caseConverter";
 
-export { default as MicroserviceRoutes } from "./LMSToolpad/components/Microservices/MicroserviceRoutes";
-export type { MicroserviceConfig } from "./LMSToolpad/components/Microservices/MicroserviceRoutes";
+export type { MicroserviceConfig } from "./LMSToolpad/components/Microservices/types";
 
 export { buildMicroServiceNavigation } from "./LMSToolpad/components/Microservices/MicroserviceNavigationBuilder";
 export type { BuildMicroServiceNavigationProps } from "./LMSToolpad/components/Microservices/MicroserviceNavigationBuilder";

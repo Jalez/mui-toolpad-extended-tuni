@@ -1,10 +1,8 @@
 /** @format */
 import ScienceIcon from "@mui/icons-material/Science";
 import { useEffect, useMemo } from "react";
-import {
-  NavigationPageStoreItem,
-} from "../LMSToolpad/components/Navigation/store/useNavigationStore";
-import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/CourseMicroservice";
+import { NavigationPageStoreItem } from "../LMSToolpad/components/Navigation/store/types";
+import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/context/CourseMicroserviceContext";
 
 /**
  * EduTest Course Microservice

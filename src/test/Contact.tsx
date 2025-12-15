@@ -33,7 +33,6 @@ const Contact = () => {
     );
 
     return () => {
-      console.log("[Contact] Unregistering microservice");
       unregisterMicroservice("contact");
     };
   }, []);
