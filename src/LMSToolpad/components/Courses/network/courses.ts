@@ -1,11 +1,11 @@
 /** @format */
 
-import { Course, CourseRaw } from "../components/Courses/store/useCourseStore";
-import axios from "./axiosConfig";
+import { Course, CourseRaw } from "../store/useCourseStore";
+import axios from "../../../network/axiosConfig";
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from "../utils/caseConverter";
+} from "../../../utils/caseConverter";
 
 const cache = new Map<string, { timestamp: number; data: any }>();
 const CACHE_TTL = 300000; // 5 minutes TTL
@@ -27,22 +27,6 @@ async function fetchWithCache<T>(
 }
 
 /**
- * @description Helper function to make a GET request to retrieve the current course
- * @returns Promise<Course> - The current course object
- */
-export async function getCurrentCourse(): Promise<Course> {
-  return fetchWithCache("getCurrentCourse", async () => {
-    try {
-      const response = await axios.get("api/courses/current/");
-      return convertObjectKeysToCamelCase(response.data) as Course;
-    } catch (error) {
-      throw new Error("Failed to retrieve current course: " + error);
-    }
-  });
-}
-
-/**
- *
  * @description Helper function to make a GET request to retrieve courses
  * @returns Promise<Course[]> - The list of courses
  */
