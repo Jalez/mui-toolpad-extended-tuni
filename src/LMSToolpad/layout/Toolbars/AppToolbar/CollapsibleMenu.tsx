@@ -50,7 +50,6 @@ const PlatformSettingsOpener = () => {
   if (!user?.platformRoles.includes("admin")) return null;
 
   const handleOpenPlatformSettings = () => {
-    console.log("Open Platform Settings");
     setOpenDialog("PlatformSettings");
   };
 

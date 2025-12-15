@@ -63,8 +63,6 @@ export default function EnrollmentTab({
     "settings"
   );
 
-  console.log("courseUsers in EnrollmentTab:", courseUsers);
-
   // Filter enrolled and pending students using new data structure
   const enrolledStudents =
     formData.data?.enrollmentData?.filter(
@@ -75,9 +73,6 @@ export default function EnrollmentTab({
     formData.data?.enrollmentData?.filter(
       (data) => data.role === "student" && data.status === "pending"
     ) || [];
-
-  console.log("Enrolled students:", enrolledStudents);
-  console.log("Pending students:", pendingStudents);
 
   const renderEnrollmentSettings = () => (
     <Stack

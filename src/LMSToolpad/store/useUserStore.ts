@@ -251,7 +251,6 @@ export const useUserStore = create<UserState>((set) => ({
       const user = await getCurrentUser();
 
       if (user) {
-        // console.log("User", user);
         set({
           user: { ...user },
           fetchState: "idle",
@@ -259,7 +258,7 @@ export const useUserStore = create<UserState>((set) => ({
         });
       }
     } catch (error) {
-      console.log("Error getting user", error);
+      console.error("Error getting user", error);
       set({ fetchState: "error" });
     }
   },

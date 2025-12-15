@@ -37,7 +37,6 @@ const UserSettings = () => {
   const { addNotificationData } = useNotificationStore();
   const [formData, setFormData] = useState<UserData | null>(null);
   const [isDirty, setIsDirty] = useState(false);
-  console.log("userToUpdate", userToUpdate);
   useEffect(() => {
     if (userToUpdate) {
       setFormData(userToUpdate);

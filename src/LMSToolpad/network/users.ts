@@ -10,7 +10,6 @@ import {
 export const getCurrentUser = async (): Promise<UserData> => {
   try {
     const response = await axios.get(`api/users/current/`);
-    // console.log('response', response.data);
     return convertObjectKeysToCamelCase(response.data) as UserData;
   } catch (error) {
     console.error("Error getting current user", error);

@@ -52,13 +52,6 @@ const enrichCourseWithData = (
   };
 };
 
-export const getCurrentCourseResponse = (): HttpResponse => {
-  return HttpResponse.json(
-    { error: 'Getting current course should be deprecated' },
-    { status: 404 }
-  );
-};
-
 export const getCourseByIdResponse = (courseId: string): HttpResponse => {
   const course = dataStore.courses.find((course) => course.id === courseId);
   // const { user } = useUserStore.getState();
@@ -135,9 +128,6 @@ export const deleteCourseResponse = (courseId: string): HttpResponse => {
 
 export const courseHandlers = [
   http.get(baseUrl + 'api/courses', async () => getCoursesResponse()),
-  http.get(baseUrl + 'api/courses/current', async () =>
-    getCurrentCourseResponse()
-  ),
   http.get(baseUrl + 'api/courses/:courseId', async ({ params }) =>
     getCourseByIdResponse(params.courseId as string)
   ),

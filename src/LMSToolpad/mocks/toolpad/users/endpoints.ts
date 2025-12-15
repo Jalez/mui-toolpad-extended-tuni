@@ -24,7 +24,6 @@ const createErrorResponse = (
 const handleCreateUser = async (request: Request): Promise<HttpResponse> => {
   try {
     const requestData = (await request.json()) as Record<string, unknown>;
-    // console.log("requestData", requestData);
     const newUser: UserBackendData = {
       id: (dataStore.users.length + 1).toString(),
       name: requestData.name as string,
@@ -56,7 +55,6 @@ const handleUpdateUser = async (
 ): Promise<HttpResponse> => {
   try {
     const requestData = (await request.json()) as Record<string, unknown>;
-    // console.log("update requestData", requestData);
     const userIndex = dataStore.users.findIndex((u) => u.id === userId);
 
     if (userIndex === -1) {
@@ -67,7 +65,6 @@ const handleUpdateUser = async (
       ...dataStore.users[userIndex],
       ...requestData,
     } as UserBackendData;
-    // console.log("updatedUser", updatedUser);
 
     dataStore.users[userIndex] = updatedUser;
     saveDataStore(dataStore);

@@ -31,13 +31,11 @@ const EventMenu = ({
   const handleAddToCalendar = (e: React.MouseEvent) => {
     e.stopPropagation();
     // TODO: Implement calendar export functionality
-    console.log("Add to calendar:", eventInfo.event.title);
   };
 
   const handleRegister = (e: React.MouseEvent) => {
     e.stopPropagation();
     // TODO: Implement registration functionality
-    console.log("Register for event:", eventInfo.event.title);
   };
 
   return (

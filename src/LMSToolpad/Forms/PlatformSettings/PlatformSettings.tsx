@@ -93,7 +93,6 @@ const PlatformSettings = () => {
     setIsDirty(checkIfThemeDirty(newThemeSettings));
   };
 
-  console.log("localPlatformSettings", localPlatformSettings);
   if (!localPlatformSettings || !localThemeSettings) {
     return null;
   }
