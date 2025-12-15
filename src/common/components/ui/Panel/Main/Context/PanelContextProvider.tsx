@@ -131,12 +131,10 @@ export const PanelProvider: React.FC<PanelProps> = ({
     newDimensions: PanelDimensions,
     isTemporary = false
   ) => {
-    console.log("handleDimensionsChange", newDimensions);
     setDimensions(newDimensions);
     setDimensionsWereTemporary(isTemporary);
 
     if (!isTemporary) {
-      console.log("Saving dimensions", newDimensions);
       saveDimensions(id, newDimensions);
     }
   };
@@ -144,7 +142,6 @@ export const PanelProvider: React.FC<PanelProps> = ({
   // // Effect to save non-temporary dimensions
   // useEffect(() => {
   //   if (!dimensionsWereTemporary) {
-  //     console.log("Saving dimensions", dimensions);
   //     saveDimensions(id, dimensions);
   //   }
   // }, [id, dimensions, dimensionsWereTemporary]);

@@ -71,8 +71,6 @@ const ResizablePanelContent = ({ children }: ResizablePanelProps) => {
   useEffect(() => {
     if (!panelRef.current) return;
 
-    console.log("panelRef.current.offsetTop", panelRef.current.offsetTop);
-    console.log("panelRef.current.offsetLeft", panelRef.current.offsetLeft);
     const updateDimensions = () => {
       const panel = panelRef.current;
       if (!panel) return;

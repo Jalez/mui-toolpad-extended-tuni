@@ -69,7 +69,6 @@ export const ExpandTool = () => {
   const handleToggleExpand = () => {
     if (!isExpanded) {
       const currentWidth = panelRef.current?.offsetWidth || 0;
-      console.log("handleToggleExpand: currentWidth", currentWidth, id);
       setExpandedPanelId(id);
     } else {
       setExpandedPanelId(null);

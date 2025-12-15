@@ -56,7 +56,6 @@ export const useResponsiveResize = (props: UseResponsiveResizeProps) => {
     if (!panelRef.current || !parentRef.current) return;
 
     const updateDimensions = () => {
-      console.log("UPDATE DIMENSIONS");
       const panel = panelContentRef.current;
       const parent = parentRef.current;
       if (!panel || !parent) return;
@@ -69,12 +68,6 @@ export const useResponsiveResize = (props: UseResponsiveResizeProps) => {
         parentRect.width - (panelRect.left - parentRect.left) - margin;
       const availableHeight =
         parentRect.height - (panelRect.top - parentRect.top) - margin;
-      console.log(
-        parentRect.height,
-        availableHeight,
-        panelRect.top,
-        parentRect.top
-      );
 
       const newWidth = calculateNewDimension(
         dimensions.width,

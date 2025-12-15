@@ -97,7 +97,6 @@ export const ResizableContextProvider = ({
         newDimensions.width !== dimensions.width ||
         newDimensions.height !== dimensions.height
       ) {
-        console.log("newDimensions", newDimensions);
         handleDimensionsChange(newDimensions, false);
       }
     };

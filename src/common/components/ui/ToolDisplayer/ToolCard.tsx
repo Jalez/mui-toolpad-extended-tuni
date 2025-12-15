@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { NavigationPageStoreItem } from "../../../../LMSToolpad/components/Navigation/store/useNavigationStore";
+import { NavigationPageStoreItem } from "../../../../LMSToolpad/components/Navigation/store/types";
 import { SvgIconComponent } from "@mui/icons-material";
 
 type ToolCardProps = {

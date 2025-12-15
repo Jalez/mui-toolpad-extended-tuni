@@ -18,7 +18,6 @@ const Scrollable = ({ children }: ScrollableProps) => {
   //   if (!parent) return;
 
   //   // const updateExpandedStyle = () => {
-  //   //   console.log("CALLED");
   //   // };
   //   const updateItemCounts = () => {
   //     const actualWidth = panelContentRef.current.offsetWidth;

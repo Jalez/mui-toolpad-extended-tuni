@@ -13,7 +13,6 @@ export const ThemeToggle = () => {
     // Toggle between light and dark (skip system for now, or cycle through all three)
     const newPreference: 'light' | 'dark' = currentMode === 'light' ? 'dark' : 'light';
     
-    console.log('Current mode:', currentMode, 'New preference:', newPreference);
     setColorSchemePreference(newPreference);
   };
 

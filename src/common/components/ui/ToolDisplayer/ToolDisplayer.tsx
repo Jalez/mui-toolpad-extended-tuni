@@ -1,25 +1,14 @@
 /** @format */
 import { Box, Fade, Typography } from "@mui/material";
-import { NavigationPageStoreItem } from "../../../../LMSToolpad/components/Navigation/store/useNavigationStore";
-import { MicroserviceConfig } from "../../../../LMSToolpad/components/Microservices/MicroserviceRoutes";
+import { NavigationPageStoreItem } from "../../../../LMSToolpad/components/Navigation/store/types";
 import useCourseStore from "../../../../LMSToolpad/components/Courses/store/useCourseStore";
 import React from "react";
 import ToolCard from "./ToolCard";
 
-export type ToolDisplayerItem = {
-  path: string;
-  icon: React.ReactElement;
-  label: string;
-  description: string;
-  forRoles?: string[];
-};
-
 interface ToolDisplayerProps {
   show: boolean;
   title: string;
-  microservices?: MicroserviceConfig[]; // new prop
-  onToggleService?: (path: string) => void; // new callback
-  navigationItems?: ToolDisplayerItem[];
+  onToggleService?: (path: string) => void;
   navItems: NavigationPageStoreItem[];
   roleCheck?: boolean;
   isUsed?: boolean;

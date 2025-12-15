@@ -50,7 +50,6 @@ export function useResizablePanel({
     newDimensions,
     isTemporary = false
   ) => {
-    console.log("handleDimensionsChange", newDimensions);
     if (!isTemporary) {
       saveDimensions(id, newDimensions);
     }
@@ -155,7 +154,6 @@ export function useResizablePanel({
           snapToGrid(maxHeight, snapDimensions.height)
         );
       }
-      console.log("handleTouchMove", newDimensions);
       handleDimensionsChange(newDimensions, false);
     };
     const handleTouchEnd = () =>

@@ -10,7 +10,7 @@ export const useResizeHandler = (isExpanded: boolean) => {
     if (!parent) return;
 
     const updateExpandedStyle = () => {
-      console.log("CALLED");
+      // Handler for resize events
     };
 
     let resizeTimer: ReturnType<typeof setTimeout>;

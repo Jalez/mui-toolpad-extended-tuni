@@ -23,7 +23,6 @@ export const useDimensionManagement = ({
   const userChosenDimensionsRef = useRef(loadDimensions(id, dimensions));
 
   const wrappedHandleDimensionsChange = (newDim: PanelDimensions) => {
-    console.log("WRAPPED HANDLE DIMENSIONS CHANGE", newDim);
     if (isUserResizingRef.current) {
       userChosenDimensionsRef.current.width = newDim.width;
       userChosenDimensionsRef.current.height = newDim.height;
