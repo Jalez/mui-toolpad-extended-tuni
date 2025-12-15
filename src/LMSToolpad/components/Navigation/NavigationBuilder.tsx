@@ -1,9 +1,7 @@
 /** @format */
 import { useEffect, useMemo, useRef } from "react";
-import {
-  useNavigationStore,
-  addSectionProps,
-} from "./store/useNavigationStore";
+import { addSectionProps } from "./store/types";
+import { useNavigationStore } from "./store/useNavigationStore";
 import {
   registerAppToolbarAction,
   unregisterAppToolbarAction,

@@ -13,8 +13,6 @@ export const useMicroserviceRoutes = () => {
   return useMemo(() => {
     const routes: ReactElement[] = [];
 
-    console.log("microservices", microservices);
-
     // Add routes from registered microservices
     microservices.forEach((microservice) => {
       if (microservice.metadata?.route) {
