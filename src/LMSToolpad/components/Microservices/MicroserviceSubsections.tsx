@@ -1,7 +1,7 @@
 /** @format */
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Button, Typography, Tooltip } from "@mui/material";
-import { NavigationPageStoreItem } from "../Navigation/store/useNavigationStore";
+import { NavigationPageStoreItem } from "../Navigation/store/types";
 import React from "react";
 
 /**

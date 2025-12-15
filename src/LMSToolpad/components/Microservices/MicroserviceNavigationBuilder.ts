@@ -1,6 +1,6 @@
 /** @format */
 
-import { NavigationPageStoreItem } from "../Navigation/store/useNavigationStore";
+import { NavigationPageStoreItem } from "../Navigation/store/types";
 
 export type BuildMicroServiceNavigationProps = {
   segment: string;

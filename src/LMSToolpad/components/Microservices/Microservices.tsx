@@ -45,29 +45,16 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
     
     // Only update if we have sections and visible sections
     if (sectionsCount > 0 && visibleSectionsCount > 0) {
-      console.log("[Microservices] Updating navigation structure...", { 
-        sectionsCount, 
-        visibleSectionsCount,
-        visibleSections: Object.keys(navStore.visibleSections).filter(k => navStore.visibleSections[k])
-      });
       // Update navigation structure - this now automatically recalculates navigation
       // within the same state update, ensuring we use the updated sections
       navStore.updateMicroserviceNavigationForSections();
-    } else {
-      console.log("[Microservices] Skipping navigation update - conditions not met:", {
-        sectionsCount,
-        visibleSectionsCount
-      });
     }
   }, []);
   
   // Subscribe to store changes outside of React's render cycle for navigation updates
   useEffect(() => {
-    console.log("[Microservices] Setting up subscriptions...");
-    
     // Initial update after mount
     const timeoutId = setTimeout(() => {
-      console.log("[Microservices] Initial timeout fired, setting initialized");
       hasInitializedRef.current = true;
       updateNavigation();
     }, 100);
@@ -76,7 +63,6 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
     const unsubscribeNav = useNavigationStore.subscribe((state) => {
       const newCount = Object.keys(state.sections).length;
       if (newCount !== lastSectionsCountRef.current) {
-        console.log("[Microservices] Sections changed:", lastSectionsCountRef.current, "->", newCount);
         lastSectionsCountRef.current = newCount;
         if (hasInitializedRef.current) {
           updateNavigation();
