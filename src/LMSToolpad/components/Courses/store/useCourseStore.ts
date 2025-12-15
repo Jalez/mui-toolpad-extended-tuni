@@ -5,7 +5,7 @@ import {
   getCourseByUrl,
   getCourses,
   updateCourse,
-} from "../../../network/courses";
+} from "../network/courses";
 import { groupCoursesByEnrollment } from "../../../utils/courseFilters";
 import { fetchState } from "../../../interfaces";
 

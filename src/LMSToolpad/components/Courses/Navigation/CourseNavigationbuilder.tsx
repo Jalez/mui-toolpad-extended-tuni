@@ -3,7 +3,7 @@ import React from "react";
 import useCourseStore, { courseLevel } from "../store/useCourseStore";
 import { NavigationSectionBuilder } from "../../Navigation/NavigationBuilder";
 // import SchoolIcon from "@mui/icons-material/School";
-import type { addSectionProps } from "../../Navigation/store/useNavigationStore";
+import type { addSectionProps } from "../../Navigation/store/types";
 import { subjectConfig } from "../config/subjectConfig";
 import { createCourseIcon } from "../CourseItem/CourseIcon";
 import { useMemo } from "react";

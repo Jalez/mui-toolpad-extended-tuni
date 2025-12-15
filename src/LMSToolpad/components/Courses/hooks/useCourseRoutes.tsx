@@ -7,8 +7,8 @@ import CourseCodeLoader from "../CourseCodeLoader";
 import CourseInstanceSelector from "../CourseInstanceSelector";
 import CourseInstanceLoader from "../CourseInstanceLoader";
 import CourseTools from "../CourseTools";
-import { NavigationPageStoreItem } from "../../Navigation/store/useNavigationStore";
-import { useCourseMicroserviceRegistration } from "../CourseMicroservice";
+import { NavigationPageStoreItem } from "../../Navigation/store/types";
+import { useCourseMicroserviceRegistration } from "../context/CourseMicroserviceContext";
 import SubSections from "../../Microservices/MicroserviceSubsections";
 
 /**
@@ -29,10 +29,8 @@ const CourseRouteWrapper: React.FC<{
 export const useCourseRoutes = () => {
   const { allCourseMicroserviceNavigation } = useCourseMicroserviceRegistration();
 
-  console.log("[useCourseRoutes] Course microservices:", allCourseMicroserviceNavigation.length, allCourseMicroserviceNavigation.map(ms => ms.segment));
 
   return useMemo(() => {
-    console.log("[useCourseRoutes] Generating routes for", allCourseMicroserviceNavigation.length, "microservices");
     const routes: ReactElement[] = [];
 
     // Course routes structure

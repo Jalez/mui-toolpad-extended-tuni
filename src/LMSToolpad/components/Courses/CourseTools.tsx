@@ -8,10 +8,8 @@ import { useNotificationStore } from "../Notifications/store/useNotificationsSto
 import CenteredHeading from "../../../common/components/ui/CenteredHeading/CenteredHeading";
 import ToolDisplayer from "../../../common/components/ui/ToolDisplayer/ToolDisplayer";
 import LtiLoginUrlForm from "./LtiLoginUrlForm";
-import {
-  NavigationPageStoreItem,
-} from "../Navigation/store/useNavigationStore";
-import { useCourseMicroserviceRegistration } from "./CourseMicroservice";
+import { NavigationPageStoreItem } from "../Navigation/store/types";
+import { useCourseMicroserviceRegistration } from "./context/CourseMicroserviceContext";
 
 interface CourseToolsProps {
   microservices?: NavigationPageStoreItem[];

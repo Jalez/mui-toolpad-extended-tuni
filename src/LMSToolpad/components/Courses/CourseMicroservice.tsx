@@ -1,44 +1,9 @@
 /** @format */
 
-import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect, useMemo } from "react";
-import {
-  NavigationPageStoreItem,
-  useNavigationStore,
-} from "../Navigation/store/useNavigationStore";
+import React, { ReactNode } from "react";
+import { CourseMicroserviceProvider } from "./context/CourseMicroserviceContext";
 import CourseRoutesProvider from "./CourseRoutesProvider";
 import CourseManager from "./CourseManager";
-
-/**
- * Context for course microservices to register themselves
- */
-interface CourseMicroserviceContextValue {
-  registerCourseMicroservice: (navigation: NavigationPageStoreItem) => void;
-  unregisterCourseMicroservice: (segment: string) => void;
-  allCourseMicroserviceNavigation: NavigationPageStoreItem[];
-  isInsideCourseMicroservice: boolean;
-}
-
-// Default context value that signals we're NOT inside CourseMicroservice
-const defaultContextValue: CourseMicroserviceContextValue = {
-  registerCourseMicroservice: () => {
-    console.warn("registerCourseMicroservice called outside CourseMicroservice context");
-  },
-  unregisterCourseMicroservice: () => {
-    console.warn("unregisterCourseMicroservice called outside CourseMicroservice context");
-  },
-  allCourseMicroserviceNavigation: [],
-  isInsideCourseMicroservice: false,
-};
-
-const CourseMicroserviceContext = createContext<CourseMicroserviceContextValue>(defaultContextValue);
-
-/**
- * Hook for course microservices to register themselves.
- * Returns isInsideCourseMicroservice=false if used outside CourseMicroservice provider.
- */
-export const useCourseMicroserviceRegistration = () => {
-  return useContext(CourseMicroserviceContext);
-};
 
 interface CourseMicroserviceProps {
   children?: ReactNode;
@@ -70,6 +35,7 @@ interface CourseMicroserviceProps {
  * - v2.0.0: Uses local state instead of Zustand store
  * - Context provides allCourseMicroserviceNavigation array
  * - Integrates with useNavigationStore to notify about course microservices
+ * - v3.1.0: Context logic extracted to separate context file
  *
  * @example
  * ```tsx
@@ -80,47 +46,12 @@ interface CourseMicroserviceProps {
  * ```
  */
 const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => {
-  const [allCourseMicroserviceNavigation, setAllCourseMicroserviceNavigation] = useState<NavigationPageStoreItem[]>([]);
-
-  useEffect(() => {
-    const navStore = useNavigationStore.getState();
-    navStore.setExternalMicroservices(allCourseMicroserviceNavigation);
-  }, [allCourseMicroserviceNavigation]);
-
-  const registerCourseMicroservice = useCallback((navigation: NavigationPageStoreItem) => {
-    setAllCourseMicroserviceNavigation((prev) => {
-      // Check if already exists
-      if (prev.find((ms) => ms.segment === navigation.segment)) {
-        return prev;
-      }
-
-      const updated = [...prev, navigation];
-
-      return updated;
-    });
-  }, []);
-
-  const unregisterCourseMicroservice = useCallback((segment: string) => {
-    setAllCourseMicroserviceNavigation((prev) => {
-      const updated = prev.filter((ms) => ms.segment !== segment);
-      return updated;
-    });
-  }, []);
-
-  // Memoize context value to prevent unnecessary re-renders of consumers
-  const contextValue = useMemo<CourseMicroserviceContextValue>(() => ({
-    registerCourseMicroservice,
-    unregisterCourseMicroservice,
-    allCourseMicroserviceNavigation,
-    isInsideCourseMicroservice: true,
-  }), [registerCourseMicroservice, unregisterCourseMicroservice, allCourseMicroserviceNavigation]);
-
   return (
-    <CourseMicroserviceContext.Provider value={contextValue}>
+    <CourseMicroserviceProvider>
       <CourseManager />
       {children}
       <CourseRoutesProvider />
-    </CourseMicroserviceContext.Provider>
+    </CourseMicroserviceProvider>
   );
 };
 
