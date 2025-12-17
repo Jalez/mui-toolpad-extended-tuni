@@ -1,7 +1,7 @@
 /** @format */
 import ScienceIcon from "@mui/icons-material/Science";
 import { useEffect, useMemo } from "react";
-import { NavigationPageStoreItem } from "../LMSToolpad/components/Navigation/store/types";
+import { NavigationPageStoreItem } from "@toolpad/core";
 import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/context/CourseMicroserviceContext";
 
 /**

@@ -2,9 +2,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import ScienceIcon from "@mui/icons-material/Science";
-import {
-  NavigationPageStoreItem,
-} from "../LMSToolpad/components/Navigation/store/useNavigationStore";
+import { NavigationPageStoreItem } from "@toolpad/core";
 import { useCourseMicroserviceRegistration } from "../LMSToolpad/components/Courses/context/CourseMicroserviceContext";
 
 /**

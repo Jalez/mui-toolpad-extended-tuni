@@ -1,7 +1,7 @@
 /** @format */
 
 import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect, useMemo } from "react";
-import { NavigationPageStoreItem } from "../../Navigation/store/types";
+import { NavigationPageStoreItem } from "@toolpad/core";
 import { useNavigationStore } from "../../Navigation/store/useNavigationStore";
 
 /**
@@ -51,7 +51,8 @@ export const CourseMicroserviceProvider: React.FC<CourseMicroserviceProviderProp
   // This decouples the registration from the store notification
   useEffect(() => {
     const navStore = useNavigationStore.getState();
-    navStore.setExternalMicroservices(allCourseMicroserviceNavigation);
+    // Cast to local type for compatibility with navigation store
+    navStore.setExternalMicroservices(allCourseMicroserviceNavigation as any);
   }, [allCourseMicroserviceNavigation]);
 
   // Memoized registration functions to prevent infinite loops
