@@ -27,7 +27,24 @@ export { default as useCourseStore } from "./LMSToolpad/components/Courses/store
 
 export { default as useDialogStore } from "./LMSToolpad/store/useDialogStore";
 
-export * from "./LMSToolpad/store/useUserStore";
+// UserStore - kept for backward compatibility and Users module internal use
+export * from "./LMSToolpad/components/Users/store/useUserStore";
+export { useUserStore } from "./LMSToolpad/components/Users/store/useUserStore";
+
+// UserBus - recommended for LMSToolpad components
+export {
+  userBus,
+  UserBus,
+  useCurrentUser,
+  useUserPreferences,
+  useUserActions,
+} from "./LMSToolpad/components/Events";
+export type {
+  UserData,
+  UserEvent,
+  UserEventType,
+  UserPreferences,
+} from "./LMSToolpad/components/Events";
 
 export * from "./LMSToolpad/components/Navigation/store/useNavigationStore";
 
