@@ -28,7 +28,6 @@ import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/Reg
 import { PageContainer } from "@toolpad/core";
 import { useMicroserviceNavigation } from "./components/Navigation/hooks/useMicroserviceNavigation";
 import { GridItemProvider } from "../common/components/layout/GridLayout/GridItemContext";
-import { CalendarManager, CalendarEventAggregator } from "./components/Calendar";
 
 export interface LMSProviderProps {
   children?: ReactNode;
@@ -226,8 +225,6 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
             >
             <AuthenticationManager />
             <UserManager />
-            <CalendarManager />
-            <CalendarEventAggregator />
             <DashboardLayout
             data-testid="dashboard-layout"
             // border={false}
