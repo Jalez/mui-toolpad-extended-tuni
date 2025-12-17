@@ -1,7 +1,7 @@
 /** @format */
 
 
-import { UserBackendData } from "../../../mocks/toolpad/users/types";
+import { UserBackendData } from "../../Users/mocks/types";
 import { courseEventType, courseLevel, courseRole, enrollmentStatus } from "../store/useCourseStore";
 import { subjectTopics } from "./constants";
 import {
