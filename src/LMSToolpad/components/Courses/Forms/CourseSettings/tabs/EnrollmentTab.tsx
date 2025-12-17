@@ -20,12 +20,12 @@ import {
   Avatar,
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { parseDate } from "../../../utils/parseDate";
+import { parseDate } from "../../../../../utils/parseDate";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
-import { CourseRaw } from "../../../components/Courses/store/useCourseStore";
-import { UserData } from "../../../store/useUserStore";
+import { CourseRaw } from "../../../store/useCourseStore";
+import { UserData } from "../../../../../store/useUserStore";
 
 interface EnrollmentTabProps {
   formData: CourseRaw;

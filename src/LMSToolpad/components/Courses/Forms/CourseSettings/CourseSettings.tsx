@@ -4,17 +4,17 @@
 
 import { useState, useEffect } from "react";
 
-import useDialogStore from "../../store/useDialogStore";
+import useDialogStore from "../../../../store/useDialogStore";
 import useCourseStore, {
   CourseRaw,
   courseTemplate,
-} from "../../components/Courses/store/useCourseStore";
-import FormDialog from "../../components/Dialogs/FormDialog";
+} from "../../store/useCourseStore";
+import FormDialog from "../../../Dialogs/FormDialog";
 import BasicInfoTab from "./tabs/BasicInfoTab";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import CourseSettingsTabs from "./CourseSettingsTabs";
-import { useNotificationStore } from "../../components/Notifications/store/useNotificationsStore";
-import { useUserStore } from "../../store/useUserStore";
+import { useNotificationStore } from "../../../Notifications/store/useNotificationsStore";
+import { useUserStore } from "../../../../store/useUserStore";
 
 /**
  * CourseSettings Component

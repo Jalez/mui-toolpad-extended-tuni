@@ -2,10 +2,10 @@
 
 import Grid from "@mui/material/Grid";
 import { Stack, Typography, Divider } from "@mui/material";
-import { CourseRaw } from "../../../components/Courses/store/useCourseStore";
-import EditableSwitch from "../../Components/Editables/EditableSwitch";
-import EditableNumber from "../../Components/Editables/EditableNumber";
-import EditableSelect from "../../Components/Editables/EditableSelect";
+import { CourseRaw } from "../../../store/useCourseStore";
+import EditableSwitch from "../../../../../Forms/Components/Editables/EditableSwitch";
+import EditableNumber from "../../../../../Forms/Components/Editables/EditableNumber";
+import EditableSelect from "../../../../../Forms/Components/Editables/EditableSelect";
 
 interface DataProcessingTabProps {
   formData: CourseRaw;

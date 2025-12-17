@@ -1,7 +1,7 @@
 /** @format */
 
 import useDialogStore from '../../store/useDialogStore';
-import CourseSettings from '../../Forms/CourseSettings/CourseSettings';
+import CourseSettings from '../Courses/Forms/CourseSettings/CourseSettings';
 import PlatformSettings from '../../Forms/PlatformSettings/PlatformSettings';
 import { getDialog, registerDialog } from './dialogRegistry';
 import UserSettings from '../../Forms/UserSettings/UserSettings';

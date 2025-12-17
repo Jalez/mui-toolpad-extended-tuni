@@ -1,12 +1,12 @@
 /** @format */
 
 import { Stack, Box, Divider, Typography } from "@mui/material";
-import { CourseRaw } from "../../../components/Courses/store/useCourseStore";
-import EditableText from "../../Components/Editables/EditableText";
-import EditableAutocomplete from "../../Components/Editables/EditableAutoComplete";
-import EditableImage from "../../Components/Editables/EditableImage";
-import EditableSelect from "../../Components/Editables/EditableSelect";
-import EditableNumber from "../../Components/Editables/EditableNumber";
+import { CourseRaw } from "../../../store/useCourseStore";
+import EditableText from "../../../../../Forms/Components/Editables/EditableText";
+import EditableAutocomplete from "../../../../../Forms/Components/Editables/EditableAutoComplete";
+import EditableImage from "../../../../../Forms/Components/Editables/EditableImage";
+import EditableSelect from "../../../../../Forms/Components/Editables/EditableSelect";
+import EditableNumber from "../../../../../Forms/Components/Editables/EditableNumber";
 
 interface BasicInfoTabProps {
   formData: CourseRaw;

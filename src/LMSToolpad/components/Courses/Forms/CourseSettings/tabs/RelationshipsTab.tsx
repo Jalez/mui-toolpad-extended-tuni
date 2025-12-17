@@ -5,8 +5,8 @@ import {
   CourseRaw,
   CourseRelation,
   courseRelationType,
-} from "../../../components/Courses/store/useCourseStore";
-import EditableAutocomplete from "../../Components/Editables/EditableAutoComplete";
+} from "../../../store/useCourseStore";
+import EditableAutocomplete from "../../../../../Forms/Components/Editables/EditableAutoComplete";
 
 interface RelationshipsTabProps {
   formData: CourseRaw;

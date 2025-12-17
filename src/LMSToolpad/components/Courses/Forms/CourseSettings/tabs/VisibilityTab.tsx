@@ -10,8 +10,8 @@ import {
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
-import { parseDate } from "../../../utils/parseDate";
-import { CourseRaw } from "../../../components/Courses/store/useCourseStore";
+import { parseDate } from "../../../../../utils/parseDate";
+import { CourseRaw } from "../../../store/useCourseStore";
 
 interface VisibilityTabProps {
   formData: CourseRaw;

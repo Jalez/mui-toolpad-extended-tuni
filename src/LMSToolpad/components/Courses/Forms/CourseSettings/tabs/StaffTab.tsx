@@ -10,8 +10,8 @@ import {
   IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { CourseRaw } from "../../../components/Courses/store/useCourseStore";
-import { UserData } from "../../../store/useUserStore";
+import { CourseRaw } from "../../../store/useCourseStore";
+import { UserData } from "../../../../../store/useUserStore";
 
 interface StaffTabProps {
   formData: CourseRaw;

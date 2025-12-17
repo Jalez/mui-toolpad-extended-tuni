@@ -13,8 +13,8 @@ import BasicInfoTab from "./tabs/BasicInfoTab";
 import StaffTab from "./tabs/StaffTab";
 import EnrollmentTab from "./tabs/EnrollmentTab";
 import VisibilityTab from "./tabs/VisibilityTab";
-import { CourseRaw } from "../../components/Courses/store/useCourseStore";
-import { UserData } from "../../store/useUserStore";
+import { CourseRaw } from "../../store/useCourseStore";
+import { UserData } from "../../../../store/useUserStore";
 import DataProcessingTab from "./tabs/DataProcessingTab";
 import RelationshipsTab from "./tabs/RelationshipsTab";
 
