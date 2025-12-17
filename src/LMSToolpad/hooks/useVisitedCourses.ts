@@ -28,7 +28,7 @@ const emitter = new VisitedCoursesEmitter();
  */
 
 import { Course } from "../components/Courses/store/useCourseStore";
-import { useUserStore } from "../store/useUserStore";
+import { userBus } from "../components/Events/UserBus";
 
 /**
  * Creates a unique identifier for a course by combining code and instance
@@ -48,7 +48,7 @@ export const addVisitedCourse = async (course: Course) => {
     return;
   }
 
-  const { user, updateUser } = useUserStore.getState();
+  const user = userBus.getCurrentUserSync();
   if (!user) return;
 
   const courseIds = user.preferences.lastVisitedCourses || [];
@@ -58,7 +58,7 @@ export const addVisitedCourse = async (course: Course) => {
   const updatedCourseIds = filteredCourseIds.slice(0, 5);
 
   try {
-    await updateUser({
+    await userBus.updateUser({
       ...user,
       preferences: {
         ...user.preferences,
@@ -76,7 +76,7 @@ export const addVisitedCourse = async (course: Course) => {
  * @returns {string[]} Array of course IDs in "code:instance" format
  */
 export const getVisitedCourses = () => {
-  const { user } = useUserStore.getState();
+  const user = userBus.getCurrentUserSync();
   return user?.preferences.lastVisitedCourses || [];
 };
 

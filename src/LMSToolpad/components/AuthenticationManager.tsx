@@ -1,9 +1,11 @@
 import { useEffect } from "react";
-import { useUserStore } from "../store/useUserStore";
+import { useCurrentUser } from "./Events/hooks/useCurrentUser";
+import { useUserActions } from "./Events/hooks/useUserActions";
 import { useRetry } from "../../common/hooks/useRetry";
 
 const AuthenticationManager = () => {
-  const { user, getUser } = useUserStore();
+  const { user } = useCurrentUser();
+  const { getUser } = useUserActions();
 
   // Use the retry hook for fetching user
   useRetry({

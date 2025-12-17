@@ -10,7 +10,8 @@ import {
   ThemeSwitcher,
 } from "@toolpad/core";
 
-import { useUserStore } from "../../../store/useUserStore";
+import { useCurrentUser } from "../../../components/Events/hooks/useCurrentUser";
+import { useUserActions } from "../../../components/Events/hooks/useUserActions";
 import useDialogStore from "../../../store/useDialogStore";
 
 export const ToolbarAccount = () => {
@@ -24,7 +25,8 @@ export const ToolbarAccount = () => {
 };
 
 const AccountMenu = () => {
-  const { user, setUserToUpdate } = useUserStore();
+  const { user } = useCurrentUser();
+  const { setUserToUpdate } = useUserActions();
   const { setOpenDialog } = useDialogStore();
 
   const handleSettingsClick = (e: React.MouseEvent<HTMLElement>) => {

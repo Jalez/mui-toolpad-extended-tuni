@@ -1,6 +1,7 @@
 /** @format */
 import { useEffect, useRef } from "react";
-import { useUserStore } from "../../../store/useUserStore";
+import { useCurrentUser } from "../../../components/Events/hooks/useCurrentUser";
+import { useUserActions } from "../../../components/Events/hooks/useUserActions";
 import { useNavigationFilterStore } from "../store/useNavigationFilterStore";
 import { useNavigationStore } from "../store/useNavigationStore";
 import { isEqual } from "lodash";
@@ -20,7 +21,8 @@ const hasLocalStoragePreferences = (): boolean => {
 };
 
 export const useSyncNavigationFilters = () => {
-  const { user, updateUser } = useUserStore();
+  const { user } = useCurrentUser();
+  const { updateUser } = useUserActions();
   const { filterOptions, setFilterOptions } = useNavigationFilterStore();
   const { sectionOrder, setVisibleSections } = useNavigationStore();
   const isInitialLoad = useRef(true);

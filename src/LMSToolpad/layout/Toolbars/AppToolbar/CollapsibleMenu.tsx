@@ -11,7 +11,7 @@ import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useEffect } from "react";
 import DevelopmentTools from "../../../components/DevTools/DevelopmentTools";
-import { useUserStore } from "../../../store/useUserStore";
+import { useCurrentUser } from "../../../components/Events/hooks/useCurrentUser";
 import useDialogStore from "../../../store/useDialogStore";
 import { CollapsingButtons } from "../../../../common/components/ui/CollapsingButtons/CollapsingButtons";
 import ThemeToggle from "../../../../common/components/ui/ThemeToggle/ThemeToggle";
@@ -44,7 +44,7 @@ export const CollapsibleMenu = () => {
 };
 
 const PlatformSettingsOpener = () => {
-  const { user } = useUserStore();
+  const { user } = useCurrentUser();
   const { setOpenDialog } = useDialogStore();
 
   if (!user?.platformRoles.includes("admin")) return null;
