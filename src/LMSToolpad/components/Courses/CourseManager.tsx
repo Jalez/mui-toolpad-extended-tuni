@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import useCourseStore from "./store/useCourseStore";
 import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
 import { useRetry } from "../../../common/hooks/useRetry";
@@ -9,8 +10,18 @@ import { createGridItem } from "../../../common/components/layout/GridLayout/lay
 
 
 const CourseManager = () => {
-  const { getCourses, setCurrentCourseUrl, getCourseByUrl, courses } =
-    useCourseStore();
+  const location = useLocation();
+  const { 
+    getCourses, 
+    setCurrentCourseUrl, 
+    getCourseByUrl, 
+    courses,
+    currentCourse,
+    currentCourseCode,
+    setCurrentCourse,
+    setCurrentCourseCode,
+    setCurrentCourseUrl: setCurrentCourseUrlState
+  } = useCourseStore();
   const { registerGridItem, unregisterGridItem } = useGridItemContext();
 
   // Use the retry hook for fetching courses
@@ -38,6 +49,18 @@ const CourseManager = () => {
     window.addEventListener("message", messageHandler);
     return () => window.removeEventListener("message", messageHandler);
   }, [getCourseByUrl, setCurrentCourseUrl]);
+
+  // Watch URL and automatically null course state when navigating away from course routes
+  useEffect(() => {
+    // Course routes are: /:code and /:code/:instance (registered at root level)
+    // When navigating to root (/), clear all course state
+    // CourseCodeLoader and CourseInstanceLoader handle setting course state when on their routes
+    if (location.pathname === '/' && (currentCourse || currentCourseCode)) {
+      setCurrentCourse(null);
+      setCurrentCourseCode(null);
+      setCurrentCourseUrlState('');
+    }
+  }, [location.pathname, currentCourse, currentCourseCode, setCurrentCourse, setCurrentCourseCode, setCurrentCourseUrlState]);
 
   // Register course-list grid item with its default layout
   // Course-list chooses its own default size: full width (15 cols), 1 row height
