@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { Box, Typography, Paper } from "@mui/material";
-import FormDialog from "../../components/Dialogs/FormDialog";
-import useDialogStore from "../../store/useDialogStore";
+import FormDialog from "../../../../components/Dialogs/FormDialog";
+import useDialogStore from "../../../../store/useDialogStore";
 import { useUserStore, UserData } from "../../store/useUserStore";
-import { useNotificationStore } from "../../components/Notifications/store/useNotificationsStore";
-import EditableText from "../Components/Editables/EditableText";
-import EditableSwitch from "../Components/Editables/EditableSwitch";
-import EditableNumber from "../Components/Editables/EditableNumber";
-import EditableImage from "../Components/Editables/EditableImage";
-import { PlatformRole } from "../../store/usePlatformStore";
+import { useNotificationStore } from "../../../../components/Notifications/store/useNotificationsStore";
+import EditableText from "../../../../Forms/Components/Editables/EditableText";
+import EditableSwitch from "../../../../Forms/Components/Editables/EditableSwitch";
+import EditableNumber from "../../../../Forms/Components/Editables/EditableNumber";
+import EditableImage from "../../../../Forms/Components/Editables/EditableImage";
+import { PlatformRole } from "../../../../store/usePlatformStore";
 
 /**
  * UserSettings Component

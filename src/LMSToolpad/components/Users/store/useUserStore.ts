@@ -7,12 +7,12 @@ import {
   logoutUser,
   updateUser,
 } from "../network/users";
-import { fetchState } from "../interfaces";
+import { fetchState } from "../../../interfaces";
 import studentImage from "/static/images/student.png";
 import teacherImage from "/static/images/teacher.png";
 import guestImage from "/static/images/guest.png";
 import adminImage from "/static/images/admin.png";
-import { PlatformRole } from "./usePlatformStore";
+import { PlatformRole } from "../../../store/usePlatformStore";
 
 export type userId = string;
 

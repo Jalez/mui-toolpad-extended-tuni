@@ -1,11 +1,11 @@
 /** @format */
 
-import axios from "./axiosConfig";
+import axios from "../../../network/axiosConfig";
 import { UserData } from "../store/useUserStore";
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from "../utils/caseConverter";
+} from "../../../utils/caseConverter";
 
 export const getCurrentUser = async (): Promise<UserData> => {
   try {
