@@ -1,7 +1,7 @@
 /** @format */
 
 import { test, expect, describe } from "vitest";
-import { groupCoursesByEnrollment } from "../courseFilters";
+import { groupCoursesByEnrollment } from "../../components/Courses/utils/courseFilters";
 import {
   Course,
   courseRole,

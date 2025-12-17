@@ -6,7 +6,7 @@ import {
   getCourses,
   updateCourse,
 } from "../network/courses";
-import { groupCoursesByEnrollment } from "../../../utils/courseFilters";
+import { groupCoursesByEnrollment } from "../utils/courseFilters";
 import { fetchState } from "../../../interfaces";
 
 export type courseRole = "student" | "teacher" | "guest";
@@ -211,7 +211,7 @@ interface CourseStore {
   setCourseToUpdate: (course: Course | null) => void;
   setCurrentCourseUrl: (url: string) => void;
   setCurrentCourse: (course: Course | null) => void;
-  setCurrentCourseCode: (code: string) => void;
+  setCurrentCourseCode: (code: string | null) => void;
   updateStateCourse: (course: Course) => Promise<Course>;
   getCourseByUrl: (url: string) => void;
   getCourses: () => void;
@@ -260,7 +260,7 @@ const useCourseStore = create<CourseStore>((set, get) => ({
   setCourseToUpdate: (course) => set({ courseToUpdate: course }),
   setCurrentCourseUrl: (url) => set({ currentCourseUrl: url }),
   setCurrentCourse: (course) => set({ currentCourse: course }),
-  setCurrentCourseCode: (code) => set({ currentCourseCode: code }),
+  setCurrentCourseCode: (code) => set({ currentCourseCode: code as string | null }),
   updateStateCourse: async (course) => {
     try {
       const updatedCourse = await updateCourse(course);

@@ -1,6 +1,6 @@
 /** @format */
 
-import { Course } from "../components/Courses/store/useCourseStore";
+import { Course } from "../store/useCourseStore";
 
 export type CourseGroups = {
   isStudent: Course[];
