@@ -57,3 +57,4 @@ export const calculateNavigationFromSections = (
 
   return sectionNavigation;
 };
+

@@ -114,3 +114,4 @@ export type ViewStore = {
   // Setter for external microservices (called by external components like CourseMicroservice)
   setExternalMicroservices: (microservices: NavigationPageStoreItem[]) => void;
 };
+
