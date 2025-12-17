@@ -1,4 +1,6 @@
-import { handlers } from "./handlers";
+/** @format */
+
 import { setupWorker } from "msw/browser";
+import { handlers } from "./handlers";
 
 export const worker = setupWorker(...handlers);
