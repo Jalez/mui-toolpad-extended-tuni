@@ -3,7 +3,8 @@
 import { ReactNode, useEffect, useState, useMemo } from "react";
 import { AppProvider, DashboardLayout, Router, Session } from "@toolpad/core";
 import { useNavigationStore } from "./components/Navigation/store/useNavigationStore";
-import { useUserStore } from "./store/useUserStore";
+import { useCurrentUser } from "./components/Events/hooks/useCurrentUser";
+import { useUserActions } from "./components/Events/hooks/useUserActions";
 import useCustomRouter from "./hooks/useCustomRouter";
 import { addIcons } from "./components/tools/addIcons";
 import { addActions } from "./components/tools/addActions";
@@ -22,7 +23,6 @@ import { useThemeStore } from "./store/useThemeStore";
 import { createTheme, Theme, useTheme, ThemeProvider, CssBaseline } from "@mui/material";
 import RegisteredAppTools from "./layout/Toolbars/AppToolbar/RegisteredAppTools";
 import PageContent from "./layout/Content/PageContent";
-import { UserManager } from "./components/UserManager";
 
 import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/RegisteredPageTools";
 import { PageContainer } from "@toolpad/core";
@@ -62,7 +62,8 @@ export interface LMSProviderProps {
  * ```
  */
 const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
-  const { user, getUser, logout } = useUserStore();
+  const { user } = useCurrentUser();
+  const { getUser, logout } = useUserActions();
   const { navigation } = useNavigationStore();
   const router = useCustomRouter();
   const themeUsed = useTheme();
@@ -224,7 +225,6 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
               authentication={authentication}
             >
             <AuthenticationManager />
-            <UserManager />
             <DashboardLayout
             data-testid="dashboard-layout"
             // border={false}
