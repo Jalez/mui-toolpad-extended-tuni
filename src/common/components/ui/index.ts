@@ -1,5 +1,4 @@
 export { default as CenteredHeading } from './CenteredHeading/CenteredHeading';
-export { default as ToolDisplayer } from './ToolDisplayer/ToolDisplayer';
 export { default as Scroller } from './Scroller/Scroller';
 export { default as LoadingScreen } from './LoadingScreen/LoadingScreen';
 export { default as CompoundPanel, Section } from './CompoundPanel/CompoundPanel';

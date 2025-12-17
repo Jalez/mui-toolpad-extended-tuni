@@ -6,9 +6,9 @@ import useCourseStore, { Course } from "./store/useCourseStore";
 import { useNotificationStore } from "../Notifications/store/useNotificationsStore";
 
 import CenteredHeading from "../../../common/components/ui/CenteredHeading/CenteredHeading";
-import ToolDisplayer from "../../../common/components/ui/ToolDisplayer/ToolDisplayer";
+import ToolDisplayer from "./components/ToolDisplayer/ToolDisplayer";
 import LtiLoginUrlForm from "./LtiLoginUrlForm";
-import { NavigationPageStoreItem } from "../Navigation/store/types";
+import { NavigationPageStoreItem } from "@toolpad/core";
 import { useCourseMicroserviceRegistration } from "./context/CourseMicroserviceContext";
 
 interface CourseToolsProps {

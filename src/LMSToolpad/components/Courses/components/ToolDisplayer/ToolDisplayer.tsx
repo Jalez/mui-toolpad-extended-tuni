@@ -1,8 +1,7 @@
 /** @format */
 import { Box, Fade, Typography } from "@mui/material";
-import { NavigationPageStoreItem } from "../../../../LMSToolpad/components/Navigation/store/types";
-import useCourseStore from "../../../../LMSToolpad/components/Courses/store/useCourseStore";
-import React from "react";
+import useCourseStore from "../../store/useCourseStore";
+import { NavigationPageStoreItem } from "@toolpad/core";
 import ToolCard from "./ToolCard";
 
 interface ToolDisplayerProps {
@@ -71,7 +70,7 @@ const ToolDisplayer = ({
             {navItems.map((item) =>
               !roleCheck ||
               (roleCheck &&
-                item.metadata?.forRoles?.includes(
+                (item.metadata?.forRoles as string[])?.includes(
                   currentCourse?.data?.myData?.role || ""
                 )) ? (
                 <ToolCard

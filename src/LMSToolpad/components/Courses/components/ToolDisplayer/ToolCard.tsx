@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { NavigationPageStoreItem } from "../../../../LMSToolpad/components/Navigation/store/types";
+import { NavigationPageStoreItem } from "@toolpad/core";
 import { SvgIconComponent } from "@mui/icons-material";
 
 type ToolCardProps = {
@@ -22,8 +22,13 @@ type ToolCardProps = {
 const ToolCard = ({ item, onToggleService, isUsed }: ToolCardProps) => {
   const theme = useTheme();
   const navigate = useNavigate();
+  // Handle icon: prefer icon if present, fall back to iconFC, or null if neither exists
   const IconComponent = item.iconFC as SvgIconComponent;
-  const iconToShow = IconComponent ? <IconComponent fontSize="large" /> : null;
+  const iconToShow = item.icon 
+    ? item.icon 
+    : IconComponent 
+      ? <IconComponent fontSize="large" /> 
+      : null;
 
   return (
     <Card
@@ -79,7 +84,7 @@ const ToolCard = ({ item, onToggleService, isUsed }: ToolCardProps) => {
           </Box>
           <Typography variant="h6">{item.title}</Typography>
           <Typography variant="body2" color="text.secondary" align="center">
-            {item.metadata?.description}
+            {item.metadata?.description as string | undefined}
           </Typography>
         </CardContent>
       </CardActionArea>
