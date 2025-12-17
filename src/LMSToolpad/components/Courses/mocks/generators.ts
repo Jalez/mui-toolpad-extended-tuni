@@ -1,12 +1,8 @@
 /** @format */
 
-import {
-  courseEventType,
-  courseLevel,
-  courseRole,
-  enrollmentStatus,
-} from "../../../components/Courses/store/useCourseStore";
-import { UserBackendData } from "../users/types";
+
+import { UserBackendData } from "../../../mocks/toolpad/users/types";
+import { courseEventType, courseLevel, courseRole, enrollmentStatus } from "../store/useCourseStore";
 import { subjectTopics } from "./constants";
 import {
   CourseBackendData,

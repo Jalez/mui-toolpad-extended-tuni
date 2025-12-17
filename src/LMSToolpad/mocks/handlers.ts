@@ -1,7 +1,7 @@
 /** @format */
 
 import { HttpResponse, http } from "msw";
-import { courseHandlers } from "./toolpad/courses/endpoints";
+import { courseHandlers } from "../components/Courses/mocks/endpoints";
 import { resetDataStore } from "./store";
 import { userHandlers } from "./toolpad/users/endpoints";
 

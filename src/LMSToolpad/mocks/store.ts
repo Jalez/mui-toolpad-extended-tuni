@@ -1,10 +1,10 @@
 /** @format */
 
-import { generateCourses } from "./toolpad/courses/generators";
+import { generateCourses } from "../components/Courses/mocks/generators";
 import {
   CourseBackendData,
   CourseEnrollmentBackendData,
-} from "./toolpad/courses/types";
+} from "../components/Courses/mocks/types";
 import { generateUsers } from "./toolpad/users/generators";
 import { UserBackendData } from "./toolpad/users/types";
 

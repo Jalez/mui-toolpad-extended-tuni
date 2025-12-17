@@ -2,7 +2,7 @@
 
 import { http, HttpResponse } from 'msw';
 
-import { dataStore, saveDataStore } from '../../store';
+import { dataStore, saveDataStore } from '../../../mocks/store';
 import { baseUrl } from '../../../constants';
 import {
   CourseBackendData,

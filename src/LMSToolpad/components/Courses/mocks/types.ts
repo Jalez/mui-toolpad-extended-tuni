@@ -7,12 +7,12 @@ import {
   enrollmentStatus,
   legalBasis,
   visibilityMode,
-} from "../../../components/Courses/store/useCourseStore";
+} from "../store/useCourseStore";
 
 import {
   courseEventType,
   courseRole,
-} from "../../../components/Courses/store/useCourseStore";
+} from "../store/useCourseStore";
 
 export interface CourseEventBackendData {
   id: string;
