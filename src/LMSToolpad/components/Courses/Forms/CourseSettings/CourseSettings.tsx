@@ -14,7 +14,9 @@ import BasicInfoTab from "./tabs/BasicInfoTab";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 import CourseSettingsTabs from "./CourseSettingsTabs";
 import { useNotificationStore } from "../../../Notifications/store/useNotificationsStore";
-import { useUserStore } from "../../../../store/useUserStore";
+import { useUserActions } from "../../../../components/Events/hooks/useUserActions";
+import { userBus } from "../../../../components/Events/UserBus";
+import type { UserData } from "../../../../components/Events/userTypes";
 
 /**
  * CourseSettings Component
@@ -42,18 +44,22 @@ const CourseSettings = () => {
   const { closeDialog } = useDialogStore();
   const { setCourseToUpdate, updateStateCourse, courseToUpdate } =
     useCourseStore();
-  const { fetchCourseUsers, courseUsers } = useUserStore();
+  const { fetchCourseUsers } = useUserActions();
   const [formData, setFormData] = useState<CourseRaw>(
     courseToUpdate || courseTemplate
   );
+  const [courseUsers, setCourseUsers] = useState<UserData[] | undefined>(undefined);
   const { addNotificationData } = useNotificationStore();
 
   useEffect(() => {
     if (courseToUpdate) {
       setFormData(courseToUpdate);
-      fetchCourseUsers(courseToUpdate.id);
+      fetchCourseUsers(courseToUpdate.id).then(() => {
+        setCourseUsers(userBus.getCourseUsers());
+      });
     } else {
       setFormData(courseTemplate);
+      setCourseUsers(undefined);
     }
   }, [courseToUpdate, fetchCourseUsers]);
 

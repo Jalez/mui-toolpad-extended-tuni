@@ -25,7 +25,7 @@ import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
 import { CourseRaw } from "../../../store/useCourseStore";
-import { UserData } from "../../../../../store/useUserStore";
+import type { UserData } from "../../../../../components/Events/userTypes";
 
 interface EnrollmentTabProps {
   formData: CourseRaw;
@@ -55,7 +55,7 @@ interface EnrollmentTabProps {
 export default function EnrollmentTab({
   formData,
   setFormData,
-  courseUsers = [],
+  courseUsers: _courseUsers = [],
 }: EnrollmentTabProps) {
   const theme = useTheme();
   const isLargeScreen = useMediaQuery(theme.breakpoints.up("md"));

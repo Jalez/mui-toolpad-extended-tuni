@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { CourseRaw } from "../../../store/useCourseStore";
-import { UserData } from "../../../../../store/useUserStore";
+import type { UserData } from "../../../../../components/Events/userTypes";
 
 interface StaffTabProps {
   formData: CourseRaw;

@@ -14,7 +14,7 @@ import StaffTab from "./tabs/StaffTab";
 import EnrollmentTab from "./tabs/EnrollmentTab";
 import VisibilityTab from "./tabs/VisibilityTab";
 import { CourseRaw } from "../../store/useCourseStore";
-import { UserData } from "../../../../store/useUserStore";
+import type { UserData } from "../../../../components/Events/userTypes";
 import DataProcessingTab from "./tabs/DataProcessingTab";
 import RelationshipsTab from "./tabs/RelationshipsTab";
 
