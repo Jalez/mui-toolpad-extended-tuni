@@ -3,7 +3,7 @@
 import { HttpResponse, http } from "msw";
 import { courseHandlers } from "../components/Courses/mocks/endpoints";
 import { resetDataStore } from "./store";
-import { userHandlers } from "./toolpad/users/endpoints";
+import { userHandlers } from "../components/Users/mocks/endpoints";
 
 interface MockDataConfig {
   teacherCount: number;

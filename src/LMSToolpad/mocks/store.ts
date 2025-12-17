@@ -5,8 +5,8 @@ import {
   CourseBackendData,
   CourseEnrollmentBackendData,
 } from "../components/Courses/mocks/types";
-import { generateUsers } from "./toolpad/users/generators";
-import { UserBackendData } from "./toolpad/users/types";
+import { generateUsers } from "../components/Users/mocks/generators";
+import { UserBackendData } from "../components/Users/mocks/types";
 
 interface DataStore {
   users: UserBackendData[];
