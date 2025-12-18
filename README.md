@@ -4,18 +4,35 @@
 
 A React library extending MUI Toolpad functionality with additional features for educational applications. This library provides components and tools for building interactive educational interfaces.
 
-## Version 2.1.0
+## Version 3.0.0
 
 ### Recent Changes
 
+- **Modular Architecture**: Calendar, Courses, and Users are now optional extension packages
+- **Standalone Core**: Main package (`mui-toolpad-extended-tuni`) is fully functional without extensions
+- **Extension Packages**: Install only the microservices you need:
+  - `@mui-toolpad-extended-tuni/calendar` - Calendar microservice
+  - `@mui-toolpad-extended-tuni/courses` - Courses microservice  
+  - `@mui-toolpad-extended-tuni/users` - Users microservice
 - Enhanced course navigation structure with support for course instances
 - Improved MicroserviceRoutes component with better TypeScript support
 - Added new CourseInstanceSelector and CourseCodeLoader components
 - Updated navigation store with better course instance handling
 - Introduced new course filtering utilities
 - Improved sidebar footer with responsive design
+- Fixed axios configuration to use configured instance with baseURL
+- Fixed user.platformRoles undefined error with optional chaining
 
-### Breaking Changes
+### Breaking Changes in v3.0.0
+
+- **Extension Packages**: Calendar, Courses, and Users are no longer included in the main package
+- **Optional Extensions**: These microservices must be installed separately if needed
+- **Peer Dependencies**: Extension packages require `mui-toolpad-extended-tuni` as a peer dependency
+- Navigation structure now requires course code and instance properties
+- MicroserviceRoutes configuration requires updated navigation builder function
+- Course data structure updated to include code and instance fields
+
+### Breaking Changes in v2.1.0
 
 - Navigation structure now requires course code and instance properties
 - MicroserviceRoutes configuration requires updated navigation builder function
@@ -40,9 +57,28 @@ This library requires the following peer dependencies:
 
 ## Installation
 
+### Core Package (Required)
+
 ```bash
 npm install mui-toolpad-extended-tuni
 ```
+
+### Optional Extension Packages
+
+The main package is fully functional standalone. Install extension packages only if you need their functionality:
+
+```bash
+# Calendar microservice
+npm install @mui-toolpad-extended-tuni/calendar
+
+# Courses microservice
+npm install @mui-toolpad-extended-tuni/courses
+
+# Users microservice
+npm install @mui-toolpad-extended-tuni/users
+```
+
+**Note**: Extension packages require `mui-toolpad-extended-tuni` as a peer dependency and will automatically register themselves when imported.
 
 ## Basic Usage
 
@@ -65,23 +101,52 @@ function App() {
 
 ```tsx
 import {
-  useUserStore,
-  useCourseStore,
   useNavigationStore,
+  useNotificationStore,
 } from 'mui-toolpad-extended-tuni';
 
 function MyComponent() {
-  const { user } = useUserStore();
-  const { currentCourse } = useCourseStore();
+  const { navigation } = useNavigationStore();
+  const { addNotificationData } = useNotificationStore();
 
   return (
     <div>
-      <h1>Welcome, {user?.name}!</h1>
-      <p>Current course: {currentCourse?.title}</p>
+      <h1>Welcome!</h1>
+      {/* Your content */}
     </div>
   );
 }
 ```
+
+### Using Extension Packages
+
+If you've installed extension packages, import and use them as microservices:
+
+```tsx
+import { LMSProvider, Microservices } from 'mui-toolpad-extended-tuni';
+import { CourseMicroservice } from '@mui-toolpad-extended-tuni/courses';
+import { UserMicroservice } from '@mui-toolpad-extended-tuni/users';
+import { CalendarMicroservice } from '@mui-toolpad-extended-tuni/calendar';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <LMSProvider>
+        <Microservices>
+          {/* Optionally include extension microservices */}
+          <CourseMicroservice>
+            {/* Your course microservices */}
+          </CourseMicroservice>
+          <UserMicroservice />
+          <CalendarMicroservice />
+        </Microservices>
+      </LMSProvider>
+    </BrowserRouter>
+  );
+}
+```
+
+**Note**: Extension packages auto-register themselves when imported. You don't need to manually register them.
 
 ## Core Components
 
@@ -155,12 +220,14 @@ function MyComponent() {
 
 ### Course Management Components
 
+**Note**: Course management components are available in the `@mui-toolpad-extended-tuni/courses` extension package.
+
 #### CourseSelector
 
 A component for listing and selecting courses:
 
 ```tsx
-import { CourseSelector } from 'mui-toolpad-extended-tuni';
+import { CourseSelector } from '@mui-toolpad-extended-tuni/courses';
 
 function MyComponent() {
   return <CourseSelector />;
@@ -172,7 +239,7 @@ function MyComponent() {
 Manages course-specific tools and LTI configuration:
 
 ```tsx
-import { CourseTools } from 'mui-toolpad-extended-tuni';
+import { CourseTools } from '@mui-toolpad-extended-tuni/courses';
 
 function MyComponent() {
   return <CourseTools />;
@@ -184,7 +251,7 @@ function MyComponent() {
 For teachers to set up course authentication:
 
 ```tsx
-import { LtiLoginUrlForm } from 'mui-toolpad-extended-tuni';
+import { LtiLoginUrlForm } from '@mui-toolpad-extended-tuni/courses';
 
 function MyComponent() {
   return <LtiLoginUrlForm />;
@@ -246,9 +313,31 @@ When running in development mode (localhost), the library provides additional to
 
 ## Available Stores
 
-### useUserStore
+### Core Stores (Main Package)
+
+The following stores are available in the main package:
+
+### useNavigationStore
 
 ```tsx
+const {
+  navigation, // Current navigation structure
+  addSection, // Add a new section with optional header
+  removeSection, // Remove a section and its header if last section
+  addMicroserviceNavigation, // Add microservice navigation items
+  setNavigation, // Set entire navigation
+} = useNavigationStore();
+```
+
+### Extension Package Stores
+
+**Note**: User and Course stores are available in their respective extension packages:
+
+#### useUserStore (`@mui-toolpad-extended-tuni/users`)
+
+```tsx
+import { useUserStore } from '@mui-toolpad-extended-tuni/users';
+
 const {
   user, // Current user data
   getUser, // Fetch user data
@@ -257,9 +346,11 @@ const {
 } = useUserStore();
 ```
 
-### useCourseStore
+#### useCourseStore (`@mui-toolpad-extended-tuni/courses`)
 
 ```tsx
+import { useCourseStore } from '@mui-toolpad-extended-tuni/courses';
+
 const {
   currentCourse, // Current active course
   courses, // List of available courses
@@ -323,13 +414,23 @@ const underscoreData = convertObjectKeysToUnderscore(requestData);
 
 ## Network Configuration
 
-The library includes pre-configured Axios instance for API communications:
+The library includes a pre-configured Axios instance for API communications:
 
 ```tsx
-import { axiosInstance } from 'mui-toolpad-extended-tuni';
+import { axios } from 'mui-toolpad-extended-tuni';
 
 // Handles CSRF tokens and base URL automatically
-const response = await axiosInstance.get('/api/endpoint');
+const response = await axios.get('/api/endpoint');
+```
+
+**Important**: Extension packages should use the configured axios instance from the main package to ensure consistent baseURL and CSRF token handling:
+
+```tsx
+// In extension packages
+import { axios } from 'mui-toolpad-extended-tuni';
+
+// This ensures correct API path resolution
+const response = await axios.get('api/users/current/');
 ```
 
 ## Course Types and Interfaces
@@ -366,16 +467,47 @@ import { EduMLTheme } from 'mui-toolpad-extended-tuni';
 // - Z-index hierarchy
 ```
 
+**Note**: The theme is provided by the main package and is available to all extension packages automatically.
+
+## Package Architecture
+
+### Main Package (`mui-toolpad-extended-tuni`)
+
+The core package provides:
+- LMSProvider and routing infrastructure
+- Navigation system
+- Notification system
+- Dialog management
+- Theme customization
+- Utility functions
+- Configured axios instance
+- Common components and layouts
+
+### Extension Packages
+
+Extension packages are optional microservices that can be installed separately:
+
+- **`@mui-toolpad-extended-tuni/calendar`**: Calendar functionality
+- **`@mui-toolpad-extended-tuni/courses`**: Course management, routing, and tools
+- **`@mui-toolpad-extended-tuni/users`**: User management and authentication
+
+Each extension:
+- Depends on `mui-toolpad-extended-tuni` as a peer dependency
+- Auto-registers itself when imported
+- Can be used independently or together
+- Uses the configured axios instance from the main package
+
 ## Current Limitations
 
 1. **Authentication:**
 
-   - LTI login URL must be configured per course
+   - LTI login URL must be configured per course (requires Courses extension)
    - Only supports single active session
    - Development mode uses mock authentication
 
 2. **Course Management:**
 
+   - Requires `@mui-toolpad-extended-tuni/courses` extension package
    - Limited to predefined course structure
    - No bulk operations support
    - Course tools must follow specific navigation structure
@@ -391,6 +523,7 @@ import { EduMLTheme } from 'mui-toolpad-extended-tuni';
    - Base URL is fixed to '/'
    - CSRF token handling is mandatory
    - No request caching implementation
+   - Extension packages must use the configured axios instance
 
 5. **Browser Support:**
    - Requires modern browser features
@@ -421,10 +554,13 @@ MIT License - See LICENSE file for details.
 When contributing, please note:
 
 - All components must implement error boundaries
-- State management should use Zustand stores
-- Network requests must use the provided axios instance
+- State management should use Zustand stores with `createWithEqualityFn` from `zustand/traditional`
+- Network requests must use the configured axios instance from the main package (`import { axios } from 'mui-toolpad-extended-tuni'`)
+- Extension packages should depend on `mui-toolpad-extended-tuni` as a peer dependency
+- Extension packages should auto-register themselves when imported
 - Theme modifications should extend EduMLTheme
 - Components should handle null states appropriately
+- Use optional chaining for potentially undefined properties (e.g., `user?.platformRoles?.includes(...)`)
 
 ## Support
 
