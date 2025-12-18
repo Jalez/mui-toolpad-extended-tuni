@@ -1,7 +1,7 @@
 /** @format */
 
 import { Course, CourseRaw } from "../store/useCourseStore";
-import axios from "axios";
+import { axios } from "mui-toolpad-extended-tuni";
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,

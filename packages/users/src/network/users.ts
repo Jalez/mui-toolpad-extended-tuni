@@ -1,6 +1,6 @@
 /** @format */
 
-import axios from "axios";
+import { axios } from "mui-toolpad-extended-tuni";
 import type { UserData } from "mui-toolpad-extended-tuni";
 import {
   convertObjectKeysToCamelCase,
