@@ -18,8 +18,9 @@ interface UserMicroserviceProps {
  * - User state change publishing to UserBus (via UserEventPublisher)
  * - User data synchronization with navigation filters
  *
- * Other modules can subscribe to UserBus to react to user changes.
- * Direct useUserStore access is still allowed for simple lookups.
+ * Other modules should subscribe to UserBus (via hooks like useCurrentUser, useUserActions)
+ * to react to user changes. Direct useUserStore access is only allowed within the Users
+ * module itself, in Events/UserBus for delegation, and in DevTools components.
  *
  * This component should be used in App.tsx, not LMSProvider.tsx, to maintain
  * proper separation of concerns and avoid tight coupling.

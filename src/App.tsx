@@ -25,7 +25,8 @@ import Help from "./test/Help";
  *
  * This structure provides clear separation:
  * - App-level microservices are children of Microservices
- * - User, Calendar, and Courses communicate through EventBus/UserBus (no direct dependencies)
+ * - User, Calendar, and Courses communicate through EventBus/UserBus (no runtime dependencies;
+ *   acceptable exceptions: mock type imports, type definitions, and bus delegation)
  * - Course-level microservices are children of CourseMicroservice
  */
 const App = () => {
@@ -36,11 +37,11 @@ const App = () => {
           <Contact />
           <Help />
           <UserMicroservice />
-          <CalendarMicroservice />
           <CourseMicroservice>
             <EduTest />
             <EduTest2 />
           </CourseMicroservice>
+          <CalendarMicroservice />
         </Microservices>
       </LMSProvider>
     </BrowserRouter>
