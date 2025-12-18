@@ -1,7 +1,7 @@
 /** @format */
 
 import { ComponentType } from "react";
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import { shallow } from "zustand/shallow";
 
 /**
@@ -58,7 +58,7 @@ const debouncedIncrementVersion = (store: ToolbarRegistryStore) => {
 };
 
 // Create the registry store
-const useToolbarRegistryStoreRaw = create<ToolbarRegistryStore>((set) => ({
+const useToolbarRegistryStoreRaw = createWithEqualityFn<ToolbarRegistryStore>((set) => ({
   version: 0,
   incrementVersion: () => set((state) => ({ version: state.version + 1 })),
 }));

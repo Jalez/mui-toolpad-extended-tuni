@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import { persist } from "zustand/middleware";
 import type { Layouts } from "react-grid-layout";
 
@@ -289,7 +289,7 @@ const DEFAULT_SETTINGS: Platform = {
   },
 };
 
-export const usePlatformStore = create<PlatformSettingsStore>()(
+export const usePlatformStore = createWithEqualityFn<PlatformSettingsStore>()(
   persist(
     (set, get) => ({
       platform: DEFAULT_SETTINGS,

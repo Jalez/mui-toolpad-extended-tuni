@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from 'zustand';
+import { createWithEqualityFn } from 'zustand/traditional';
 import type {
   Components,
   Theme,
@@ -408,7 +408,7 @@ interface ThemeStore {
  * - System preference detection
  * - Always uses ThemeTemplate for base colors
  */
-export const useThemeStore = create<ThemeStore>()((set, get) => {
+export const useThemeStore = createWithEqualityFn<ThemeStore>()((set, get) => {
   // Initialize with cookie value
   const initialPreference = getColorSchemePreference();
   

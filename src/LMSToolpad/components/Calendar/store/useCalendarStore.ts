@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import { devtools } from "zustand/middleware";
 
 export interface CalendarEvent {
@@ -42,7 +42,7 @@ interface CalendarState {
   getEventsForDateRange: (start: Date, end: Date) => CalendarEvent[];
 }
 
-export const useCalendarStore = create<CalendarState>()(
+export const useCalendarStore = createWithEqualityFn<CalendarState>()(
   devtools(
     (set, get) => ({
       events: [],

@@ -1,5 +1,5 @@
 /** @format */
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import { useNavigationStore } from "./useNavigationStore";
 
 const NAVIGATION_FILTER_STORAGE_KEY = "navigation-filter-preferences";
@@ -46,7 +46,7 @@ export interface NavigationFilterState {
   initializeFilters: () => void;
 }
 
-export const useNavigationFilterStore = create<NavigationFilterState>(
+export const useNavigationFilterStore = createWithEqualityFn<NavigationFilterState>(
   (set, get) => ({
     // Initialize filterOptions from localStorage if available
     filterOptions: loadFromLocalStorage() || {},

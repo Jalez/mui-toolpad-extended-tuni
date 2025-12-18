@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from 'zustand';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 export type toolbarType = string | null;
 
@@ -9,7 +9,7 @@ type ToolbarState = {
   setCurrentToolbar: (toolbar: toolbarType) => void;
 };
 
-const useToolbarStore = create<ToolbarState>((set) => ({
+const useToolbarStore = createWithEqualityFn<ToolbarState>((set) => ({
   currentToolbar: null,
   setCurrentToolbar: (toolbar) => set({ currentToolbar: toolbar }),
 }));

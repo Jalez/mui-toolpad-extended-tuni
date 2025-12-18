@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import {
   getCourseByUrl,
   getCourses,
@@ -237,7 +237,7 @@ interface CourseStore {
  * - Updated Course interface requires code and instance fields
  * - Changed course identification logic to use code + instance
  */
-const useCourseStore = create<CourseStore>((set, get) => ({
+const useCourseStore = createWithEqualityFn<CourseStore>((set, get) => ({
   fetchState: "loading",
   currentCourseUrl: "",
   currentCourse: null,

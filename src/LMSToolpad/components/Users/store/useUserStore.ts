@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import {
   getCurrentUser,
   getUsers,
@@ -234,7 +234,7 @@ export interface UserState {
   updateUser: (userData: UserData) => Promise<UserData>;
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useUserStore = createWithEqualityFn<UserState>((set) => ({
   fetchState: "idle",
   user: null,
   userToUpdate: null,

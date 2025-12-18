@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from 'zustand';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 export type NotificationRaw = {
   type: string;
@@ -35,7 +35,7 @@ const shouldShowNotification = (singularId?: string): boolean => {
   return true;
 };
 
-export const useNotificationStore = create<NotificationStore>((set) => ({
+export const useNotificationStore = createWithEqualityFn<NotificationStore>((set) => ({
   notifications: [],
   addNotificationData: (notificationData: NotificationRaw) => {
     // Check if we should show this notification

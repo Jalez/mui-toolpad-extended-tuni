@@ -1,7 +1,7 @@
 /** @format */
 import { ComponentType, ReactNode } from "react";
 import type { ReactElement } from "react";
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import { shallow } from "zustand/shallow";
 import { SvgIconComponent } from "@mui/icons-material";
 import { useNavigationStore } from "./store/useNavigationStore";
@@ -126,7 +126,7 @@ const updateMicroserviceNavigation = () => {
 };
 
 // Create the store with optimized structure and singleton registry
-const useMicroserviceRegistryStoreRaw = create<MicroserviceRegistryStore>((set) => ({
+const useMicroserviceRegistryStoreRaw = createWithEqualityFn<MicroserviceRegistryStore>((set) => ({
   microservices: microserviceRegistry,
   routeProviders: routeProvidersRegistry,
   lastUpdate: Date.now(),

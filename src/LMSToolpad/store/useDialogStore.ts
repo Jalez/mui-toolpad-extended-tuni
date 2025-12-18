@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from 'zustand';
+import { createWithEqualityFn } from 'zustand/traditional';
 
 export type dialogType = string | null;
 
@@ -10,7 +10,7 @@ type DialogState = {
   closeDialog: () => void;
 };
 
-const useDialogStore = create<DialogState>((set) => ({
+const useDialogStore = createWithEqualityFn<DialogState>((set) => ({
   openDialog: null,
   setOpenDialog: (dialog) => set({ openDialog: dialog }),
   closeDialog: () => set({ openDialog: null }),

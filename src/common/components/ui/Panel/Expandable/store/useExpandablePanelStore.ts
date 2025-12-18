@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 
 interface ExpandablePanelState {
   expandedPanelId: string | null;
@@ -8,7 +8,7 @@ interface ExpandablePanelState {
 }
 
 // Using zustand to create a global store that's accessible from anywhere
-export const useExpandablePanelStore = create<ExpandablePanelState>((set) => ({
+export const useExpandablePanelStore = createWithEqualityFn<ExpandablePanelState>((set) => ({
   expandedPanelId: null,
   setExpandedPanelId: (id: string | null) => set({ expandedPanelId: id }),
 }));

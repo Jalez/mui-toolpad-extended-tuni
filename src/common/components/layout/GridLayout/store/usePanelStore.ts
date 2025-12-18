@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import { persist } from "zustand/middleware";
 
 interface PanelState {
@@ -18,7 +18,7 @@ interface PanelState {
  * This uses a single editMode that enables both dragging and resizing.
  * It also manages saved layout presets.
  */
-export const usePanelStore = create<PanelState>()(
+export const usePanelStore = createWithEqualityFn<PanelState>()(
   persist(
     (set) => ({
       editMode: false,
