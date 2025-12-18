@@ -63,7 +63,7 @@ export const useSyncNavigationFilters = () => {
     const initialFilters: Record<string, boolean> = {};
     sectionOrder.forEach((header) => {
       initialFilters[header] =
-        user.preferences.visibleNavigation.includes(header);
+        user?.preferences?.visibleNavigation?.includes(header) ?? false;
     });
 
     // Only update if there's an actual change to avoid infinite loops
@@ -78,7 +78,7 @@ export const useSyncNavigationFilters = () => {
 
     // Update refs for next comparison
     previousSectionOrder.current = [...sectionOrder];
-    previousUserPrefs.current = [...user.preferences.visibleNavigation];
+    previousUserPrefs.current = [...(user?.preferences?.visibleNavigation || [])];
   }, [
     user?.preferences?.visibleNavigation,
     sectionOrder,
@@ -106,11 +106,11 @@ export const useSyncNavigationFilters = () => {
           .map(([header]) => header);
 
         // Only update user if visible headers have actually changed
-        if (!isEqual(visibleHeaders, user.preferences.visibleNavigation)) {
+        if (!user?.preferences?.visibleNavigation || !isEqual(visibleHeaders, user.preferences?.visibleNavigation)) {
           const updatedUser = {
             ...user,
             preferences: {
-              ...user.preferences,
+              ...(user.preferences || {}),
               visibleNavigation: visibleHeaders,
             },
           };

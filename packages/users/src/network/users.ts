@@ -51,6 +51,9 @@ export const createUser = async (
 
 export const updateUser = async (userData: UserData): Promise<UserData> => {
   try {
+    if (!userData?.id) {
+      throw new Error("Cannot update user: user.id is undefined");
+    }
     const snakeCaseData = convertObjectKeysToUnderscore(userData);
     const response = await axios.put(
       `api/users/${userData.id}/`,

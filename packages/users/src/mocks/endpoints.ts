@@ -1,9 +1,8 @@
 /** @format */
 
 import { http, HttpResponse } from "msw";
-import { baseUrl } from "../../../constants";
+import { baseUrl, dataStore, saveDataStore } from "mui-toolpad-extended-tuni";
 import { UserBackendData } from "./types";
-import { dataStore, saveDataStore } from "../../../mocks/store";
 
 // Type for response data
 type JsonResponse = {

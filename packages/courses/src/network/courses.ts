@@ -34,6 +34,11 @@ export async function getCourses(): Promise<Course[]> {
   return fetchWithCache("getCourses", async () => {
     try {
       const response = await axios.get("api/courses/");
+      // Ensure response.data is an array
+      if (!Array.isArray(response.data)) {
+        console.error("Expected array but got:", response.data);
+        return [];
+      }
       return convertObjectKeysToCamelCase(response.data) as Course[];
     } catch (error) {
       throw new Error("Failed to retrieve courses: " + error);
