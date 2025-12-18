@@ -21,17 +21,9 @@ export * from "./LMSToolpad/interfaces";
 /**
  * **STORES**
  */
-export * from "./LMSToolpad/components/Courses/store/useCourseStore";
-
-export { default as useCourseStore } from "./LMSToolpad/components/Courses/store/useCourseStore";
-
 export { default as useDialogStore } from "./LMSToolpad/store/useDialogStore";
 
-// UserStore - kept for backward compatibility and Users module internal use
-export * from "./LMSToolpad/components/Users/store/useUserStore";
-export { useUserStore } from "./LMSToolpad/components/Users/store/useUserStore";
-
-// UserBus - recommended for LMSToolpad components
+// UserBus and hooks - core functionality
 export {
   userBus,
   UserBus,
@@ -44,11 +36,55 @@ export type {
   UserEvent,
   UserEventType,
   UserPreferences,
+  PlatformRole,
+  UserBusStoreConfig,
 } from "./LMSToolpad/components/Events";
 
-export * from "./LMSToolpad/components/Navigation/store/useNavigationStore";
+// Navigation - core functionality
+export {
+  registerMicroservice,
+  unregisterMicroservice,
+  registerRouteProvider,
+  unregisterRouteProvider,
+  getMicroservice,
+  getAllMicroservices,
+  getMicroserviceIds,
+  isMicroserviceRegistered,
+  useMicroserviceRegistryStore,
+} from "./LMSToolpad/components/Navigation/NavigationRegistry";
+export type {
+  MicroserviceEntry,
+  RouteProvider,
+} from "./LMSToolpad/components/Navigation/NavigationRegistry";
 
-export * from "./LMSToolpad/components/Notifications/store/useNotificationsStore";
+export { useMicroserviceRoutes } from "./LMSToolpad/components/Navigation/hooks/useMicroserviceRoutes";
+export { useMicroserviceNavigation } from "./LMSToolpad/components/Navigation/hooks/useMicroserviceNavigation";
+export { useNavigationSectionManager } from "./LMSToolpad/components/Navigation/hooks/useNavigationSectionManager";
+export { useSyncNavigationFilters } from "./LMSToolpad/components/Navigation/hooks/useSyncNavigationFilters";
+
+export {
+  useNavigationStore,
+  filterNavigationByRole,
+} from "./LMSToolpad/components/Navigation/store/useNavigationStore";
+export type {
+  NavigationStoreItem,
+  NavigationPageStoreItem,
+  NavigationHeaderItem,
+  NavigationDividerItem,
+  NavigationSection,
+  ViewStore,
+  ToolMetadata,
+} from "./LMSToolpad/components/Navigation/store/types";
+
+export { useNavigationFilterStore } from "./LMSToolpad/components/Navigation/store/useNavigationFilterStore";
+export type { NavigationFilterState } from "./LMSToolpad/components/Navigation/store/useNavigationFilterStore";
+
+export { NavigationSectionBuilder } from "./LMSToolpad/components/Navigation/NavigationBuilder";
+export { NavigationFilter } from "./LMSToolpad/components/Navigation/NavigationFilter";
+
+// Notifications - core functionality
+export { default as Notifications } from "./LMSToolpad/components/Notifications/Notifications";
+export { useNotificationStore } from "./LMSToolpad/components/Notifications/store/useNotificationsStore";
 
 /**
  * **COMPONENTS**
@@ -56,22 +92,29 @@ export * from "./LMSToolpad/components/Notifications/store/useNotificationsStore
 
 export { default as Home } from "./LMSToolpad/components/Routes/Home/Home";
 
-export { default as CourseTools } from "./LMSToolpad/components/Courses/CourseTools";
+// Microservices component - core infrastructure
+export { default as Microservices } from "./LMSToolpad/components/Microservices/Microservices";
 
-export { default as CourseMicroservice } from "./LMSToolpad/components/Courses/CourseMicroservice";
-export { useCourseMicroserviceRegistration } from "./LMSToolpad/components/Courses/context/CourseMicroserviceContext";
+// Common components - core functionality
+export * from "./common/components";
 
-export { default as LoadingScreen } from "./common/components/ui/LoadingScreen/LoadingScreen";
-
+// Dialogs - core functionality
 export { default as DialogOpener } from "./LMSToolpad/components/Dialogs/DialogOpener";
-
 export { default as FormDialog } from "./LMSToolpad/components/Dialogs/FormDialog";
+export { default as ExtendedDialog } from "./LMSToolpad/components/Dialogs/ExtendedDialog";
+export { default as Dialogs } from "./LMSToolpad/components/Dialogs/Dialogs";
+export { registerDialog, getDialog } from "./LMSToolpad/components/Dialogs/dialogRegistry";
 
 export { default as IconWithBadge } from "./LMSToolpad/components/IconWithBadge";
 
-export { default as ExtendedDialog } from "./LMSToolpad/components/Dialogs/ExtendedDialog";
-
-export { default as CenteredHeading } from "./common/components/ui/CenteredHeading/CenteredHeading";
+// Forms components - core functionality
+export { default as EditableText } from "./LMSToolpad/Forms/Components/Editables/EditableText";
+export { default as EditableSwitch } from "./LMSToolpad/Forms/Components/Editables/EditableSwitch";
+export { default as EditableNumber } from "./LMSToolpad/Forms/Components/Editables/EditableNumber";
+export { default as EditableImage } from "./LMSToolpad/Forms/Components/Editables/EditableImage";
+export { default as EditableSelect } from "./LMSToolpad/Forms/Components/Editables/EditableSelect";
+export { default as EditableAutocomplete } from "./LMSToolpad/Forms/Components/Editables/EditableAutoComplete";
+export { default as EditableColor } from "./LMSToolpad/Forms/Components/Editables/EditableColor";
 
 /**
  * **TOOLS**
@@ -81,15 +124,21 @@ export { default as ErrorBoundary } from "./LMSToolpad/tools/ErrorBoundary";
 
 export { default as NullStateWarning } from "./LMSToolpad/tools/NullStateWarning";
 
+// Utils - core functionality
 export {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
 } from "./LMSToolpad/utils/caseConverter";
+export { parseDate } from "./LMSToolpad/utils/parseDate";
+export { slugify } from "./LMSToolpad/utils/slugify";
+export { getApiPrefix } from "./LMSToolpad/utils/apiPrefix";
+export { getCookie, setCookie, deleteCookie } from "./LMSToolpad/utils/cookieUtils";
 
 export type { MicroserviceConfig } from "./LMSToolpad/components/Microservices/types";
 
 export { buildMicroServiceNavigation } from "./LMSToolpad/components/Microservices/MicroserviceNavigationBuilder";
 export type { BuildMicroServiceNavigationProps } from "./LMSToolpad/components/Microservices/MicroserviceNavigationBuilder";
+export { default as MicroserviceSubsections } from "./LMSToolpad/components/Microservices/MicroserviceSubsections";
 
 /**
  * **NETWORK**
@@ -102,5 +151,13 @@ export { default as axios } from "./LMSToolpad/network/axiosConfig";
  */
 
 export { baseUrl } from "./LMSToolpad/constants";
+export { dataStore, saveDataStore } from "./LMSToolpad/mocks/store";
 
 export * from "./LMSToolpad/interfaces";
+
+// EventBus - core functionality
+export { EventBus, eventBus } from "./LMSToolpad/components/Events/EventBus";
+export type { Event, EventSource } from "./LMSToolpad/components/Events/types";
+
+// Common hooks
+export { useRetry } from "./common/hooks/useRetry";
