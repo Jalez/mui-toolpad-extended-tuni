@@ -1,6 +1,6 @@
 /** @format */
 
-import { create } from "zustand";
+import { createWithEqualityFn } from "zustand/traditional";
 import {
   NavigationStoreItem,
   NavigationPageStoreItem,
@@ -57,7 +57,7 @@ const DEFAULTNAVIGATION: NavigationStoreItem[] = [];
  * });
  * ```
  */
-export const useNavigationStore = create<ViewStore>((set, get) => ({
+export const useNavigationStore = createWithEqualityFn<ViewStore>((set, get) => ({
   navigation: DEFAULTNAVIGATION,
   sections: {},
   sectionOrder: [],
