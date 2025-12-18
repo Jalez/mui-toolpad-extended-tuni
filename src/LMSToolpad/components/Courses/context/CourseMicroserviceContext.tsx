@@ -17,10 +17,16 @@ export interface CourseMicroserviceContextValue {
 // Default context value that signals we're NOT inside CourseMicroservice
 const defaultContextValue: CourseMicroserviceContextValue = {
   registerCourseMicroservice: () => {
-    console.warn("registerCourseMicroservice called outside CourseMicroservice context");
+    // Only warn in development mode to reduce console noise
+    if (import.meta.env.DEV) {
+      console.warn("registerCourseMicroservice called outside CourseMicroservice context. Make sure your component is wrapped in <CourseMicroservice>.");
+    }
   },
   unregisterCourseMicroservice: () => {
-    console.warn("unregisterCourseMicroservice called outside CourseMicroservice context");
+    // Only warn in development mode to reduce console noise
+    if (import.meta.env.DEV) {
+      console.warn("unregisterCourseMicroservice called outside CourseMicroservice context. Make sure your component is wrapped in <CourseMicroservice>.");
+    }
   },
   allCourseMicroserviceNavigation: [],
   isInsideCourseMicroservice: false,
