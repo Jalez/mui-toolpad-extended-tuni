@@ -47,7 +47,11 @@ const PlatformSettingsOpener = () => {
   const { user } = useCurrentUser();
   const { setOpenDialog } = useDialogStore();
 
-  if (!user?.platformRoles.includes("admin")) return null;
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CollapsibleMenu.tsx:47',message:'PlatformSettingsOpener render',data:{hasUser:!!user,hasPlatformRoles:!!user?.platformRoles,platformRoles:user?.platformRoles},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'L'})}).catch(()=>{});
+  // #endregion
+
+  if (!user?.platformRoles?.includes("admin")) return null;
 
   const handleOpenPlatformSettings = () => {
     setOpenDialog("PlatformSettings");
