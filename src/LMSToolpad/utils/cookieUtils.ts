@@ -11,7 +11,7 @@ export type ColorSchemePreference = 'light' | 'dark' | 'system';
 /**
  * Get a cookie value by name
  */
-function getCookie(name: string): string | null {
+export function getCookie(name: string): string | null {
   if (typeof document === 'undefined') return null;
   
   const cookies = document.cookie.split(';');
@@ -27,12 +27,21 @@ function getCookie(name: string): string | null {
 /**
  * Set a cookie value
  */
-function setCookie(name: string, value: string, days: number = 365): void {
+export function setCookie(name: string, value: string, days: number = 365): void {
   if (typeof document === 'undefined') return;
   
   const expires = new Date();
   expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
   document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/;SameSite=Lax`;
+}
+
+/**
+ * Delete a cookie by name
+ */
+export function deleteCookie(name: string): void {
+  if (typeof document === 'undefined') return;
+  
+  document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;SameSite=Lax`;
 }
 
 /**
@@ -66,5 +75,3 @@ export function getEffectiveColorScheme(preference: ColorSchemePreference): 'lig
   }
   return preference;
 }
-
-
