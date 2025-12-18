@@ -1,0 +1,54 @@
+{
+  "name": "@mui-toolpad-extended-tuni/calendar",
+  "version": "2.1.0",
+  "description": "Calendar microservice for MUI Toolpad Extended TUNI",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.es.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "react",
+    "mui",
+    "toolpad",
+    "education",
+    "tuni",
+    "calendar"
+  ],
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "mui-toolpad-extended-tuni": "^2.1.0",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
+    "@mui/icons-material": "^7.0.0",
+    "@mui/material": "^7.0.0",
+    "@mui/x-date-pickers": "^7.0.0",
+    "@fullcalendar/core": "^6.0.0",
+    "@fullcalendar/daygrid": "^6.0.0",
+    "@fullcalendar/interaction": "^6.0.0",
+    "@fullcalendar/react": "^6.0.0",
+    "@fullcalendar/timegrid": "^6.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.0.0",
+    "luxon": "^3.0.0"
+  }
+}

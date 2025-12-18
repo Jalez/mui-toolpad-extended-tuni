@@ -1,0 +1,52 @@
+{
+  "name": "@mui-toolpad-extended-tuni/core",
+  "version": "2.1.0",
+  "description": "Core shared dependencies for MUI Toolpad Extended TUNI microservices",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.es.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "react",
+    "mui",
+    "toolpad",
+    "education",
+    "tuni",
+    "core"
+  ],
+  "license": "MIT",
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc && vite build",
+    "dev": "vite build --watch"
+  },
+  "peerDependencies": {
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
+    "@mui/icons-material": "^7.0.0",
+    "@mui/material": "^7.0.0",
+    "@mui/x-date-pickers": "^7.0.0",
+    "@toolpad/core": "^0.16.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.0.0",
+    "zustand": "^4.5.0"
+  },
+  "dependencies": {
+    "notistack": "^3.0.1"
+  }
+}

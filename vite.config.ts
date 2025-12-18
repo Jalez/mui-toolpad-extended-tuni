@@ -16,6 +16,12 @@ export default defineConfig({
       include: ["src"],
     }),
   ],
+  resolve: {
+    alias: {
+      // Resolve main package imports to local src for extension packages during development
+      "mui-toolpad-extended-tuni": resolve(__dirname, "src"),
+    },
+  },
   optimizeDeps: {
     include: [
       "@mui/material",

@@ -20,7 +20,14 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+
+    /* Path mapping for extension packages */
+    "baseUrl": ".",
+    "paths": {
+      "mui-toolpad-extended-tuni": ["./src/index.ts"]
+    }
   },
-  "include": ["src"]
+  "include": ["src", "packages"],
+  "exclude": ["node_modules", "dist"]
 }
