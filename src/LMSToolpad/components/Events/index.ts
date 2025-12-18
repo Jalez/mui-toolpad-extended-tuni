@@ -1,11 +1,12 @@
 /** @format */
 
-export { eventBus } from './EventBus';
+export { EventBus, eventBus } from './EventBus';
 export type { Event, EventSource } from './types';
 
-// UserBus exports
-export { userBus, UserBus } from './UserBus';
-export type { UserData, UserEvent, UserEventType } from './userTypes';
+// UserBus exports - class only, instance configured by extensions or consumers
+export { UserBus, userBus } from './UserBus';
+export type { UserBusStoreConfig } from './UserBus';
+export type { UserData, UserEvent, UserEventType, PlatformRole, navigationTypes, gender, userId } from './userTypes';
 
 // UserBus hooks
 export { useCurrentUser } from './hooks/useCurrentUser';

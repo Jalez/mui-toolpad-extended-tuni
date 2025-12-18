@@ -1,8 +1,61 @@
 /** @format */
 
-import type { UserData } from "../Users/store/useUserStore";
+/**
+ * User data type definition.
+ * This is defined here to avoid circular dependencies.
+ */
+export type userId = string;
+export type navigationTypes = "direct" | "instances";
+export type gender = "male" | "female" | "other";
 
-export type { UserData };
+export type PlatformRole =
+  | "admin"
+  | "developer"
+  | "moderator"
+  | "creator"
+  | "user"
+  | "guest";
+
+export interface UserData {
+  id: userId;
+  name: string;
+  email: string;
+  gender?: gender;
+  image?: {
+    large: string;
+    medium: string;
+    thumbnail: string;
+  };
+  department?: string;
+  platformRoles: PlatformRole[];
+  privacySettings: {
+    allowAnalytics: boolean;
+    allowPersonalization: boolean;
+    allowCommunications: boolean;
+    allowThirdPartySharing: boolean;
+  };
+  gdprConsent: {
+    accepted: boolean;
+    acceptedDate?: string;
+    lastUpdated: string;
+  };
+  dataRetention: {
+    deleteAccountAfterInactivity?: number;
+    deleteDataAfterAccountDeletion?: number;
+  };
+  preferences: {
+    navigationType: navigationTypes;
+    visibleCourseLists: {
+      isStudent: boolean;
+      isStudentOld: boolean;
+      isTeacher: boolean;
+      isTeacherOld: boolean;
+      available: boolean;
+    };
+    lastVisitedCourses: string[];
+    visibleNavigation: string[];
+  };
+}
 
 /**
  * User event types for UserBus communication.

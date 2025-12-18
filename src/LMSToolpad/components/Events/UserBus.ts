@@ -1,20 +1,54 @@
 /** @format */
 
 import { UserEvent, UserData } from "./userTypes";
-import { useUserStore } from "../Users/store/useUserStore";
+
+/**
+ * Configuration interface for UserBus store methods.
+ * This allows UserBus to work with any user store implementation.
+ */
+export interface UserBusStoreConfig {
+  getUser: () => Promise<void>;
+  updateUser: (userData: UserData) => Promise<UserData>;
+  setUserToUpdate: (user: UserData | null) => void;
+  fetchCourseUsers: (courseId: string) => Promise<void>;
+  logout: () => Promise<void>;
+  getState: () => {
+    user: UserData | null;
+    courseUsers?: UserData[];
+  };
+}
 
 /**
  * User Bus for decoupling user state changes from consumers.
  * Modules can subscribe to user events and react to user state changes.
  * This follows the same pattern as EventBus but is specifically for user-related events.
+ * 
+ * UserBus requires store methods to be configured via configureStore() before use.
+ * This allows it to work without direct dependencies on user store implementations.
  */
 export class UserBus {
   private static instance: UserBus;
   private subscribers: Set<(event: UserEvent) => void> = new Set();
   private currentUser: UserData | null = null;
   private lastEvent: UserEvent | null = null;
+  private storeConfig: UserBusStoreConfig | null = null;
 
   private constructor() {}
+  
+  /**
+   * Configure UserBus with store methods.
+   * This must be called before using store-dependent methods.
+   */
+  configureStore(config: UserBusStoreConfig): void {
+    this.storeConfig = config;
+  }
+  
+  private getStoreConfig(): UserBusStoreConfig {
+    if (!this.storeConfig) {
+      throw new Error('UserBus store not configured. Call configureStore() first.');
+    }
+    return this.storeConfig;
+  }
 
   static getInstance(): UserBus {
     if (!UserBus.instance) {
@@ -119,7 +153,7 @@ export class UserBus {
    * Should be called by UserEventPublisher on mount
    */
   initializeFromStore(): void {
-    const store = useUserStore.getState();
+    const store = this.getStoreConfig().getState();
     if (store.user && !this.currentUser) {
       this.currentUser = store.user;
       this.publish({
@@ -132,22 +166,23 @@ export class UserBus {
 
   /**
    * Get user from store and publish to bus
-   * Delegates to useUserStore.getUser() and publishes event when complete
+   * Delegates to store.getUser() and publishes event when complete
    */
   async getUser(): Promise<void> {
-    const store = useUserStore.getState();
-    await store.getUser();
+    const config = this.getStoreConfig();
+    await config.getUser();
     // UserEventPublisher will publish the event when user changes
   }
 
   /**
    * Update user and publish event
-   * Delegates to useUserStore.updateUser() and publishes event
+   * Delegates to store.updateUser() and publishes event
    */
   async updateUser(userData: UserData): Promise<UserData> {
-    const store = useUserStore.getState();
+    const config = this.getStoreConfig();
+    const store = config.getState();
     const previousUser = store.user;
-    const updatedUser = await store.updateUser(userData);
+    const updatedUser = await config.updateUser(userData);
     
     // Publish update event
     this.publish({
@@ -162,20 +197,20 @@ export class UserBus {
 
   /**
    * Set user to update (for editing)
-   * Delegates to useUserStore.setUserToUpdate()
+   * Delegates to store.setUserToUpdate()
    */
   setUserToUpdate(user: UserData | null): void {
-    const store = useUserStore.getState();
-    store.setUserToUpdate(user);
+    const config = this.getStoreConfig();
+    config.setUserToUpdate(user);
   }
 
   /**
    * Fetch course users
-   * Delegates to useUserStore.fetchCourseUsers()
+   * Delegates to store.fetchCourseUsers()
    */
   async fetchCourseUsers(courseId: string): Promise<void> {
-    const store = useUserStore.getState();
-    await store.fetchCourseUsers(courseId);
+    const config = this.getStoreConfig();
+    await config.fetchCourseUsers(courseId);
     // Note: courseUsers are stored in store, not published to bus
     // Components that need courseUsers can access via store or we could add a getter
   }
@@ -185,17 +220,17 @@ export class UserBus {
    * @returns Course users array or undefined
    */
   getCourseUsers(): UserData[] | undefined {
-    const store = useUserStore.getState();
+    const store = this.getStoreConfig().getState();
     return store.courseUsers;
   }
 
   /**
    * Logout user and publish event
-   * Delegates to useUserStore.logout() and publishes event
+   * Delegates to store.logout() and publishes event
    */
   async logout(): Promise<void> {
-    const store = useUserStore.getState();
-    await store.logout();
+    const config = this.getStoreConfig();
+    await config.logout();
     
     // Publish logout event
     this.publish({
@@ -206,5 +241,6 @@ export class UserBus {
   }
 }
 
-// Export singleton instance
+// Export singleton instance (without store configuration)
+// Store configuration should be done by the users extension package or by consumers
 export const userBus = UserBus.getInstance();
