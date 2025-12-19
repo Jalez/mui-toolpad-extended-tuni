@@ -5,7 +5,8 @@ import { CompactEventView, RegularView } from "./components/EventViews";
 import EventMenu from "./components/EventMenu";
 
 // Calendar-specific event types (decoupled from course-specific types)
-export type CalendarEventType = "lecture" | "exercise" | "exam" | "deadline" | "other" | "meeting" | "maintenance";
+// Re-exported from types.ts
+import type { CalendarEventType } from "./types";
 
 const eventTypeIcons: Record<CalendarEventType, string> = {
   lecture: "/static/images/icons/brain.svg",

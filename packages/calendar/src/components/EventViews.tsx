@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { EventViewProps } from "../types";
-import { CalendarEventType } from "../CalendarEventItem";
+import type { CalendarEventType } from "../types";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
 import RepeatIcon from "@mui/icons-material/Repeat";

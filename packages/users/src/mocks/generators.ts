@@ -1,6 +1,6 @@
 /** @format */
 
-import { PlatformRole } from "../../../store/usePlatformStore";
+import { PlatformRole } from "mui-toolpad-extended-tuni";
 import { departmentVariants, preferencesVariants } from "./constants";
 import { randomPersonFromApi, UserBackendData } from "./types";
 

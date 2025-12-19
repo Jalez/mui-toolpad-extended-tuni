@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { useUserStore } from "./store/useUserStore";
 import { userBus, UserEvent } from "mui-toolpad-extended-tuni";
-import "./configureUserBus"; // Ensure UserBus is configured
+import { configureUserBus } from "./configureUserBus"; // Ensure UserBus is configured
 
 /**
  * UserEventPublisher publishes user state changes to the UserBus.
@@ -16,6 +16,8 @@ const UserEventPublisher: React.FC = () => {
 
   // Initialize UserBus with current user on mount
   useEffect(() => {
+    // Ensure UserBus is configured before using it
+    configureUserBus();
     userBus.initializeFromStore();
   }, []);
 

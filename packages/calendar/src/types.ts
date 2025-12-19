@@ -1,6 +1,14 @@
 import { Theme } from "@mui/material";
 import { EventContentArg } from "@fullcalendar/core";
-import { CalendarEventType } from "./CalendarEventItem";
+
+export type CalendarEventType = 
+  | "lecture"
+  | "exercise"
+  | "exam"
+  | "deadline"
+  | "other"
+  | "meeting"
+  | "maintenance";
 
 export interface EventViewProps {
   eventInfo: EventContentArg;

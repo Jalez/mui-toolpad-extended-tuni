@@ -1,5 +1,5 @@
 /** @format */
-import { PlatformRole } from "../../../store/usePlatformStore";
+import { PlatformRole } from "mui-toolpad-extended-tuni";
 import { navigationTypes } from "../store/useUserStore";
 import { randomPerson } from "./constants";
 

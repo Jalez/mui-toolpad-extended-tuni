@@ -2,15 +2,17 @@
 
 import { useState, useEffect } from "react";
 import { Box, Typography, Paper } from "@mui/material";
-import FormDialog from "../../../../components/Dialogs/FormDialog";
-import useDialogStore from "../../../../store/useDialogStore";
+import {
+  FormDialog,
+  useDialogStore,
+  useNotificationStore,
+  EditableText,
+  EditableSwitch,
+  EditableNumber,
+  EditableImage,
+  PlatformRole,
+} from "mui-toolpad-extended-tuni";
 import { useUserStore, UserData } from "../../store/useUserStore";
-import { useNotificationStore } from "../../../../components/Notifications/store/useNotificationsStore";
-import EditableText from "../../../../Forms/Components/Editables/EditableText";
-import EditableSwitch from "../../../../Forms/Components/Editables/EditableSwitch";
-import EditableNumber from "../../../../Forms/Components/Editables/EditableNumber";
-import EditableImage from "../../../../Forms/Components/Editables/EditableImage";
-import { PlatformRole } from "../../../../store/usePlatformStore";
 
 /**
  * UserSettings Component
@@ -123,7 +125,7 @@ const UserSettings = () => {
                 <EditableImage
                   label="Profile Image"
                   value={formData.image?.large || ""}
-                  onChange={(value) =>
+                  onChange={(value: string) =>
                     setFormData({
                       ...formData,
                       image: { large: value, medium: value, thumbnail: value },
@@ -140,26 +142,26 @@ const UserSettings = () => {
                   <EditableText
                     label="Name"
                     value={formData.name}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                       setFormData({ ...formData, name: value })
                     }
                   />
                   <EditableText
                     label="Email"
                     value={formData.email}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                       setFormData({ ...formData, email: value })
                     }
                   />
                   <EditableText
                     label="Platform Roles"
                     value={formData.platformRoles.join(", ")}
-                    onChange={(value) =>
+                    onChange={(value: string) =>
                       setFormData({
                         ...formData,
                         platformRoles: value
                           .split(",")
-                          .map((role) => role.trim()) as PlatformRole[],
+                          .map((role: string) => role.trim()) as PlatformRole[],
                       })
                     }
                     disabled={!formData.platformRoles.includes("admin")}
@@ -187,7 +189,7 @@ const UserSettings = () => {
                 <EditableSwitch
                   label="Allow Analytics"
                   value={formData.privacySettings.allowAnalytics}
-                  onChange={(value) =>
+                  onChange={(value: boolean) =>
                     setFormData({
                       ...formData,
                       privacySettings: {
@@ -200,7 +202,7 @@ const UserSettings = () => {
                 <EditableSwitch
                   label="GDPR Consent"
                   value={formData.gdprConsent.accepted}
-                  onChange={(value) =>
+                  onChange={(value: boolean) =>
                     setFormData({
                       ...formData,
                       gdprConsent: {
@@ -234,7 +236,7 @@ const UserSettings = () => {
               <EditableNumber
                 label="Delete Account After Inactivity (days)"
                 value={formData.dataRetention.deleteAccountAfterInactivity || 0}
-                onChange={(value) =>
+                onChange={(value: number) =>
                   setFormData({
                     ...formData,
                     dataRetention: {
@@ -252,7 +254,7 @@ const UserSettings = () => {
                 value={
                   formData.dataRetention.deleteDataAfterAccountDeletion || 0
                 }
-                onChange={(value) =>
+                onChange={(value: number) =>
                   setFormData({
                     ...formData,
                     dataRetention: {

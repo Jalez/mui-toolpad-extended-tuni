@@ -54,7 +54,7 @@ const handleUpdateUser = async (
 ): Promise<HttpResponse> => {
   try {
     const requestData = (await request.json()) as Record<string, unknown>;
-    const userIndex = dataStore.users.findIndex((u) => u.id === userId);
+    const userIndex = dataStore.users.findIndex((u: UserBackendData) => u.id === userId);
 
     if (userIndex === -1) {
       return createErrorResponse("User not found", 404);
@@ -75,7 +75,7 @@ const handleUpdateUser = async (
 
 const handleDeleteUser = async (userId: string): Promise<HttpResponse> => {
   try {
-    const userIndex = dataStore.users.findIndex((u) => u.id === userId);
+    const userIndex = dataStore.users.findIndex((u: UserBackendData) => u.id === userId);
 
     if (userIndex === -1) {
       return createErrorResponse("User not found", 404);
@@ -90,7 +90,7 @@ const handleDeleteUser = async (userId: string): Promise<HttpResponse> => {
     Object.keys(dataStore.enrollmentsByCourse).forEach((courseId) => {
       dataStore.enrollmentsByCourse[courseId] = dataStore.enrollmentsByCourse[
         courseId
-      ].filter((enrollment) => enrollment.user_id !== userId);
+      ].filter((enrollment: { user_id: string }) => enrollment.user_id !== userId);
     });
 
     return HttpResponse.json(user);
@@ -136,7 +136,7 @@ export const userHandlers = [
 export const getUserDataResponse = (userId?: string): HttpResponse => {
   try {
     const user = userId
-      ? dataStore.users.find((u) => u.id === userId)
+      ? dataStore.users.find((u: UserBackendData) => u.id === userId)
       : dataStore.users[0];
 
     if (user) {

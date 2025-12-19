@@ -19,7 +19,7 @@ const hasAccessToCourse = (
   if (course.visibility.mode === 'public') return true;
 
   const enrollments = dataStore.enrollmentsByCourse[course.id] || [];
-  const userEnrollment = enrollments.find((e) => e.user_id === userId);
+  const userEnrollment = enrollments.find((e: { user_id: string }) => e.user_id === userId);
 
   if (!userEnrollment) return false;
   if (course.visibility.mode === 'enrolled') return true;
@@ -35,7 +35,7 @@ const enrichCourseWithData = (
 ): CourseBackendDataWithEnrollments => {
   const enrollments = dataStore.enrollmentsByCourse[course.id] || [];
   const userEnrollment = userId
-    ? enrollments.find((e) => e.user_id === userId)
+    ? enrollments.find((e: { user_id: string }) => e.user_id === userId)
     : undefined;
 
   return {
@@ -77,8 +77,8 @@ export const getCoursesResponse = (): HttpResponse => {
   const user = dataStore.users[0];
 
   const accessibleCourses = dataStore.courses
-    .filter((course) => hasAccessToCourse(course, user?.id))
-    .map((course) => enrichCourseWithData(course, user?.id));
+    .filter((course: CourseBackendData) => hasAccessToCourse(course, user?.id))
+    .map((course: CourseBackendData) => enrichCourseWithData(course, user?.id)) as CourseBackendDataWithEnrollments[];
 
   return HttpResponse.json(accessibleCourses);
 };
@@ -103,7 +103,7 @@ export const updateCourseResponse = (
   updatedCourse: CourseBackendData
 ): HttpResponse => {
   const index = dataStore.courses.findIndex(
-    (course) => course.id === updatedCourse.id
+    (course: CourseBackendData) => course.id === updatedCourse.id
   );
   if (index !== -1) {
     updatedCourse.updated_at = new Date().toISOString();
@@ -116,7 +116,7 @@ export const updateCourseResponse = (
 };
 
 export const deleteCourseResponse = (courseId: string): HttpResponse => {
-  const index = dataStore.courses.findIndex((course) => course.id === courseId);
+  const index = dataStore.courses.findIndex((course: CourseBackendData) => course.id === courseId);
   if (index !== -1) {
     const deletedCourse = dataStore.courses.splice(index, 1)[0];
     saveDataStore(dataStore);
