@@ -29,8 +29,17 @@ export default defineConfig({
         "@emotion/styled",
         "axios",
         "zustand",
-        "@mui-toolpad-extended-tuni/core",
+        "mui-toolpad-extended-tuni",
       ],
+      treeshake: {
+        moduleSideEffects: (id) => {
+          // Preserve side effects for index.ts (contains configureUserBus call)
+          if (id.includes('index.ts') || id.includes('index.js')) {
+            return true;
+          }
+          return false;
+        },
+      },
       output: {
         exports: "named",
       },
@@ -46,3 +55,4 @@ export default defineConfig({
     },
   },
 });
+

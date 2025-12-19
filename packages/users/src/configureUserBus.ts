@@ -1,6 +1,6 @@
 /** @format */
 
-import { UserBus, userBus, UserBusStoreConfig } from "mui-toolpad-extended-tuni";
+import { userBus, UserBusStoreConfig } from "mui-toolpad-extended-tuni";
 import { useUserStore } from "./store/useUserStore";
 import type { UserData } from "mui-toolpad-extended-tuni";
 
@@ -8,7 +8,14 @@ import type { UserData } from "mui-toolpad-extended-tuni";
  * Configure UserBus with store methods from useUserStore.
  * This should be called once when the users package is initialized.
  */
+let isConfigured = false;
+
 export function configureUserBus(): void {
+  // Make idempotent - only configure once
+  if (isConfigured) {
+    return;
+  }
+  
   const storeConfig: UserBusStoreConfig = {
     getUser: async () => {
       const store = useUserStore.getState();
@@ -40,7 +47,8 @@ export function configureUserBus(): void {
   };
 
   userBus.configureStore(storeConfig);
+  isConfigured = true;
 }
 
-// Configure UserBus immediately when this module is loaded
-configureUserBus();
+// Note: configureUserBus is now called explicitly in index.ts to ensure it runs synchronously
+
