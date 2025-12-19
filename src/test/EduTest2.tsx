@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo } from "react";
 import ScienceIcon from "@mui/icons-material/Science";
-import { NavigationPageStoreItem } from "@toolpad/core";
+import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
 import { useCourseMicroserviceRegistration } from "../../packages/courses/src/context/CourseMicroserviceContext";
 
 /**
@@ -15,37 +15,38 @@ import { useCourseMicroserviceRegistration } from "../../packages/courses/src/co
 const EduTest2 = () => {
   const { registerCourseMicroservice, unregisterCourseMicroservice } = useCourseMicroserviceRegistration();
 
-  const eduTest2Navigation: NavigationPageStoreItem = useMemo(
-    () => ({
-      kind: "page",
-      segment: "eduteest",
-      title: "EduTest2",
-      iconFC: ScienceIcon,
-      view: EduTestView,
-      metadata: {
-        description: "EduTest is a microservice for testing",
-        forRoles: ["teacher", "student"],
-        isRootTool: true,
-      },
-      children: [
-        {
-          kind: "page",
-          segment: "dashboard",
-          title: "Dashboard",
-          view: DashboardView,
-          metadata: {
-            description: "Dashboard for EduTest2",
-            forRoles: ["teacher", "student"],
+  const eduTest2Navigation = useMemo(
+    () =>
+      ({
+        kind: "page",
+        segment: "eduteest",
+        title: "EduTest2",
+        iconFC: ScienceIcon,
+        view: EduTestView,
+        metadata: {
+          description: "EduTest is a microservice for testing",
+          forRoles: ["teacher", "student"],
+          isRootTool: true,
+        },
+        children: [
+          {
+            kind: "page",
+            segment: "dashboard",
+            title: "Dashboard",
+            view: DashboardView,
+            metadata: {
+              description: "Dashboard for EduTest2",
+              forRoles: ["teacher", "student"],
+            },
           },
-        },
-        {
-          kind: "page",
-          segment: "assignments",
-          title: "Assignments",
-          view: AssignmentsView,
-        },
-      ],
-    }),
+          {
+            kind: "page",
+            segment: "assignments",
+            title: "Assignments",
+            view: AssignmentsView,
+          },
+        ],
+      }) as NavigationPageStoreItem,
     []
   );
 

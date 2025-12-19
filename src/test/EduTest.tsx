@@ -1,8 +1,8 @@
 /** @format */
 import ScienceIcon from "@mui/icons-material/Science";
 import { useEffect, useMemo } from "react";
-import { NavigationPageStoreItem } from "@toolpad/core";
 import { useCourseMicroserviceRegistration } from "../../packages/courses/src/context/CourseMicroserviceContext";
+import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
 
 /**
  * EduTest Course Microservice
