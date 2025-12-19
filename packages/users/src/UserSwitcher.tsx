@@ -1,7 +1,7 @@
 /** @format */
 
 import { MenuItem, ListItemIcon, Avatar, ListItemText } from '@mui/material';
-import { UserData, useUserStore } from '../Users/store/useUserStore';
+import { type UserData, useUserStore } from './store/useUserStore';
 
 const UserSwitcher: React.FC = () => {
   const { user, setUser, testUsers, setTestUsers } = useUserStore();

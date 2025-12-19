@@ -1,12 +1,12 @@
 /** @format */
 
 import { test, expect, describe } from "vitest";
-import { groupCoursesByEnrollment } from "../../components/Courses/utils/courseFilters";
 import {
-  Course,
+  groupCoursesByEnrollment,
+  type Course,
   courseRole,
   enrollmentStatus,
-} from "../../components/Courses/store/useCourseStore";
+} from "../..";
 
 describe("groupCoursesByEnrollment", () => {
   const createMockCourse = (override: Partial<Course> = {}): Course => ({

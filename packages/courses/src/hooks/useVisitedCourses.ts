@@ -27,8 +27,8 @@ const emitter = new VisitedCoursesEmitter();
  * @module useVisitedCourses
  */
 
-import { Course } from "../components/Courses/store/useCourseStore";
-import { userBus } from "../components/Events/UserBus";
+import { type Course } from "../store/useCourseStore";
+import { userBus } from "mui-toolpad-extended-tuni";
 
 /**
  * Creates a unique identifier for a course by combining code and instance
