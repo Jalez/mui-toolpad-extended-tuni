@@ -28,6 +28,6 @@
       "mui-toolpad-extended-tuni": ["./src/index.ts"]
     }
   },
-  "include": ["src", "packages"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }
