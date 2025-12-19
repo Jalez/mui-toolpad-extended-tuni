@@ -1,7 +1,7 @@
 /** @format */
 
 import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect, useMemo } from "react";
-import { NavigationPageStoreItem } from "@toolpad/core";
+import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
 import { useNavigationStore } from "mui-toolpad-extended-tuni";
 
 /**

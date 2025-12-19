@@ -9,8 +9,8 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { NavigationPageStoreItem } from "@toolpad/core";
+import { useNavigate } from "mui-toolpad-extended-tuni";
+import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
 import { SvgIconComponent } from "@mui/icons-material";
 
 type ToolCardProps = {

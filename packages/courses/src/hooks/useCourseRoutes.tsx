@@ -2,7 +2,7 @@
 
 import React, { useMemo } from "react";
 import type { ReactElement } from "react";
-import { Route } from "react-router-dom";
+import { Route } from "mui-toolpad-extended-tuni";
 import CourseCodeLoader from "../CourseCodeLoader";
 import CourseInstanceSelector from "../CourseInstanceSelector";
 import CourseInstanceLoader from "../CourseInstanceLoader";
@@ -49,7 +49,7 @@ export const useCourseRoutes = () => {
             element={<CourseTools microservices={allCourseMicroserviceNavigation} />}
           />
           {/* Dynamic routes for registered course microservices */}
-          {allCourseMicroserviceNavigation.map((nav) => {
+          {allCourseMicroserviceNavigation.map((nav: NavigationPageStoreItem) => {
             // #region agent log
             fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useCourseRoutes.tsx:45',message:'Mapping nav route',data:{segment:nav.segment,hasChildren:!!nav.children,childrenCount:nav.children?.length,childSegments:nav.children?.map(c=>c.segment)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
             // #endregion
@@ -68,7 +68,7 @@ export const useCourseRoutes = () => {
                   </CourseRouteWrapper>
                 }
               />
-              {nav.children?.map((child) => {
+              {nav.children?.map((child: NavigationPageStoreItem) => {
                 // #region agent log
                 fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useCourseRoutes.tsx:60',message:'Mapping child route',data:{parentSegment:nav.segment,childSegment:child.segment,hasSubChildren:!!child.children,subChildrenCount:child.children?.length,subChildSegments:child.children?.map(sc=>sc.segment)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
                 // #endregion
@@ -92,7 +92,7 @@ export const useCourseRoutes = () => {
                       </CourseRouteWrapper>
                     }
                   />
-                  {child.children?.map((subChild) => (
+                  {child.children?.map((subChild: NavigationPageStoreItem) => (
                     <Route
                       key={subChild.segment}
                       path={subChild.segment}
@@ -115,7 +115,7 @@ export const useCourseRoutes = () => {
     );
 
     // #region agent log
-    fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useCourseRoutes.tsx:102',message:'Routes built',data:{routeCount:routes.length,firstRoutePath:routes[0]?.props?.path},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useCourseRoutes.tsx:102',message:'Routes built',data:{routeCount:routes.length,firstRoutePath:(routes[0] as any)?.props?.path},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
     // #endregion
     
     return routes;

@@ -1,7 +1,7 @@
 /** @format */
 
 import { Box } from "@mui/material";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "mui-toolpad-extended-tuni";
 import { CenteredHeading } from "mui-toolpad-extended-tuni";
 import useCourseStore, { Course } from "./store/useCourseStore";
 import CourseItem from "./CourseItem/CourseItem";

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation } from "mui-toolpad-extended-tuni";
 import useCourseStore from "./store/useCourseStore";
 import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
 import { useRetry, useGridItemContext, createGridItem } from "mui-toolpad-extended-tuni";
@@ -8,7 +8,22 @@ import CourseList from "./CourseList";
 
 
 const CourseManager = () => {
-  const location = useLocation();
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CourseManager.tsx:11',message:'CourseManager render - about to call useLocation',data:{timestamp:Date.now()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'M'})}).catch(()=>{});
+  // #endregion
+  let location;
+  try {
+    location = useLocation();
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CourseManager.tsx:15',message:'useLocation succeeded',data:{pathname:location?.pathname},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'N'})}).catch(()=>{});
+    // #endregion
+  } catch (error) {
+    // #region agent log
+    fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'CourseManager.tsx:18',message:'useLocation failed',data:{error:error instanceof Error ? error.message : String(error),errorName:error instanceof Error ? error.name : 'Unknown'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'O'})}).catch(()=>{});
+    // #endregion
+    // Fallback: return empty location object if Router context is not available
+    location = { pathname: typeof window !== 'undefined' ? window.location.pathname : '/', search: '', hash: '', state: null, key: 'default' };
+  }
   const { 
     getCourses, 
     setCurrentCourseUrl, 

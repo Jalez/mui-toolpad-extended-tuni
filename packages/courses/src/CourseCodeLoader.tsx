@@ -1,7 +1,7 @@
 /** @format */
 
 import { useEffect } from "react";
-import { Outlet, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useNavigate, useParams } from "mui-toolpad-extended-tuni";
 import useCourseStore, { Course } from "./store/useCourseStore";
 import { useNotificationStore, LoadingScreen } from "mui-toolpad-extended-tuni";
 

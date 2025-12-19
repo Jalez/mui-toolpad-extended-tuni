@@ -1,12 +1,12 @@
 /** @format */
 
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "mui-toolpad-extended-tuni";
 import useCourseStore, { Course } from "./store/useCourseStore";
 import { useNotificationStore, CenteredHeading } from "mui-toolpad-extended-tuni";
 import ToolDisplayer from "./components/ToolDisplayer/ToolDisplayer";
 import LtiLoginUrlForm from "./LtiLoginUrlForm";
-import { NavigationPageStoreItem } from "@toolpad/core";
+import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
 import { useCourseMicroserviceRegistration } from "./context/CourseMicroserviceContext";
 
 interface CourseToolsProps {

@@ -1,8 +1,8 @@
 /** @format */
 import useCourseStore, { Course } from "./store/useCourseStore";
 import CourseItem from "./CourseItem/CourseItem";
-import { Scroller, useNavigationStore, type NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
-import { useNavigate } from "react-router-dom";
+import { Scroller, useNavigationStore } from "mui-toolpad-extended-tuni";
+import { useNavigate } from "mui-toolpad-extended-tuni";
 import { Box } from "@mui/material";
 
 type CourseListProps = {
