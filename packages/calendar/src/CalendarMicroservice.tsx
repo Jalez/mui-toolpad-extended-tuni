@@ -21,7 +21,7 @@ interface CalendarMicroserviceProps {
  * Calendar receives events from EventBus, not directly from Courses.
  * Courses publishes events via CourseEventPublisher, Calendar subscribes via CalendarEventAggregator.
  *
- * This component should be used in App.tsx, not LMSProvider.tsx, to maintain
+ * This component should be used in App.tsx, not ToolpadProvider.tsx, to maintain
  * proper separation of concerns and avoid tight coupling.
  *
  * @example

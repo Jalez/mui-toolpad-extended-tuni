@@ -22,7 +22,7 @@ interface UserMicroserviceProps {
  * to react to user changes. Direct useUserStore access is only allowed within the Users
  * module itself, in Events/UserBus for delegation, and in DevTools components.
  *
- * This component should be used in App.tsx, not LMSProvider.tsx, to maintain
+ * This component should be used in App.tsx, not ToolpadProvider.tsx, to maintain
  * proper separation of concerns and avoid tight coupling.
  *
  * @example
