@@ -1,6 +1,6 @@
 {
   "name": "@mui-toolpad-extended-tuni/users",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "Users microservice for MUI Toolpad Extended TUNI",
   "type": "module",
   "main": "./dist/index.cjs",
