@@ -14,6 +14,8 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
       include: ["src"],
+      outDir: "dist",
+      exclude: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.spec.ts", "src/**/*.spec.tsx"],
     }),
   ],
   resolve: {
