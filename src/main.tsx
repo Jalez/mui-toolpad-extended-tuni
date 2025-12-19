@@ -12,23 +12,8 @@ import "react-resizable/css/styles.css";
 //   trackUnnecessaryRenders: true,
 // });
 
-(async () => {
-  if (import.meta.env.MODE === "development") {
-    try {
-      const { worker } = await import("./LMSToolpad/mocks/browser");
-      await worker.start({
-        serviceWorker: {
-          url: "/mockServiceWorker.js",
-        },
-        quiet: true,
-      });
-      console.log("Mock service worker started");
-    } catch (error) {
-      console.warn("MSW initialization failed:", error);
-    }
-  }
+// Mock initialization removed - mocks are now handled by extension packages
+// For development, import mocks from @mui-toolpad-extended-tuni/courses and @mui-toolpad-extended-tuni/users
 
-  console.log("Starting app...");
-  // Render the app after MSW has started
-  createRoot(document.getElementById("root")!).render(<App />);
-})();
+console.log("Starting app...");
+createRoot(document.getElementById("root")!).render(<App />);

@@ -1,15 +1,12 @@
 /** @format */
 
 import useDialogStore from '../../store/useDialogStore';
-import CourseSettings from '../Courses/Forms/CourseSettings/CourseSettings';
 import PlatformSettings from '../../Forms/PlatformSettings/PlatformSettings';
 import { getDialog, registerDialog } from './dialogRegistry';
-import UserSettings from '../Users/Forms/UserSettings/UserSettings';
 
-// Register the dialogs once, outside any components
-registerDialog('CourseSettings', CourseSettings);
+// Register PlatformSettings dialog (part of main package)
+// CourseSettings and UserSettings are registered by their respective packages when imported
 registerDialog('PlatformSettings', PlatformSettings);
-registerDialog('UserSettings', UserSettings);
 const Dialogs = () => {
   const { openDialog } = useDialogStore();
   if (!openDialog) return null;

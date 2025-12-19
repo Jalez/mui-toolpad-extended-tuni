@@ -65,6 +65,15 @@ export { useMicroserviceNavigation } from "./LMSToolpad/components/Navigation/ho
 export { useNavigationSectionManager } from "./LMSToolpad/components/Navigation/hooks/useNavigationSectionManager";
 export { useSyncNavigationFilters } from "./LMSToolpad/components/Navigation/hooks/useSyncNavigationFilters";
 
+// Toolbar registry - for registering app and page toolbar actions
+export {
+  registerAppToolbarAction,
+  unregisterAppToolbarAction,
+  registerPageToolbarAction,
+  unregisterPageToolbarAction,
+  useToolbarRegistryStore,
+} from "./LMSToolpad/layout/Toolbars/toolbarRegistry";
+
 export {
   useNavigationStore,
   filterNavigationByRole,
@@ -159,7 +168,6 @@ export { default as axios } from "./LMSToolpad/network/axiosConfig";
  */
 
 export { baseUrl } from "./LMSToolpad/constants";
-export { dataStore, saveDataStore } from "./LMSToolpad/mocks/store";
 
 export * from "./LMSToolpad/interfaces";
 
