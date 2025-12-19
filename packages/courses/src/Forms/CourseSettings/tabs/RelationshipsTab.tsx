@@ -70,9 +70,9 @@ export default function RelationshipsTab({
         <EditableAutocomplete<CourseRelation>
           label="Required Courses"
           value={formData.relationships?.prerequisites || []}
-          onChange={(courses) => updateRelationships("prerequisites", courses)}
+          onChange={(courses: CourseRelation[]) => updateRelationships("prerequisites", courses)}
           helperText={relationTypeDescriptions.prerequisite}
-          getOptionLabel={(option) => `${option.code} - ${option.type}`}
+          getOptionLabel={(option: CourseRelation) => `${option.code} - ${option.type}`}
         />
       </Box>
 
@@ -83,9 +83,9 @@ export default function RelationshipsTab({
         <EditableAutocomplete<CourseRelation>
           label="Follow-up Courses"
           value={formData.relationships?.continuations || []}
-          onChange={(courses) => updateRelationships("continuations", courses)}
+          onChange={(courses: CourseRelation[]) => updateRelationships("continuations", courses)}
           helperText={relationTypeDescriptions.continues_from}
-          getOptionLabel={(option) => `${option.code} - ${option.type}`}
+          getOptionLabel={(option: CourseRelation) => `${option.code} - ${option.type}`}
         />
       </Box>
 
@@ -96,9 +96,9 @@ export default function RelationshipsTab({
         <EditableAutocomplete<CourseRelation>
           label="Alternative Courses"
           value={formData.relationships?.alternatives || []}
-          onChange={(courses) => updateRelationships("alternatives", courses)}
+          onChange={(courses: CourseRelation[]) => updateRelationships("alternatives", courses)}
           helperText={relationTypeDescriptions.alternative_to}
-          getOptionLabel={(option) => `${option.code} - ${option.type}`}
+          getOptionLabel={(option: CourseRelation) => `${option.code} - ${option.type}`}
         />
       </Box>
 
@@ -109,9 +109,9 @@ export default function RelationshipsTab({
         <EditableAutocomplete<CourseRelation>
           label="Related Courses"
           value={formData.relationships?.related || []}
-          onChange={(courses) => updateRelationships("related", courses)}
+          onChange={(courses: CourseRelation[]) => updateRelationships("related", courses)}
           helperText={relationTypeDescriptions.part_of}
-          getOptionLabel={(option) => `${option.code} - ${option.type}`}
+          getOptionLabel={(option: CourseRelation) => `${option.code} - ${option.type}`}
         />
       </Box>
     </Stack>

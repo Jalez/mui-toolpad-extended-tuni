@@ -19,7 +19,7 @@ export default function BasicInfoTab({
         <Stack direction="row" spacing={2} alignItems="flex-start">
           <EditableImage
             value={formData.image?.large}
-            onChange={(value) =>
+            onChange={(value: string) =>
               setFormData({
                 ...formData,
                 image: { large: value, medium: "", thumbnail: "" },
@@ -31,13 +31,13 @@ export default function BasicInfoTab({
             <EditableText
               label="Course Code"
               value={formData.code}
-              onChange={(value) => setFormData({ ...formData, code: value })}
+              onChange={(value: string) => setFormData({ ...formData, code: value })}
             />
 
             <EditableText
               label="Instance"
               value={formData.instance}
-              onChange={(value) =>
+              onChange={(value: string) =>
                 setFormData({ ...formData, instance: value })
               }
             />
@@ -45,13 +45,13 @@ export default function BasicInfoTab({
             <EditableText
               label="Title"
               value={formData.title}
-              onChange={(value) => setFormData({ ...formData, title: value })}
+              onChange={(value: string) => setFormData({ ...formData, title: value })}
             />
 
             <EditableText
               label="Description"
               value={formData.description}
-              onChange={(value) =>
+              onChange={(value: string) =>
                 setFormData({ ...formData, description: value })
               }
               multiline
@@ -60,7 +60,7 @@ export default function BasicInfoTab({
             <EditableAutocomplete
               label="Tags"
               value={formData.tags || []}
-              onChange={(newTags) =>
+              onChange={(newTags: string[]) =>
                 setFormData({ ...formData, tags: newTags })
               }
             />
@@ -68,7 +68,7 @@ export default function BasicInfoTab({
             <EditableText
               label="Language"
               value={formData.language || ""}
-              onChange={(value) =>
+              onChange={(value: string) =>
                 setFormData({ ...formData, language: value })
               }
               helperText="Use ISO 639-1 code (e.g., 'en', 'fi')"
