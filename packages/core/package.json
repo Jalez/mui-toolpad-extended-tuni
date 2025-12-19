@@ -1,6 +1,6 @@
 {
   "name": "@mui-toolpad-extended-tuni/core",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "Core shared dependencies for MUI Toolpad Extended TUNI microservices",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -50,3 +50,4 @@
     "notistack": "^3.0.1"
   }
 }
+
