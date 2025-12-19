@@ -10,7 +10,6 @@ import {
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useEffect } from "react";
-import DevelopmentTools from "../../../components/DevTools/DevelopmentTools";
 import { useCurrentUser } from "../../../components/Events/hooks/useCurrentUser";
 import useDialogStore from "../../../store/useDialogStore";
 import { CollapsingButtons } from "../../../../common/components/ui/CollapsingButtons/CollapsingButtons";
@@ -35,7 +34,6 @@ export const CollapsibleMenu = () => {
       tooltipTitle="More actions"
     >
       <Stack direction="row" spacing={1}>
-        <DevelopmentTools />
         <ThemeToggle />
         <PlatformSettingsOpener />
       </Stack>
