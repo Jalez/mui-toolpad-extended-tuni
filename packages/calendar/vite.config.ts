@@ -34,7 +34,7 @@ export default defineConfig({
         "@emotion/react",
         "@emotion/styled",
         "luxon",
-        "@mui-toolpad-extended-tuni/core",
+        "mui-toolpad-extended-tuni",
       ],
       output: {
         exports: "named",
@@ -51,3 +51,4 @@ export default defineConfig({
     },
   },
 });
+
