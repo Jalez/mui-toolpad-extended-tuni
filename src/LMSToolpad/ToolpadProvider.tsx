@@ -29,15 +29,16 @@ import { PageContainer } from "@toolpad/core";
 import { useMicroserviceNavigation } from "./components/Navigation/hooks/useMicroserviceNavigation";
 import { GridItemProvider } from "../common/components/layout/GridLayout/GridItemContext";
 
-export interface LMSProviderProps {
+export interface ToolpadProviderProps {
   children?: ReactNode;
 }
 
 /**
- * LMSProvider Component
+ * ToolpadProvider Component
  *
  * @version 3.0.0
  * @breaking-changes
+ * - Renamed from LMSProvider to ToolpadProvider in v3.0.0
  * - Complete architectural restructuring for better separation of concerns
  * - Removed direct course management (now handled by CourseManager)
  * - Simplified authentication handling (now handled by AuthenticationManager)
@@ -55,13 +56,13 @@ export interface LMSProviderProps {
  * @example
  * ```tsx
  * <BrowserRouter>
- *   <LMSProvider>
+ *   <ToolpadProvider>
  *     <YourApp />
- *   </LMSProvider>
+ *   </ToolpadProvider>
  * </BrowserRouter>
  * ```
  */
-const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
+const ToolpadProvider: React.FC<ToolpadProviderProps> = ({ children }) => {
   const { user } = useCurrentUser();
   const { getUser, logout } = useUserActions();
   const { navigation } = useNavigationStore();
@@ -97,7 +98,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
   useEffect(() => {
     const theme = getTheme();
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LMSProvider.tsx:99',message:'Theme store changed',data:{defaultColorScheme:theme?.defaultColorScheme,darkBackgroundDefault:theme?.colorSchemes?.dark?.palette?.background?.default,lightBackgroundDefault:theme?.colorSchemes?.light?.palette?.background?.default},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ToolpadProvider.tsx:99',message:'Theme store changed',data:{defaultColorScheme:theme?.defaultColorScheme,darkBackgroundDefault:theme?.colorSchemes?.dark?.palette?.background?.default,lightBackgroundDefault:theme?.colorSchemes?.light?.palette?.background?.default},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
     // #endregion
     const currentMode = theme?.defaultColorScheme || 'light';
     const colorScheme = theme?.colorSchemes?.[currentMode];
@@ -108,7 +109,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
     }
 
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LMSProvider.tsx:108',message:'Creating theme with colorScheme',data:{currentMode,backgroundDefault:colorScheme.palette.background.default,backgroundPaper:colorScheme.palette.background.paper},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ToolpadProvider.tsx:108',message:'Creating theme with colorScheme',data:{currentMode,backgroundDefault:colorScheme.palette.background.default,backgroundPaper:colorScheme.palette.background.paper},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
     // #endregion
 
     const newTheme = createTheme({
@@ -125,7 +126,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
       zIndex: theme.zIndex,
     });
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LMSProvider.tsx:121',message:'New theme created',data:{mode:newTheme.palette?.mode,backgroundDefault:newTheme.palette?.background?.default,backgroundPaper:newTheme.palette?.background?.paper},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ToolpadProvider.tsx:121',message:'New theme created',data:{mode:newTheme.palette?.mode,backgroundDefault:newTheme.palette?.background?.default,backgroundPaper:newTheme.palette?.background?.paper},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
     // #endregion
     setLmsTheme(newTheme);
   }, [colorSchemePreference, getTheme]);
@@ -140,7 +141,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
     document.documentElement.setAttribute('data-color-scheme', mode);
     
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LMSProvider.tsx:127',message:'Before setting DOM backgrounds',data:{bgColor,mode,bodyComputed:window.getComputedStyle(document.body).backgroundColor,htmlComputed:window.getComputedStyle(document.documentElement).backgroundColor,rootComputed:document.getElementById('root')?window.getComputedStyle(document.getElementById('root')!).backgroundColor:'not found'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ToolpadProvider.tsx:127',message:'Before setting DOM backgrounds',data:{bgColor,mode,bodyComputed:window.getComputedStyle(document.body).backgroundColor,htmlComputed:window.getComputedStyle(document.documentElement).backgroundColor,rootComputed:document.getElementById('root')?window.getComputedStyle(document.getElementById('root')!).backgroundColor:'not found'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
     // #endregion
     document.body.style.backgroundColor = bgColor;
     document.documentElement.style.backgroundColor = bgColor;
@@ -149,7 +150,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
       rootElement.style.backgroundColor = bgColor;
     }
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LMSProvider.tsx:134',message:'After setting DOM backgrounds',data:{bgColor,mode,bodyComputed:window.getComputedStyle(document.body).backgroundColor,htmlComputed:window.getComputedStyle(document.documentElement).backgroundColor,rootComputed:document.getElementById('root')?window.getComputedStyle(document.getElementById('root')!).backgroundColor:'not found',bodyInline:document.body.style.backgroundColor,htmlInline:document.documentElement.style.backgroundColor},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ToolpadProvider.tsx:134',message:'After setting DOM backgrounds',data:{bgColor,mode,bodyComputed:window.getComputedStyle(document.body).backgroundColor,htmlComputed:window.getComputedStyle(document.documentElement).backgroundColor,rootComputed:document.getElementById('root')?window.getComputedStyle(document.getElementById('root')!).backgroundColor:'not found',bodyInline:document.body.style.backgroundColor,htmlInline:document.documentElement.style.backgroundColor},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
     // #endregion
   }, [lmsTheme]);
 
@@ -196,7 +197,7 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
       const dashboardBg = dashboardLayout ? window.getComputedStyle(dashboardLayout as Element).backgroundColor : 'not found';
       
       // #region agent log
-      fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'LMSProvider.tsx:182',message:'Computed styles check',data:{themeBackgroundDefault:lmsTheme.palette.background.default,bodyComputed:bodyBg,htmlComputed:htmlBg,rootComputed:rootBg,dashboardLayoutComputed:dashboardBg,bodyInline:document.body.style.backgroundColor,htmlInline:document.documentElement.style.backgroundColor},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+      fetch('http://127.0.0.1:7242/ingest/30a7b8ff-4a46-48a8-8e84-a3a483543b74',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'ToolpadProvider.tsx:182',message:'Computed styles check',data:{themeBackgroundDefault:lmsTheme.palette.background.default,bodyComputed:bodyBg,htmlComputed:htmlBg,rootComputed:rootBg,dashboardLayoutComputed:dashboardBg,bodyInline:document.body.style.backgroundColor,htmlInline:document.documentElement.style.backgroundColor},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
       // #endregion
     };
     
@@ -359,4 +360,4 @@ const LMSProvider: React.FC<LMSProviderProps> = ({ children }) => {
   );
 };
 
-export default LMSProvider;
+export default ToolpadProvider;
