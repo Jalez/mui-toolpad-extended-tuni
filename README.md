@@ -25,6 +25,7 @@ A React library extending MUI Toolpad functionality with additional features for
 
 ### Breaking Changes in v3.0.0
 
+- **Renamed `LMSProvider` to `ToolpadProvider`**: Update all imports and usage from `LMSProvider` to `ToolpadProvider`
 - **Extension Packages**: Calendar, Courses, and Users are no longer included in the main package
 - **Optional Extensions**: These microservices must be installed separately if needed
 - **Peer Dependencies**: Extension packages require `mui-toolpad-extended-tuni` as a peer dependency
@@ -41,6 +42,7 @@ A React library extending MUI Toolpad functionality with additional features for
 ## Breaking Changes in v2.0.0
 
 1. Renamed `EduMLProvider` to `LMSProvider` (EduMLProvider is now deprecated)
+   - **Note**: In v3.0.0, `LMSProvider` was renamed to `ToolpadProvider`
 2. All routing components must now be imported from this package
 3. State management is now centralized through the package
 
@@ -82,16 +84,16 @@ npm install @mui-toolpad-extended-tuni/users
 
 ## Basic Usage
 
-1. Setup your application with `LMSProvider` and routing:
+1. Setup your application with `ToolpadProvider` and routing:
 
 ```tsx
 import { BrowserRouter } from 'react-router-dom';
-import { LMSProvider } from 'mui-toolpad-extended-tuni';
+import { ToolpadProvider } from 'mui-toolpad-extended-tuni';
 
 function App() {
   return (
     <BrowserRouter>
-      <LMSProvider>{/* Your application content */}</LMSProvider>
+      <ToolpadProvider>{/* Your application content */}</ToolpadProvider>
     </BrowserRouter>
   );
 }
@@ -123,7 +125,7 @@ function MyComponent() {
 If you've installed extension packages, import and use them as microservices:
 
 ```tsx
-import { LMSProvider, Microservices } from 'mui-toolpad-extended-tuni';
+import { ToolpadProvider, Microservices } from 'mui-toolpad-extended-tuni';
 import { CourseMicroservice } from '@mui-toolpad-extended-tuni/courses';
 import { UserMicroservice } from '@mui-toolpad-extended-tuni/users';
 import { CalendarMicroservice } from '@mui-toolpad-extended-tuni/calendar';
@@ -131,7 +133,7 @@ import { CalendarMicroservice } from '@mui-toolpad-extended-tuni/calendar';
 function App() {
   return (
     <BrowserRouter>
-      <LMSProvider>
+      <ToolpadProvider>
         <Microservices>
           {/* Optionally include extension microservices */}
           <CourseMicroservice>
@@ -140,7 +142,7 @@ function App() {
           <UserMicroservice />
           <CalendarMicroservice />
         </Microservices>
-      </LMSProvider>
+      </ToolpadProvider>
     </BrowserRouter>
   );
 }
@@ -150,19 +152,19 @@ function App() {
 
 ## Core Components
 
-### LMSProvider
+### ToolpadProvider
 
 The main provider component that sets up the application context:
 
 ```tsx
-import { LMSProvider, BrowserRouter } from 'mui-toolpad-extended-tuni';
+import { ToolpadProvider, BrowserRouter } from 'mui-toolpad-extended-tuni';
 
 function App() {
   return (
     <BrowserRouter>
-      <LMSProvider>
+      <ToolpadProvider>
         <YourComponents />
-      </LMSProvider>
+      </ToolpadProvider>
     </BrowserRouter>
   );
 }
@@ -474,7 +476,7 @@ import { EduMLTheme } from 'mui-toolpad-extended-tuni';
 ### Main Package (`mui-toolpad-extended-tuni`)
 
 The core package provides:
-- LMSProvider and routing infrastructure
+- ToolpadProvider and routing infrastructure
 - Navigation system
 - Notification system
 - Dialog management
