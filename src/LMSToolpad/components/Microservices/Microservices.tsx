@@ -76,6 +76,9 @@ const Microservices = ({ children }: { children: React.ReactNode }) => {
     };
   }, [updateNavigation]);
 
+  // #region agent log
+  fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Microservices.tsx:79',message:'Rendering Routes',data:{routeCount:microserviceRoutes.length,routeTypes:microserviceRoutes.map((r:any)=>r?.type?.name || r?.type?.displayName || 'unknown')},timestamp:Date.now(),sessionId:'debug-session',runId:'run2',hypothesisId:'T'})}).catch(()=>{});
+  // #endregion
   return (
     <>
       {/* Render children - this includes CourseMicroservice with its nested routes */}

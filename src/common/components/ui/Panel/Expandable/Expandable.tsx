@@ -61,14 +61,13 @@ const Expandable = () => {
 };
 
 export const ExpandTool = () => {
-  const { id, panelRef } = usePanelContext();
+  const { id } = usePanelContext();
   const { isExpanded } = useExpandableContext();
   const { resizeMode } = usePanelStore();
   const { setExpandedPanelId } = useExpandablePanelStore();
 
   const handleToggleExpand = () => {
     if (!isExpanded) {
-      const currentWidth = panelRef.current?.offsetWidth || 0;
       setExpandedPanelId(id);
     } else {
       setExpandedPanelId(null);

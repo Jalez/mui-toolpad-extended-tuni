@@ -42,7 +42,7 @@ export const useMicroserviceRoutes = () => {
         // #endregion
         const providerRoutes = provider();
         // #region agent log
-        fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useMicroserviceRoutes.tsx:36',message:'Route provider returned routes',data:{providerId:id,routeCount:providerRoutes.length,firstRoutePath:providerRoutes[0]?.props?.path},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7244/ingest/c66c732d-3054-49ac-a9c8-4251e2d751a6',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'useMicroserviceRoutes.tsx:36',message:'Route provider returned routes',data:{providerId:id,routeCount:providerRoutes.length,firstRoutePath:(providerRoutes[0] as any)?.props?.path},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
         // #endregion
         routes.push(...providerRoutes);
       } catch (error) {
