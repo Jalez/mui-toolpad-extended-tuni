@@ -1,7 +1,7 @@
 /** @format */
 
 import { BrowserRouter } from "react-router-dom";
-import { LMSProvider, Microservices } from ".";
+import { ToolpadProvider, Microservices } from ".";
 import Contact from "./test/Contact";
 import Help from "./test/Help";
 
@@ -25,7 +25,7 @@ import EduTest2 from "./test/EduTest2";
  *
  * Architecture:
  * - BrowserRouter: Provides routing context
- * - LMSProvider: Core LMS functionality, auth, theme, layout
+ * - ToolpadProvider: Core Toolpad functionality, auth, theme, layout
  * - Microservices: Top-level routing (Home, Help, Contact, dynamic routes)
  *   - UserMicroservice: Optional extension - self-contained user module with UserBus integration
  *   - CalendarMicroservice: Optional extension - self-contained calendar module with EventBus integration
@@ -51,7 +51,7 @@ import EduTest2 from "./test/EduTest2";
 const App = () => {
   return (
     <BrowserRouter>
-      <LMSProvider>
+      <ToolpadProvider>
         <Microservices>
           <Contact />
           <Help />
@@ -63,7 +63,7 @@ const App = () => {
           </CourseMicroservice>
           <CalendarMicroservice />
         </Microservices>
-      </LMSProvider>
+      </ToolpadProvider>
     </BrowserRouter>
   );
 };
