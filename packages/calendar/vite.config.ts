@@ -28,7 +28,7 @@ export default defineConfig({
         "@mui/x-date-pickers",
         "@emotion/react",
         "@emotion/styled",
-        "mui-toolpad-extended-tuni",
+        "@mui-toolpad-extended-tuni/main",
       ],
       output: {
         exports: "named",

@@ -30,7 +30,7 @@ export default defineConfig({
         "@emotion/styled",
         "axios",
         "zustand",
-        "mui-toolpad-extended-tuni",
+        "@mui-toolpad-extended-tuni/main",
       ],
       output: {
         exports: "named",
