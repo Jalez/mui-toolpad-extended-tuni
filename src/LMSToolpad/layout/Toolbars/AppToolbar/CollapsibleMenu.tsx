@@ -10,10 +10,10 @@ import {
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useEffect } from "react";
-import { useCurrentUser } from "../../../components/Events/hooks/useCurrentUser";
+import { useCurrentUser } from "@mui-toolpad-extended-tuni/core";
 import useDialogStore from "../../../store/useDialogStore";
-import { CollapsingButtons } from "../../../../common/components/ui/CollapsingButtons/CollapsingButtons";
-import ThemeToggle from "../../../../common/components/ui/ThemeToggle/ThemeToggle";
+import { CollapsingButtons } from "@mui-toolpad-extended-tuni/core";
+import ThemeToggle from "../../../components/ThemeToggle/ThemeToggle";
 
 export const CollapsibleMenu = () => {
   // const [isExpanded, setIsExpanded] = useState(false);
