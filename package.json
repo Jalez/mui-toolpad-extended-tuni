@@ -1,9 +1,10 @@
 {
   "name": "mui-toolpad-extended-tuni",
   "private": false,
-  "description": "Extended Toolpad",
+  "description": "Extended Toolpad (DEPRECATED - use @mui-toolpad-extended-tuni/main instead)",
   "author": "Jaakko Rajala",
-  "version": "3.1.0",
+  "version": "3.2.0",
+  "deprecated": "This package is deprecated. Please use @mui-toolpad-extended-tuni/main instead. See https://github.com/Jalez/mui-toolpad-extended-tuni for migration guide.",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.es.js",
@@ -36,12 +37,8 @@
   "license": "MIT",
   "sideEffects": false,
   "scripts": {
-    "clean": "rm -rf dist && rm -rf build && rm -rf coverage && rm -rf node_modules/.cache",
-    "dev": "vite --open --port 3100",
-    "build": "tsc --project tsconfig.json && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "test": "vitest --coverage"
+    "build": "cd packages/main && npm run build && cd ../.. && cp -r packages/main/dist dist",
+    "prepublishOnly": "npm run build"
   },
   "overrides": {
     "cross-spawn": "7.0.5",
@@ -49,35 +46,7 @@
     "react-dom": "^19.0.0"
   },
   "dependencies": {
-    "@dnd-kit/core": "^6.3.1",
-    "@dnd-kit/modifiers": "^9.0.0",
-    "@dnd-kit/sortable": "^10.0.0",
-    "@emotion/react": "^11.0.0",
-    "@emotion/styled": "^11.0.0",
-    "@fontsource/roboto": "^5.0.14",
-    "@mui-toolpad-extended-tuni/core": "^3.1.0",
-    "@mui/icons-material": "^7.3.4",
-    "@mui/material": "^7.3.4",
-    "@mui/x-date-pickers": "^7.25.0",
-    "@toolpad/core": "^0.16.0",
-    "@types/axios": "^0.9.36",
-    "@types/react-router-dom": "^5.3.3",
-    "@types/react-slider": "^1.3.6",
-    "@xyflow/react": "^12.4.4",
-    "axios": "^1.7.9",
-    "chart.js": "^4.5.1",
-    "d3-force": "^3.0.0",
-    "lodash": "^4.17.21",
-    "notistack": "^3.0.1",
-    "react": "^19.0.0",
-    "react-chartjs-2": "^5.2.0",
-    "react-colorful": "^5.6.1",
-    "react-dom": "^19.0.0",
-    "react-grid-layout": "^1.5.0",
-    "react-router-dom": "^7.11.0",
-    "styled-components": "^6.1.0",
-    "uuid": "^10.0.0",
-    "zustand": "^4.5.4"
+    "@mui-toolpad-extended-tuni/main": "^3.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.8.0",
@@ -100,7 +69,6 @@
     "globals": "^15.9.0",
     "jsdom": "^25.0.1",
     "msw": "^2.7.0",
-    "mui-toolpad-extended-tuni": "^3.0.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.0.0",
     "vite": "^6.4.0",

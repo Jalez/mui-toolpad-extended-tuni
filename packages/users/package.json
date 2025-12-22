@@ -1,6 +1,6 @@
 {
   "name": "@mui-toolpad-extended-tuni/users",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Users microservice for MUI Toolpad Extended TUNI",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -30,22 +30,29 @@
     "users"
   ],
   "license": "MIT",
-  "sideEffects": ["./dist/index.es.js", "./dist/index.cjs", "./dist/configureUserBus.js"],
+  "sideEffects": [
+    "./dist/index.es.js",
+    "./dist/index.cjs",
+    "./dist/configureUserBus.js"
+  ],
   "scripts": {
     "build": "tsc --skipLibCheck && vite build",
     "dev": "vite build --watch"
   },
   "peerDependencies": {
-    "@mui-toolpad-extended-tuni/core": "^3.0.0",
-    "mui-toolpad-extended-tuni": "^3.0.0",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
+    "@mui-toolpad-extended-tuni/core": "^3.1.0",
+    "@mui-toolpad-extended-tuni/main": "^3.3.0",
     "@mui/icons-material": "^7.0.0",
     "@mui/material": "^7.0.0",
+    "axios": "^1.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.0",
-    "axios": "^1.7.0",
     "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@mui-toolpad-extended-tuni/main": "^3.3.0"
   }
 }
