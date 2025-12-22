@@ -1,0 +1,10 @@
+# NPM Configuration for Publishing
+# Copy this file to .npmrc and replace YOUR_TOKEN_HERE with your actual NPM access token
+# Make sure .npmrc is in .gitignore (it should be by default)
+
+# For scoped packages (@mui-toolpad-extended-tuni/*)
+@mui-toolpad-extended-tuni:registry=https://registry.npmjs.org/
+//registry.npmjs.org/:_authToken=YOUR_TOKEN_HERE
+
+# Alternative: Set token for all packages
+# //registry.npmjs.org/:_authToken=YOUR_TOKEN_HERE
