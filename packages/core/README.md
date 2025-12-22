@@ -10,10 +10,13 @@ This package contains shared dependencies used by all microservices in the MUI T
 npm install @mui-toolpad-extended-tuni/core
 ```
 
-## Peer Dependencies
+**Note**: This package is typically installed as a peer dependency of `@mui-toolpad-extended-tuni/main` or other extension packages. You usually don't need to install it directly unless you're using it standalone.
 
-This package requires the following peer dependencies:
+## Required Peer Dependencies
 
+This package requires the following peer dependencies to be installed:
+
+### React & UI Framework
 - `@emotion/react`: ^11.0.0
 - `@emotion/styled`: ^11.0.0
 - `@mui/icons-material`: ^7.0.0
@@ -24,6 +27,16 @@ This package requires the following peer dependencies:
 - `react-dom`: ^19.0.0
 - `react-router-dom`: ^7.0.0
 - `zustand`: ^4.5.0
+
+### Installation Example
+
+```bash
+npm install @mui-toolpad-extended-tuni/core \
+  @emotion/react @emotion/styled \
+  @mui/icons-material @mui/material @mui/x-date-pickers \
+  @toolpad/core \
+  react react-dom react-router-dom zustand
+```
 
 ## Features
 

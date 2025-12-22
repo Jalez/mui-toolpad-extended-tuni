@@ -5,28 +5,47 @@ Calendar microservice extension for MUI Toolpad Extended TUNI. This package prov
 ## Installation
 
 ```bash
-npm install @mui-toolpad-extended-tuni/calendar
+npm install @mui-toolpad-extended-tuni/calendar @mui-toolpad-extended-tuni/main @mui-toolpad-extended-tuni/core
 ```
 
-**Note**: This package requires `mui-toolpad-extended-tuni@^3.0.0` as a peer dependency.
+**Important**: You must also install `@mui-toolpad-extended-tuni/main` and `@mui-toolpad-extended-tuni/core` as they are required peer dependencies.
 
-## Peer Dependencies
+## Required Peer Dependencies
 
-- `mui-toolpad-extended-tuni@^3.0.0`
+This package requires the following peer dependencies to be installed:
+
+### Required Packages
+- **`@mui-toolpad-extended-tuni/main`**: ^3.3.0 - **MUST be installed separately**
+- **`@mui-toolpad-extended-tuni/core`**: ^3.1.0 - **MUST be installed separately** (also required by main)
+
+### React & UI Framework
 - `react@^19.0.0`
 - `react-dom@^19.0.0`
 - `react-router-dom@^7.0.0`
 - `@mui/material@^7.0.0`
 - `@mui/icons-material@^7.0.0`
 - `@mui/x-date-pickers@^7.0.0`
+- `@emotion/react@^11.0.0`
+- `@emotion/styled@^11.0.0`
+
+### Calendar Dependencies
 - `@fullcalendar/core@^6.0.0`
 - `@fullcalendar/daygrid@^6.0.0`
 - `@fullcalendar/interaction@^6.0.0`
 - `@fullcalendar/react@^6.0.0`
 - `@fullcalendar/timegrid@^6.0.0`
-- `@emotion/react@^11.0.0`
-- `@emotion/styled@^11.0.0`
 - `luxon@^3.0.0`
+
+### Installation Example
+
+```bash
+npm install @mui-toolpad-extended-tuni/calendar @mui-toolpad-extended-tuni/main @mui-toolpad-extended-tuni/core \
+  react react-dom react-router-dom \
+  @mui/material @mui/icons-material @mui/x-date-pickers \
+  @emotion/react @emotion/styled \
+  @fullcalendar/core @fullcalendar/daygrid @fullcalendar/interaction @fullcalendar/react @fullcalendar/timegrid \
+  luxon
+```
 
 ## Usage
 

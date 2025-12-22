@@ -5,14 +5,20 @@ Courses microservice extension for MUI Toolpad Extended TUNI. This package provi
 ## Installation
 
 ```bash
-npm install @mui-toolpad-extended-tuni/courses
+npm install @mui-toolpad-extended-tuni/courses @mui-toolpad-extended-tuni/main @mui-toolpad-extended-tuni/core
 ```
 
-**Note**: This package requires `mui-toolpad-extended-tuni@^3.0.0` as a peer dependency.
+**Important**: You must also install `@mui-toolpad-extended-tuni/main` and `@mui-toolpad-extended-tuni/core` as they are required peer dependencies.
 
-## Peer Dependencies
+## Required Peer Dependencies
 
-- `mui-toolpad-extended-tuni@^3.0.0`
+This package requires the following peer dependencies to be installed:
+
+### Required Packages
+- **`@mui-toolpad-extended-tuni/main`**: ^3.3.0 - **MUST be installed separately**
+- **`@mui-toolpad-extended-tuni/core`**: ^3.1.0 - **MUST be installed separately** (also required by main)
+
+### React & UI Framework
 - `react@^19.0.0`
 - `react-dom@^19.0.0`
 - `react-router-dom@^7.0.0`
@@ -23,6 +29,16 @@ npm install @mui-toolpad-extended-tuni/courses
 - `@emotion/styled@^11.0.0`
 - `axios@^1.7.0`
 - `zustand@^4.5.0`
+
+### Installation Example
+
+```bash
+npm install @mui-toolpad-extended-tuni/courses @mui-toolpad-extended-tuni/main @mui-toolpad-extended-tuni/core \
+  react react-dom react-router-dom \
+  @mui/material @mui/icons-material @mui/x-date-pickers \
+  @emotion/react @emotion/styled \
+  axios zustand
+```
 
 ## Usage
 
