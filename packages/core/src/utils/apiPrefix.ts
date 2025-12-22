@@ -6,3 +6,6 @@ export const getApiPrefix = () => {
   }
   return '';
 };
+
+// Export as apiPrefix for backward compatibility
+export { getApiPrefix as apiPrefix };

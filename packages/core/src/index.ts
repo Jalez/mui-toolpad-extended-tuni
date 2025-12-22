@@ -84,9 +84,13 @@ export {
 } from './utils/caseConverter';
 export { parseDate } from './utils/parseDate';
 export { slugify } from './utils/slugify';
-export { apiPrefix } from './utils/apiPrefix';
+export { apiPrefix, getApiPrefix } from './utils/apiPrefix';
 export { getCookie, setCookie, deleteCookie } from './utils/cookieUtils';
 
 // Interfaces
 export type { fetchState } from './interfaces';
+
+// Constants
+export { BREAKPOINT_INFO } from './constants';
+export type { BreakpointColor } from './constants';
 

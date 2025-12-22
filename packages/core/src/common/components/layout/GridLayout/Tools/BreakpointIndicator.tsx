@@ -4,7 +4,7 @@ import { useTheme, Tooltip, Chip, useMediaQuery } from "@mui/material";
 import DesktopWindowsIcon from "@mui/icons-material/DesktopWindows";
 import TabletIcon from "@mui/icons-material/Tablet";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
-import { BREAKPOINT_INFO, BreakpointColor } from "../../../../../LMSToolpad/constants";
+import { BREAKPOINT_INFO, BreakpointColor } from "../../../../constants";
 
 /**
  * Shows which responsive breakpoint is currently active

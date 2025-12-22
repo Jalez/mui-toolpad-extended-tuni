@@ -8,7 +8,7 @@ export type { ItemCounts } from './Scroller/context/ScrollerContextProvider';
 export type { priority } from './Scroller/types';
 export { CollapsingButtons } from './CollapsingButtons/CollapsingButtons';
 export { SpeedDialButton } from './SpeedDialButton/SpeedDialButton';
-export { default as ThemeToggle } from './ThemeToggle/ThemeToggle';
+// ThemeToggle removed from core exports - it depends on LMS-specific useThemeStore
 // Panel system exports
 export { default as Panel } from './Panel/Main/Panel';
 export { PanelProvider, usePanelContext } from './Panel/Main/Context/PanelContextProvider';
