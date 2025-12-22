@@ -10,7 +10,7 @@ import {
   DragStartEvent,
 } from "@dnd-kit/core";
 import EditableSwitch from "../../Components/Editables/EditableSwitch";
-import DraggableItem from "../../../../common/components/ui/Panel/Movable/DraggableItem";
+import { DraggableItem } from "@mui-toolpad-extended-tuni/core";
 
 interface AITabProps {
   settings: Platform;

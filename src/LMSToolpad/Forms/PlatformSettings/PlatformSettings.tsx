@@ -1,10 +1,9 @@
 /** @format */
 
 import { Box } from "@mui/material";
-import FormDialog from "../../components/Dialogs/FormDialog";
+import { FormDialog, useNotificationStore } from "@mui-toolpad-extended-tuni/core";
 import useDialogStore from "../../store/useDialogStore";
 import { Platform, usePlatformStore } from "../../store/usePlatformStore";
-import { useNotificationStore } from "../../components/Notifications/store/useNotificationsStore";
 import PlatformSettingsTabs from "./PlatformSettingsTabs";
 import { useState, useEffect, useCallback } from "react";
 import isEqual from "lodash/isEqual";

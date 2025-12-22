@@ -1,7 +1,7 @@
 import {
   NavigationStoreItem,
   NavigationPageStoreItem,
-} from "../Navigation/store/useNavigationStore";
+} from "@mui-toolpad-extended-tuni/core";
 import IconWrapper from "./utils/IconFCWrapper";
 
 export const addIcons = (

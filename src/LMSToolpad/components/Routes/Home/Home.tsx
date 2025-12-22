@@ -4,7 +4,7 @@ import {
   registerPageToolbarAction,
   unregisterPageToolbarAction,
 } from "../../../layout/Toolbars/toolbarRegistry";
-import { EditModeToggler, ResponsiveGridLayout, useGridItemContext } from "../../../../common/components/layout/GridLayout";
+import { EditModeToggler, ResponsiveGridLayout, useGridItemContext } from "@mui-toolpad-extended-tuni/core";
 import { Box } from "@mui/material";
 
 // Storage key for layouts

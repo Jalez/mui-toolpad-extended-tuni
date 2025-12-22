@@ -62,6 +62,7 @@ export { getAllMicroservices as getAllRegisteredMicroservices } from './Navigati
 
 // Common Components
 export * from './common/components';
+export { default as DraggableItem } from './common/components/ui/Panel/Movable/DraggableItem';
 
 // Common Hooks
 export { useRetry } from './common/hooks/useRetry';
@@ -85,7 +86,8 @@ export {
 export { parseDate } from './utils/parseDate';
 export { slugify } from './utils/slugify';
 export { apiPrefix, getApiPrefix } from './utils/apiPrefix';
-export { getCookie, setCookie, deleteCookie } from './utils/cookieUtils';
+export { getCookie, setCookie, deleteCookie, getColorSchemePreference, setColorSchemePreference, getEffectiveColorScheme } from './utils/cookieUtils';
+export type { ColorSchemePreference } from './utils/cookieUtils';
 
 // Interfaces
 export type { fetchState } from './interfaces';

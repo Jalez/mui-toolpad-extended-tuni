@@ -7,7 +7,7 @@ import type {
   PaletteMode,
   PaletteOptions,
 } from '@mui/material/styles';
-import { getColorSchemePreference, setColorSchemePreference as setColorSchemeCookie, getEffectiveColorScheme, type ColorSchemePreference } from '../utils/cookieUtils';
+import { getColorSchemePreference, setColorSchemePreference as setColorSchemeCookie, getEffectiveColorScheme, type ColorSchemePreference } from '@mui-toolpad-extended-tuni/core';
 
 // Add type definitions for typography
 export interface TypographyVariantStyle extends Partial<React.CSSProperties> {

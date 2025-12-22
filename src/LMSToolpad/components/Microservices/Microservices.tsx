@@ -3,10 +3,10 @@
 import { Route, Routes } from "react-router-dom";
 import {
   useNavigationStore,
-} from "../Navigation/store/useNavigationStore";
+  useMicroserviceRoutes,
+} from "@mui-toolpad-extended-tuni/core";
 import Home from "../Routes/Home/Home";
 import React, { useEffect, useRef, useCallback } from "react";
-import { useMicroserviceRoutes } from "../Navigation/hooks/useMicroserviceRoutes";
 
 /**
  * Core component for handling top-level app routing and microservices.

@@ -93,8 +93,7 @@ export {
 } from "./LMSToolpad/layout/Toolbars/toolbarRegistry";
 
 // Notifications - from core
-export { default as Notifications } from "@mui-toolpad-extended-tuni/core";
-export { useNotificationStore } from "@mui-toolpad-extended-tuni/core";
+export { Notifications, useNotificationStore } from "@mui-toolpad-extended-tuni/core";
 
 /**
  * **COMPONENTS**
@@ -109,11 +108,7 @@ export { default as Microservices } from "./LMSToolpad/components/Microservices/
 export * from "@mui-toolpad-extended-tuni/core";
 
 // Dialogs - from core
-export { default as DialogOpener } from "@mui-toolpad-extended-tuni/core";
-export { default as FormDialog } from "@mui-toolpad-extended-tuni/core";
-export { default as ExtendedDialog } from "@mui-toolpad-extended-tuni/core";
-export { default as Dialogs } from "@mui-toolpad-extended-tuni/core";
-export { openDialog, closeDialog, registerDialog } from "@mui-toolpad-extended-tuni/core";
+export { DialogOpener, FormDialog, ExtendedDialog, Dialogs, openDialog, closeDialog, registerDialog } from "@mui-toolpad-extended-tuni/core";
 
 export { default as IconWithBadge } from "./LMSToolpad/components/IconWithBadge";
 export { default as ThemeToggle } from "./LMSToolpad/components/ThemeToggle/ThemeToggle";

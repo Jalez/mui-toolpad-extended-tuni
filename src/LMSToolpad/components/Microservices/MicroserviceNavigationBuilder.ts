@@ -1,6 +1,6 @@
 /** @format */
 
-import { NavigationPageStoreItem } from "../Navigation/store/types";
+import { NavigationPageStoreItem } from "@mui-toolpad-extended-tuni/core";
 
 export type BuildMicroServiceNavigationProps = {
   segment: string;

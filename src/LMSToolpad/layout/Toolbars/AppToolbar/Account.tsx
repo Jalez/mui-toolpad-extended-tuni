@@ -10,8 +10,7 @@ import {
   ThemeSwitcher,
 } from "@toolpad/core";
 
-import { useCurrentUser } from "../../../components/Events/hooks/useCurrentUser";
-import { useUserActions } from "../../../components/Events/hooks/useUserActions";
+import { useCurrentUser, useUserActions } from "@mui-toolpad-extended-tuni/core";
 import useDialogStore from "../../../store/useDialogStore";
 
 export const ToolbarAccount = () => {
