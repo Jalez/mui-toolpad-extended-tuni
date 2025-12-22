@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import {
   registerMicroservice,
   unregisterMicroservice,
-} from "../LMSToolpad/components/Navigation/NavigationRegistry";
+} from "@mui-toolpad-extended-tuni/core";
 
 /**
  * Help App-Level Microservice
