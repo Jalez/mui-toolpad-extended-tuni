@@ -1,7 +1,7 @@
 /** @format */
 import React from "react";
 import useCourseStore, { courseLevel } from "../store/useCourseStore";
-import { NavigationSectionBuilder, type addSectionProps } from "mui-toolpad-extended-tuni";
+import { NavigationSectionBuilder, type addSectionProps } from '@mui-toolpad-extended-tuni/main';
 // import SchoolIcon from "@mui/icons-material/School";
 import { subjectConfig } from "../config/subjectConfig";
 import { createCourseIcon } from "../CourseItem/CourseIcon";

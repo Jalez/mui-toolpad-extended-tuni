@@ -1,7 +1,7 @@
 /** @format */
 
 import { useEffect } from "react";
-import { registerRouteProvider, unregisterRouteProvider } from "mui-toolpad-extended-tuni";
+import { registerRouteProvider, unregisterRouteProvider } from '@mui-toolpad-extended-tuni/main';
 import { useCourseRoutes } from "./hooks/useCourseRoutes";
 
 /**

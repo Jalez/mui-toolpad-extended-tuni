@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Box, TextField, Button, Paper, Typography } from "@mui/material";
 import useCourseStore from "./store/useCourseStore";
-import { useNotificationStore } from "mui-toolpad-extended-tuni";
+import { useNotificationStore } from '@mui-toolpad-extended-tuni/main';
 
 const LtiLoginUrlForm = () => {
   const { currentCourse, updateStateCourse } = useCourseStore();

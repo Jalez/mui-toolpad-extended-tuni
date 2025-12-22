@@ -1,8 +1,8 @@
 /** @format */
 
 import { Box } from "@mui/material";
-import { useNavigate, useParams } from "mui-toolpad-extended-tuni";
-import { CenteredHeading } from "mui-toolpad-extended-tuni";
+import { useNavigate, useParams } from '@mui-toolpad-extended-tuni/main';
+import { CenteredHeading } from '@mui-toolpad-extended-tuni/main';
 import useCourseStore, { Course } from "./store/useCourseStore";
 import CourseItem from "./CourseItem/CourseItem";
 

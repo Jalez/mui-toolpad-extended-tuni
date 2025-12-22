@@ -1,6 +1,6 @@
 /** @format */
 
-import { userBus, registerDialog } from 'mui-toolpad-extended-tuni';
+import { userBus, registerDialog } from '@mui-toolpad-extended-tuni/main';
 import { configureUserBus } from './configureUserBus';
 import UserSettings from './Forms/UserSettings/UserSettings';
 

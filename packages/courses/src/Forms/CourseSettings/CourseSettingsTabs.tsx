@@ -14,7 +14,7 @@ import StaffTab from "./tabs/StaffTab";
 import EnrollmentTab from "./tabs/EnrollmentTab";
 import VisibilityTab from "./tabs/VisibilityTab";
 import { CourseRaw } from "../../store/useCourseStore";
-import type { UserData } from "mui-toolpad-extended-tuni";
+import type { UserData } from '@mui-toolpad-extended-tuni/main';
 import DataProcessingTab from "./tabs/DataProcessingTab";
 import RelationshipsTab from "./tabs/RelationshipsTab";
 

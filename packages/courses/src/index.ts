@@ -1,6 +1,6 @@
 /** @format */
 
-import { registerDialog } from 'mui-toolpad-extended-tuni';
+import { registerDialog } from '@mui-toolpad-extended-tuni/main';
 import CourseSettings from './Forms/CourseSettings/CourseSettings';
 
 // Register CourseSettings dialog when package is imported

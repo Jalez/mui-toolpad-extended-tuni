@@ -1,11 +1,11 @@
 /** @format */
 
-import { axios } from "mui-toolpad-extended-tuni";
-import type { UserData } from "mui-toolpad-extended-tuni";
+import { axios } from '@mui-toolpad-extended-tuni/main';
+import type { UserData } from '@mui-toolpad-extended-tuni/main';
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from "mui-toolpad-extended-tuni";
+} from '@mui-toolpad-extended-tuni/main';
 
 export const getCurrentUser = async (): Promise<UserData> => {
   try {

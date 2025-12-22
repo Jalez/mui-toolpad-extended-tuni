@@ -9,8 +9,8 @@ import {
   Button,
   Tooltip,
 } from "@mui/material";
-import { useNavigate } from "mui-toolpad-extended-tuni";
-import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
+import { useNavigate } from '@mui-toolpad-extended-tuni/main';
+import { NavigationPageStoreItem } from '@mui-toolpad-extended-tuni/main';
 import { SvgIconComponent } from "@mui/icons-material";
 
 type ToolCardProps = {

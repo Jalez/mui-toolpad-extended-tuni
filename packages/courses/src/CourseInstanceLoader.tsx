@@ -1,9 +1,9 @@
 /** @format */
 
 import { useEffect } from "react";
-import { Outlet, useNavigate, useParams } from "mui-toolpad-extended-tuni";
+import { Outlet, useNavigate, useParams } from '@mui-toolpad-extended-tuni/main';
 import useCourseStore, { Course } from "./store/useCourseStore";
-import { useNotificationStore, LoadingScreen } from "mui-toolpad-extended-tuni";
+import { useNotificationStore, LoadingScreen } from '@mui-toolpad-extended-tuni/main';
 
 /**
  * Component for loading specific course instance data.

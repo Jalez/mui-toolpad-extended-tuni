@@ -7,7 +7,7 @@ import {
   updateCourse,
 } from "../network/courses";
 import { groupCoursesByEnrollment } from "../utils/courseFilters";
-import { fetchState } from "mui-toolpad-extended-tuni";
+import { fetchState } from '@mui-toolpad-extended-tuni/main';
 
 export type courseRole = "student" | "teacher" | "guest";
 

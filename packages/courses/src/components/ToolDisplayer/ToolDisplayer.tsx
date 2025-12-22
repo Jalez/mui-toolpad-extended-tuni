@@ -1,7 +1,7 @@
 /** @format */
 import { Box, Fade, Typography } from "@mui/material";
 import useCourseStore from "../../store/useCourseStore";
-import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
+import { NavigationPageStoreItem } from '@mui-toolpad-extended-tuni/main';
 import ToolCard from "./ToolCard";
 
 interface ToolDisplayerProps {

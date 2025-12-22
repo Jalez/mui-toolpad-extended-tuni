@@ -1,8 +1,8 @@
 /** @format */
 
-import { userBus, UserBusStoreConfig } from "mui-toolpad-extended-tuni";
+import { userBus, UserBusStoreConfig } from '@mui-toolpad-extended-tuni/main';
 import { useUserStore } from "./store/useUserStore";
-import type { UserData } from "mui-toolpad-extended-tuni";
+import type { UserData } from '@mui-toolpad-extended-tuni/main';
 
 /**
  * Configure UserBus with store methods from useUserStore.

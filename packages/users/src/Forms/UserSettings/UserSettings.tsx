@@ -11,7 +11,7 @@ import {
   EditableNumber,
   EditableImage,
   PlatformRole,
-} from "mui-toolpad-extended-tuni";
+} from '@mui-toolpad-extended-tuni/main';
 import { useUserStore, UserData } from "../../store/useUserStore";
 
 /**

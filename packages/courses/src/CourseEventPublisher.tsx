@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import useCourseStore from "./store/useCourseStore";
-import { eventBus, Event } from "mui-toolpad-extended-tuni";
+import { eventBus, Event } from '@mui-toolpad-extended-tuni/main';
 
 /**
  * CourseEventPublisher publishes course events to the EventBus.

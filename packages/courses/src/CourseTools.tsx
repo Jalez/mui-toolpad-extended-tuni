@@ -1,12 +1,12 @@
 /** @format */
 
 import { useEffect, useState } from "react";
-import { useParams } from "mui-toolpad-extended-tuni";
+import { useParams } from '@mui-toolpad-extended-tuni/main';
 import useCourseStore, { Course } from "./store/useCourseStore";
-import { useNotificationStore, CenteredHeading } from "mui-toolpad-extended-tuni";
+import { useNotificationStore, CenteredHeading } from '@mui-toolpad-extended-tuni/main';
 import ToolDisplayer from "./components/ToolDisplayer/ToolDisplayer";
 import LtiLoginUrlForm from "./LtiLoginUrlForm";
-import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
+import { NavigationPageStoreItem } from '@mui-toolpad-extended-tuni/main';
 import { useCourseMicroserviceRegistration } from "./context/CourseMicroserviceContext";
 
 interface CourseToolsProps {

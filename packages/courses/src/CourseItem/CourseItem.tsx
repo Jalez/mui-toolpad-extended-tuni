@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Card, Box, Skeleton } from "@mui/material";
 import { Course } from "../store/useCourseStore";
-import { useDialogStore } from "mui-toolpad-extended-tuni";
+import { useDialogStore } from '@mui-toolpad-extended-tuni/main';
 import useCourseStore from "../store/useCourseStore";
 import { subjectConfig } from "../config/subjectConfig";
 import { CourseHeader } from "./CourseHeader";

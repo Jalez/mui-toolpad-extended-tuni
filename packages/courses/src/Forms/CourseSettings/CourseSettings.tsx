@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 
-import { useDialogStore, FormDialog, useNotificationStore, useUserActions, userBus, type UserData } from "mui-toolpad-extended-tuni";
+import { useDialogStore, FormDialog, useNotificationStore, useUserActions, userBus, type UserData } from '@mui-toolpad-extended-tuni/main';
 import useCourseStore, {
   CourseRaw,
   courseTemplate,

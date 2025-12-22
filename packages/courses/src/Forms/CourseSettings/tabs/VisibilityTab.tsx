@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
-import { parseDate } from "mui-toolpad-extended-tuni";
+import { parseDate } from '@mui-toolpad-extended-tuni/main';
 import { CourseRaw } from "../../../store/useCourseStore";
 
 interface VisibilityTabProps {

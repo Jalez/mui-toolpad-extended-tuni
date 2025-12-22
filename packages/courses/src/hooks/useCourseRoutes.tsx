@@ -2,12 +2,12 @@
 
 import React, { useMemo } from "react";
 import type { ReactElement } from "react";
-import { Route } from "mui-toolpad-extended-tuni";
+import { Route } from '@mui-toolpad-extended-tuni/main';
 import CourseCodeLoader from "../CourseCodeLoader";
 import CourseInstanceSelector from "../CourseInstanceSelector";
 import CourseInstanceLoader from "../CourseInstanceLoader";
 import CourseTools from "../CourseTools";
-import { NavigationPageStoreItem, MicroserviceSubsections as SubSections } from "mui-toolpad-extended-tuni";
+import { NavigationPageStoreItem, MicroserviceSubsections as SubSections } from '@mui-toolpad-extended-tuni/main';
 import { useCourseMicroserviceRegistration } from "../context/CourseMicroserviceContext";
 
 /**

@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { CourseRaw } from "../../../store/useCourseStore";
-import type { UserData } from "mui-toolpad-extended-tuni";
+import type { UserData } from '@mui-toolpad-extended-tuni/main';
 
 interface StaffTabProps {
   formData: CourseRaw;

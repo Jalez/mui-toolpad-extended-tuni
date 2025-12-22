@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useUserStore } from "./store/useUserStore";
-import { userBus, UserEvent } from "mui-toolpad-extended-tuni";
+import { userBus, UserEvent } from '@mui-toolpad-extended-tuni/main';
 import { configureUserBus } from "./configureUserBus"; // Ensure UserBus is configured
 
 /**

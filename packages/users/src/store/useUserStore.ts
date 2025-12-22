@@ -7,7 +7,7 @@ import {
   logoutUser,
   updateUser,
 } from "../network/users";
-import { fetchState, PlatformRole, type UserData, type navigationTypes } from "mui-toolpad-extended-tuni";
+import { fetchState, PlatformRole, type UserData, type navigationTypes } from '@mui-toolpad-extended-tuni/main';
 
 // Static image paths - these will be resolved at runtime by the consuming application
 const studentImage = "/static/images/student.png";
@@ -16,7 +16,7 @@ const guestImage = "/static/images/guest.png";
 const adminImage = "/static/images/admin.png";
 
 // Re-export UserData type from main package
-export type { UserData, PlatformRole, userId, navigationTypes, gender } from "mui-toolpad-extended-tuni";
+export type { UserData, PlatformRole, userId, navigationTypes, gender } from '@mui-toolpad-extended-tuni/main';
 
 const defaultTestUsers = [
   {

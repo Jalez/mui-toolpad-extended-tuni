@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Calendar from "./Calendar";
 
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
-import { useGridItemContext, createGridItem, registerMicroservice, unregisterMicroservice } from "mui-toolpad-extended-tuni";
+import { useGridItemContext, createGridItem, registerMicroservice, unregisterMicroservice } from '@mui-toolpad-extended-tuni/main';
 
 const CalendarManager = () => {
   const { registerGridItem, unregisterGridItem } = useGridItemContext();

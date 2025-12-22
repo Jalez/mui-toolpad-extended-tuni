@@ -2,7 +2,7 @@
 
 import { Stack, Box, Divider, Typography } from "@mui/material";
 import { CourseRaw } from "../../../store/useCourseStore";
-import { EditableText, EditableAutocomplete, EditableImage, EditableSelect, EditableNumber } from "mui-toolpad-extended-tuni";
+import { EditableText, EditableAutocomplete, EditableImage, EditableSelect, EditableNumber } from '@mui-toolpad-extended-tuni/main';
 
 interface BasicInfoTabProps {
   formData: CourseRaw;

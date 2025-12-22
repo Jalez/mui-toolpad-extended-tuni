@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { useLocation } from "mui-toolpad-extended-tuni";
+import { useLocation } from '@mui-toolpad-extended-tuni/main';
 import useCourseStore from "./store/useCourseStore";
 import { CourseNavigationBuilder } from "./Navigation/CourseNavigationbuilder";
-import { useRetry, useGridItemContext, createGridItem } from "mui-toolpad-extended-tuni";
+import { useRetry, useGridItemContext, createGridItem } from '@mui-toolpad-extended-tuni/main';
 import CourseEventPublisher from "./CourseEventPublisher";
 import CourseList from "./CourseList";
 

@@ -1,11 +1,11 @@
 /** @format */
 
 import { Course, CourseRaw } from "../store/useCourseStore";
-import { axios } from "mui-toolpad-extended-tuni";
+import { axios } from '@mui-toolpad-extended-tuni/main';
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from "mui-toolpad-extended-tuni";
+} from '@mui-toolpad-extended-tuni/main';
 
 const cache = new Map<string, { timestamp: number; data: any }>();
 const CACHE_TTL = 300000; // 5 minutes TTL

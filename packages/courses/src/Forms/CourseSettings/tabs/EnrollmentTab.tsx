@@ -20,7 +20,7 @@ import {
   Avatar,
 } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { parseDate, type UserData } from "mui-toolpad-extended-tuni";
+import { parseDate, type UserData } from '@mui-toolpad-extended-tuni/main';
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";

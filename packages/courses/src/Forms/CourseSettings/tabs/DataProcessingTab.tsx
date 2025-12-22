@@ -3,7 +3,7 @@
 import Grid from "@mui/material/Grid";
 import { Stack, Typography, Divider } from "@mui/material";
 import { CourseRaw } from "../../../store/useCourseStore";
-import { EditableSwitch, EditableNumber, EditableSelect } from "mui-toolpad-extended-tuni";
+import { EditableSwitch, EditableNumber, EditableSelect } from '@mui-toolpad-extended-tuni/main';
 
 interface DataProcessingTabProps {
   formData: CourseRaw;

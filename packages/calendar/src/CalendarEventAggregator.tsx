@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useCalendarStore, CalendarEvent, getContrastColor } from "./store/useCalendarStore";
-import { eventBus, Event } from "mui-toolpad-extended-tuni";
+import { eventBus, Event } from '@mui-toolpad-extended-tuni/main';
 
 // Course-specific color configuration (defined at the aggregation level)
 const courseSubjectConfig: Record<string, { baseColor: string; levelShades: Record<string, string> }> = {

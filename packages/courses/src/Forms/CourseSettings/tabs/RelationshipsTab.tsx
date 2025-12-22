@@ -6,7 +6,7 @@ import {
   CourseRelation,
   courseRelationType,
 } from "../../../store/useCourseStore";
-import { EditableAutocomplete } from "mui-toolpad-extended-tuni";
+import { EditableAutocomplete } from '@mui-toolpad-extended-tuni/main';
 
 interface RelationshipsTabProps {
   formData: CourseRaw;

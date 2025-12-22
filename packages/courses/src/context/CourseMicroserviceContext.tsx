@@ -1,8 +1,8 @@
 /** @format */
 
 import React, { createContext, useContext, ReactNode, useState, useCallback, useEffect, useMemo } from "react";
-import { NavigationPageStoreItem } from "mui-toolpad-extended-tuni";
-import { useNavigationStore } from "mui-toolpad-extended-tuni";
+import { NavigationPageStoreItem } from '@mui-toolpad-extended-tuni/main';
+import { useNavigationStore } from '@mui-toolpad-extended-tuni/main';
 
 /**
  * Context for course microservices to register themselves
