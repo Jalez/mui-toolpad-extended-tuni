@@ -49,6 +49,7 @@ export type {
   NavigationSection,
   ViewStore,
   ToolMetadata,
+  addSectionProps,
 } from './Navigation/store/types';
 
 export { useNavigationFilterStore } from './Navigation/store/useNavigationFilterStore';
