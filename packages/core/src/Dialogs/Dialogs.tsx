@@ -1,17 +1,14 @@
 /** @format */
 
-import useDialogStore from '../../store/useDialogStore';
-import CourseSettings from '../Courses/Forms/CourseSettings/CourseSettings';
-import PlatformSettings from '../../Forms/PlatformSettings/PlatformSettings';
-import { getDialog, registerDialog } from './dialogRegistry';
-import UserSettings from '../Users/Forms/UserSettings/UserSettings';
+import { getDialog } from './dialogRegistry';
 
-// Register the dialogs once, outside any components
-registerDialog('CourseSettings', CourseSettings);
-registerDialog('PlatformSettings', PlatformSettings);
-registerDialog('UserSettings', UserSettings);
-const Dialogs = () => {
-  const { openDialog } = useDialogStore();
+// Dialog store should be provided by the consuming application
+// This component accepts the current dialog ID as a prop
+type DialogsProps = {
+  openDialog?: string | null;
+};
+
+const Dialogs = ({ openDialog }: DialogsProps) => {
   if (!openDialog) return null;
   const DialogComponent = getDialog(openDialog);
   if (!DialogComponent) return null;

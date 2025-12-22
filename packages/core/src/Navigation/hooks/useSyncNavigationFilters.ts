@@ -1,7 +1,7 @@
 /** @format */
 import { useEffect, useRef } from "react";
-import { useCurrentUser } from "../../../components/Events/hooks/useCurrentUser";
-import { useUserActions } from "../../../components/Events/hooks/useUserActions";
+import { useCurrentUser } from "../../Events/hooks/useCurrentUser";
+import { useUserActions } from "../../Events/hooks/useUserActions";
 import { useNavigationFilterStore } from "../store/useNavigationFilterStore";
 import { useNavigationStore } from "../store/useNavigationStore";
 import { isEqual } from "lodash";

@@ -14,7 +14,6 @@ import {
   DialogContentText,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import useDialogStore from "../../store/useDialogStore";
 import EduMLDialog from "./ExtendedDialog";
 import { useState } from "react";
 
@@ -28,6 +27,7 @@ interface FormDialogProps {
   fullWidth?: boolean;
   showUnsavedChangesWarning?: boolean;
   isDirty?: boolean;
+  onClose?: () => void;
 }
 
 const FormDialog: React.FC<FormDialogProps> = ({
@@ -38,22 +38,28 @@ const FormDialog: React.FC<FormDialogProps> = ({
   disableSubmit = false,
   showUnsavedChangesWarning = false,
   isDirty = false,
+  onClose,
   ...dialogProps
 }) => {
-  const { closeDialog } = useDialogStore();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleClose = () => {
     if (showUnsavedChangesWarning && isDirty) {
       setShowConfirmDialog(true);
     } else {
-      closeDialog();
+      if (onClose) {
+        onClose();
+      } else {
+        console.warn('FormDialog: onClose prop not provided. Please provide a close handler.');
+      }
     }
   };
 
   const handleConfirmClose = () => {
     setShowConfirmDialog(false);
-    closeDialog();
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (

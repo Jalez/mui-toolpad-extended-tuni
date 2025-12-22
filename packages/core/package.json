@@ -2,13 +2,20 @@
   "name": "@mui-toolpad-extended-tuni/core",
   "version": "3.0.0",
   "description": "Core shared dependencies for MUI Toolpad Extended TUNI microservices",
+  "author": "Jaakko Rajala",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "README.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jalez/mui-toolpad-extended-tuni.git",
+    "directory": "packages/core"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -32,7 +39,8 @@
   "sideEffects": false,
   "scripts": {
     "build": "tsc && vite build",
-    "dev": "vite build --watch"
+    "dev": "vite build --watch",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "@emotion/react": "^11.0.0",

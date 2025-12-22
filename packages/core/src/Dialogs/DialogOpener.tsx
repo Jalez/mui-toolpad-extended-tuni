@@ -2,8 +2,9 @@
 
 import { Button, MenuItem } from '@mui/material';
 
-import useDialogStore, { dialogType } from '../../store/useDialogStore';
-import { iconByType } from '../tools/iconsByType';
+// Dialog store and icon utilities should be provided by the consuming application
+// These are placeholders that can be overridden via props or context
+type dialogType = string;
 
 type DialogOpenerProps = {
   title: string;
@@ -12,6 +13,8 @@ type DialogOpenerProps = {
     event: React.MouseEvent<HTMLButtonElement | HTMLElement>
   ) => void;
   showTitle?: boolean;
+  onOpenDialog?: (dialogId: string) => void;
+  icon?: React.ReactNode;
 };
 
 const DialogOpener = ({
@@ -19,13 +22,17 @@ const DialogOpener = ({
   dialogId,
   callOnOpen,
   showTitle = true,
+  onOpenDialog,
+  icon,
 }: DialogOpenerProps) => {
-  const { setOpenDialog } = useDialogStore();
-
   const openDialog = (event: React.MouseEvent<HTMLElement>) => {
     event.stopPropagation();
     event.preventDefault();
-    setOpenDialog(dialogId);
+    if (onOpenDialog) {
+      onOpenDialog(dialogId);
+    } else {
+      console.warn('DialogOpener: onOpenDialog prop not provided. Please provide a dialog store handler.');
+    }
     if (callOnOpen) callOnOpen(event);
   };
 
@@ -33,7 +40,6 @@ const DialogOpener = ({
     <MenuItem
       component={Button}
       onClick={openDialog}
-      //   variant="contained"
       style={{
         marginLeft: 'auto',
         zIndex: 1000,
@@ -42,7 +48,7 @@ const DialogOpener = ({
         justifyContent: 'left',
         columnGap: 2,
       }}>
-      {iconByType[title.toLowerCase()]} {showTitle && title}
+      {icon} {showTitle && title}
     </MenuItem>
   );
 };

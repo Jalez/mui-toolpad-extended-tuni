@@ -2,10 +2,30 @@
 import { useEffect, useMemo, useRef } from "react";
 import { addSectionProps } from "./store/types";
 import { useNavigationStore } from "./store/useNavigationStore";
-import {
-  registerAppToolbarAction,
-  unregisterAppToolbarAction,
-} from "../../layout/Toolbars/toolbarRegistry";
+// Toolbar registry functions should be provided by the consuming application
+// These are placeholders that can be overridden
+let registerAppToolbarActionImpl: ((id: string, component: React.ComponentType) => void) | null = null;
+let unregisterAppToolbarActionImpl: ((id: string, component: React.ComponentType) => void) | null = null;
+
+export function setToolbarRegistryFunctions(
+  register: (id: string, component: React.ComponentType) => void,
+  unregister: (id: string, component: React.ComponentType) => void
+) {
+  registerAppToolbarActionImpl = register;
+  unregisterAppToolbarActionImpl = unregister;
+}
+
+function registerAppToolbarAction(id: string, component: React.ComponentType) {
+  if (registerAppToolbarActionImpl) {
+    registerAppToolbarActionImpl(id, component);
+  }
+}
+
+function unregisterAppToolbarAction(id: string, component: React.ComponentType) {
+  if (unregisterAppToolbarActionImpl) {
+    unregisterAppToolbarActionImpl(id, component);
+  }
+}
 import { NavigationFilter } from "./NavigationFilter";
 import { isEqual } from "lodash"; // Add lodash dependency for deep equality check
 
