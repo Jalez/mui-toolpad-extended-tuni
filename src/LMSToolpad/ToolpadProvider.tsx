@@ -2,13 +2,10 @@
 
 import { ReactNode, useEffect, useState, useMemo } from "react";
 import { AppProvider, DashboardLayout, Router, Session } from "@toolpad/core";
-import { useNavigationStore } from "./components/Navigation/store/useNavigationStore";
-import { useCurrentUser } from "./components/Events/hooks/useCurrentUser";
-import { useUserActions } from "./components/Events/hooks/useUserActions";
+import { useNavigationStore, useCurrentUser, useUserActions, Notifications } from "@mui-toolpad-extended-tuni/core";
 import useCustomRouter from "./hooks/useCustomRouter";
 import { addIcons } from "./components/tools/addIcons";
 import { addActions } from "./components/tools/addActions";
-import Notifications from "./components/Notifications/Notifications";
 import { SnackbarProvider } from "notistack";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
@@ -18,7 +15,7 @@ import { ToolbarAccount } from "./layout/Toolbars/AppToolbar/Account";
 import SidebarFooter from "./layout/sidebar/Footer";
 import AuthenticationManager from "./components/AuthenticationManager";
 
-import Dialogs from "./components/Dialogs/Dialogs";
+import { Dialogs } from "@mui-toolpad-extended-tuni/core";
 import { useThemeStore } from "./store/useThemeStore";
 import { createTheme, Theme, useTheme, ThemeProvider, CssBaseline } from "@mui/material";
 import RegisteredAppTools from "./layout/Toolbars/AppToolbar/RegisteredAppTools";
@@ -26,8 +23,7 @@ import PageContent from "./layout/Content/PageContent";
 
 import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/RegisteredPageTools";
 import { PageContainer } from "@toolpad/core";
-import { useMicroserviceNavigation } from "./components/Navigation/hooks/useMicroserviceNavigation";
-import { GridItemProvider } from "../common/components/layout/GridLayout/GridItemContext";
+import { useMicroserviceNavigation, GridItemProvider } from "@mui-toolpad-extended-tuni/core";
 
 export interface ToolpadProviderProps {
   children?: ReactNode;

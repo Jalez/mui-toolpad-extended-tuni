@@ -23,14 +23,17 @@ export * from "./LMSToolpad/interfaces";
  */
 export { default as useDialogStore } from "./LMSToolpad/store/useDialogStore";
 
-// UserBus and hooks - core functionality
+// Re-export from @mui-toolpad-extended-tuni/core
 export {
+  // Events
   userBus,
   UserBus,
   useCurrentUser,
   useUserPreferences,
   useUserActions,
-} from "./LMSToolpad/components/Events";
+  EventBus,
+  eventBus,
+} from "@mui-toolpad-extended-tuni/core";
 export type {
   UserData,
   UserEvent,
@@ -38,12 +41,12 @@ export type {
   UserPreferences,
   PlatformRole,
   UserBusStoreConfig,
-  navigationTypes,
-  gender,
-  userId,
-} from "./LMSToolpad/components/Events";
+  Event,
+  EventSource,
+} from "@mui-toolpad-extended-tuni/core";
+export type { Event as EventType } from "@mui-toolpad-extended-tuni/core";
 
-// Navigation - core functionality
+// Navigation - from core
 export {
   registerMicroservice,
   unregisterMicroservice,
@@ -54,16 +57,31 @@ export {
   getMicroserviceIds,
   isMicroserviceRegistered,
   useMicroserviceRegistryStore,
-} from "./LMSToolpad/components/Navigation/NavigationRegistry";
+  useMicroserviceRoutes,
+  useMicroserviceNavigation,
+  useNavigationSectionManager,
+  useSyncNavigationFilters,
+  useNavigationStore,
+  filterNavigationByRole,
+  useNavigationFilterStore,
+  NavigationSectionBuilder,
+  NavigationFilter,
+  calculateNavigationFromSections,
+  updateMicroserviceNavigationForSections,
+  getAllRegisteredMicroservices,
+} from "@mui-toolpad-extended-tuni/core";
 export type {
   MicroserviceEntry,
   RouteProvider,
-} from "./LMSToolpad/components/Navigation/NavigationRegistry";
-
-export { useMicroserviceRoutes } from "./LMSToolpad/components/Navigation/hooks/useMicroserviceRoutes";
-export { useMicroserviceNavigation } from "./LMSToolpad/components/Navigation/hooks/useMicroserviceNavigation";
-export { useNavigationSectionManager } from "./LMSToolpad/components/Navigation/hooks/useNavigationSectionManager";
-export { useSyncNavigationFilters } from "./LMSToolpad/components/Navigation/hooks/useSyncNavigationFilters";
+  NavigationStoreItem,
+  NavigationPageStoreItem,
+  NavigationHeaderItem,
+  NavigationDividerItem,
+  NavigationSection,
+  ViewStore,
+  ToolMetadata,
+  NavigationFilterState,
+} from "@mui-toolpad-extended-tuni/core";
 
 // Toolbar registry - for registering app and page toolbar actions
 export {
@@ -74,30 +92,9 @@ export {
   useToolbarRegistryStore,
 } from "./LMSToolpad/layout/Toolbars/toolbarRegistry";
 
-export {
-  useNavigationStore,
-  filterNavigationByRole,
-} from "./LMSToolpad/components/Navigation/store/useNavigationStore";
-export type {
-  NavigationStoreItem,
-  NavigationPageStoreItem,
-  NavigationHeaderItem,
-  NavigationDividerItem,
-  NavigationSection,
-  ViewStore,
-  ToolMetadata,
-  addSectionProps,
-} from "./LMSToolpad/components/Navigation/store/types";
-
-export { useNavigationFilterStore } from "./LMSToolpad/components/Navigation/store/useNavigationFilterStore";
-export type { NavigationFilterState } from "./LMSToolpad/components/Navigation/store/useNavigationFilterStore";
-
-export { NavigationSectionBuilder } from "./LMSToolpad/components/Navigation/NavigationBuilder";
-export { NavigationFilter } from "./LMSToolpad/components/Navigation/NavigationFilter";
-
-// Notifications - core functionality
-export { default as Notifications } from "./LMSToolpad/components/Notifications/Notifications";
-export { useNotificationStore } from "./LMSToolpad/components/Notifications/store/useNotificationsStore";
+// Notifications - from core
+export { default as Notifications } from "@mui-toolpad-extended-tuni/core";
+export { useNotificationStore } from "@mui-toolpad-extended-tuni/core";
 
 /**
  * **COMPONENTS**
@@ -108,21 +105,18 @@ export { default as Home } from "./LMSToolpad/components/Routes/Home/Home";
 // Microservices component - core infrastructure
 export { default as Microservices } from "./LMSToolpad/components/Microservices/Microservices";
 
-// Common components - core functionality
-export * from "./common/components";
-export { default as Scroller } from "./common/components/ui/Scroller/Scroller";
-export { SpeedDialButton } from "./common/components/ui/SpeedDialButton/SpeedDialButton";
-export { useGridItemContext } from "./common/components/layout/GridLayout/GridItemContext";
-export { createGridItem } from "./common/components/layout/GridLayout/layoutUtils";
+// Common components - from core
+export * from "@mui-toolpad-extended-tuni/core";
 
-// Dialogs - core functionality
-export { default as DialogOpener } from "./LMSToolpad/components/Dialogs/DialogOpener";
-export { default as FormDialog } from "./LMSToolpad/components/Dialogs/FormDialog";
-export { default as ExtendedDialog } from "./LMSToolpad/components/Dialogs/ExtendedDialog";
-export { default as Dialogs } from "./LMSToolpad/components/Dialogs/Dialogs";
-export { registerDialog, getDialog } from "./LMSToolpad/components/Dialogs/dialogRegistry";
+// Dialogs - from core
+export { default as DialogOpener } from "@mui-toolpad-extended-tuni/core";
+export { default as FormDialog } from "@mui-toolpad-extended-tuni/core";
+export { default as ExtendedDialog } from "@mui-toolpad-extended-tuni/core";
+export { default as Dialogs } from "@mui-toolpad-extended-tuni/core";
+export { openDialog, closeDialog, registerDialog } from "@mui-toolpad-extended-tuni/core";
 
 export { default as IconWithBadge } from "./LMSToolpad/components/IconWithBadge";
+export { default as ThemeToggle } from "./LMSToolpad/components/ThemeToggle/ThemeToggle";
 
 // Forms components - core functionality
 export { default as EditableText } from "./LMSToolpad/Forms/Components/Editables/EditableText";
@@ -141,15 +135,18 @@ export { default as ErrorBoundary } from "./LMSToolpad/tools/ErrorBoundary";
 
 export { default as NullStateWarning } from "./LMSToolpad/tools/NullStateWarning";
 
-// Utils - core functionality
+// Utils - from core
 export {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from "./LMSToolpad/utils/caseConverter";
-export { parseDate } from "./LMSToolpad/utils/parseDate";
-export { slugify } from "./LMSToolpad/utils/slugify";
-export { getApiPrefix } from "./LMSToolpad/utils/apiPrefix";
-export { getCookie, setCookie, deleteCookie } from "./LMSToolpad/utils/cookieUtils";
+  parseDate,
+  slugify,
+  getApiPrefix,
+  apiPrefix,
+  getCookie,
+  setCookie,
+  deleteCookie,
+} from "@mui-toolpad-extended-tuni/core";
 
 export type { MicroserviceConfig } from "./LMSToolpad/components/Microservices/types";
 
@@ -171,10 +168,8 @@ export { baseUrl } from "./LMSToolpad/constants";
 
 export * from "./LMSToolpad/interfaces";
 
-// EventBus - core functionality
-export { EventBus, eventBus } from "./LMSToolpad/components/Events/EventBus";
-export type { Event, EventSource } from "./LMSToolpad/components/Events/types";
-export type { Event as EventType } from "./LMSToolpad/components/Events/types";
+// Common hooks - from core
+export { useRetry } from "@mui-toolpad-extended-tuni/core";
 
-// Common hooks
-export { useRetry } from "./common/hooks/useRetry";
+// Interfaces - from core
+export type { fetchState } from "@mui-toolpad-extended-tuni/core";

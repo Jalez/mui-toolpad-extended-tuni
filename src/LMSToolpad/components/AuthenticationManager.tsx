@@ -1,7 +1,5 @@
 import { useEffect } from "react";
-import { useCurrentUser } from "./Events/hooks/useCurrentUser";
-import { useUserActions } from "./Events/hooks/useUserActions";
-import { useRetry } from "../../common/hooks/useRetry";
+import { useCurrentUser, useUserActions, useRetry } from "@mui-toolpad-extended-tuni/core";
 
 const AuthenticationManager = () => {
   const { user } = useCurrentUser();
