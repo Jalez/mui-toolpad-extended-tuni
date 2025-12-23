@@ -97,3 +97,28 @@ export type { fetchState } from './interfaces';
 export { BREAKPOINT_INFO } from './constants';
 export type { BreakpointColor } from './constants';
 
+// API Configuration
+export {
+  ApiConfigProvider,
+  useServiceApiConfig,
+  useApiConfigContext,
+  registerApiEndpoints,
+  getApiConfig,
+} from './API/ApiConfigContext';
+export type {
+  ApiConfigContextValue,
+  ApiConfigProviderProps,
+} from './API/ApiConfigContext';
+export type {
+  StandardApiEndpoints,
+  CoursesApiEndpoints,
+  UsersApiEndpoints,
+  CalendarApiEndpoints,
+  ServiceApiEndpoints,
+} from './API/types';
+export {
+  buildUrl,
+  getDefaultEndpoints,
+  mergeEndpoints,
+} from './API/utils';
+

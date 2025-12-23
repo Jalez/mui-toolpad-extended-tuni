@@ -1,6 +1,6 @@
 {
   "name": "@mui-toolpad-extended-tuni/core",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "description": "Core shared dependencies for MUI Toolpad Extended TUNI microservices",
   "author": "Jaakko Rajala",
   "type": "module",
