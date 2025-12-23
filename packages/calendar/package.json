@@ -1,6 +1,6 @@
 {
   "name": "@mui-toolpad-extended-tuni/calendar",
-  "version": "3.0.2",
+  "version": "3.2.0",
   "description": "Calendar microservice for MUI Toolpad Extended TUNI",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -46,8 +46,8 @@
   "peerDependencies": {
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
-    "@mui-toolpad-extended-tuni/core": "^3.1.0",
-    "@mui-toolpad-extended-tuni/main": "^3.3.0",
+    "@mui-toolpad-extended-tuni/core": "^3.2.0",
+    "@mui-toolpad-extended-tuni/main": "^3.4.0",
     "@mui/icons-material": "^7.0.0",
     "@mui/material": "^7.0.0",
     "@mui/x-date-pickers": "^7.0.0",
@@ -56,6 +56,6 @@
     "react-router-dom": "^7.0.0"
   },
   "devDependencies": {
-    "@mui-toolpad-extended-tuni/main": "^3.3.0"
+    "@mui-toolpad-extended-tuni/main": "^3.4.0"
   }
 }

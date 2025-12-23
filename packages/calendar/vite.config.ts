@@ -29,6 +29,7 @@ export default defineConfig({
         "@emotion/react",
         "@emotion/styled",
         "@mui-toolpad-extended-tuni/main",
+        "@mui-toolpad-extended-tuni/core", // Peer dependency - must not be bundled
       ],
       output: {
         exports: "named",

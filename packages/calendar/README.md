@@ -15,8 +15,8 @@ npm install @mui-toolpad-extended-tuni/calendar @mui-toolpad-extended-tuni/main 
 This package requires the following peer dependencies to be installed:
 
 ### Required Packages
-- **`@mui-toolpad-extended-tuni/main`**: ^3.3.0 - **MUST be installed separately**
-- **`@mui-toolpad-extended-tuni/core`**: ^3.1.0 - **MUST be installed separately** (also required by main)
+- **`@mui-toolpad-extended-tuni/main`**: ^3.4.0 - **MUST be installed separately**
+- **`@mui-toolpad-extended-tuni/core`**: ^3.2.0 - **MUST be installed separately** (also required by main)
 
 ### React & UI Framework
 - `react@^19.0.0`
@@ -46,6 +46,39 @@ npm install @mui-toolpad-extended-tuni/calendar @mui-toolpad-extended-tuni/main 
   @fullcalendar/core @fullcalendar/daygrid @fullcalendar/interaction @fullcalendar/react @fullcalendar/timegrid \
   luxon
 ```
+
+## API Configuration
+
+**Note**: The calendar package does not make direct API calls. It receives events through the EventBus system from other microservices (primarily the courses package). However, you can configure calendar endpoints via the `apiEndpoints` prop if you plan to add direct API integration in the future.
+
+### Default Endpoints
+
+If you need to configure calendar endpoints for future API integration:
+
+- `get: "api/calendar/"` - GET list of calendar events
+- `getById: "api/calendar/:id"` - GET event by ID
+- `post: "api/calendar/"` - POST create new event
+- `put: "api/calendar/:id/"` - PUT update event
+- `delete: "api/calendar/:id/"` - DELETE event
+
+### Customizing Endpoints
+
+```tsx
+import { CalendarMicroservice } from '@mui-toolpad-extended-tuni/calendar';
+import type { CalendarApiEndpoints } from '@mui-toolpad-extended-tuni/calendar';
+
+const calendarEndpoints: CalendarApiEndpoints = {
+  get: "https://api.example.com/v1/calendar",
+  getById: "https://api.example.com/v1/calendar/:id",
+  post: "https://api.example.com/v1/calendar",
+  put: "https://api.example.com/v1/calendar/:id",
+  delete: "https://api.example.com/v1/calendar/:id",
+};
+
+<CalendarMicroservice apiEndpoints={calendarEndpoints} />
+```
+
+**Current Implementation**: The calendar currently uses EventBus to receive events from other microservices. Direct API endpoints are reserved for future use.
 
 ## Usage
 
@@ -213,6 +246,71 @@ Events from courses are automatically color-coded:
 - **By Level**: Basic (light), Intermediate (medium), Advanced (dark) shades
 - **By Type**: Different event types (lecture, exercise, exam, etc.) have distinct styling
 
+## Data Types
+
+### CalendarEvent
+
+Calendar event object displayed in the calendar.
+
+```typescript
+interface CalendarEvent {
+  id: string;                      // Unique event ID
+  title: string;                   // Event title
+  start: Date | string;            // Event start date/time (ISO string or Date)
+  end?: Date | string;             // Event end date/time (optional)
+  backgroundColor?: string;        // Background color (hex)
+  borderColor?: string;            // Border color (hex)
+  textColor?: string;             // Text color (hex)
+  extendedProps?: {                // Additional event metadata
+    courseCode?: string;           // Course code (if from courses package)
+    courseTitle?: string;          // Course title
+    type?: string;                 // Event type
+    description?: string;          // Event description
+    location?: string;             // Event location
+    [key: string]: any;            // Additional custom properties
+  };
+}
+```
+
+### CalendarEventType
+
+Type of calendar event.
+
+```typescript
+type CalendarEventType = 
+  | "lecture"      // Lecture events
+  | "exercise"     // Exercise sessions
+  | "exam"         // Examinations
+  | "deadline"     // Assignment deadlines
+  | "other"        // Other events
+  | "meeting"      // Meetings
+  | "maintenance"; // Maintenance windows
+```
+
+### EventBus Event Format
+
+Events received from EventBus (e.g., from courses package) follow this structure:
+
+```typescript
+interface Event {
+  id: string;
+  title: string;
+  start: string;                   // ISO date string
+  end: string;                      // ISO date string
+  metadata: {
+    source: string;                 // Event source (e.g., "courses")
+    type?: CalendarEventType;       // Event type
+    courseCode?: string;            // Course code
+    courseTitle?: string;           // Course title
+    subject?: string;               // Course subject
+    courseLevel?: "basic" | "intermediate" | "advanced";
+    description?: string;
+    location?: string;
+    [key: string]: any;             // Additional metadata
+  };
+}
+```
+
 ## Exports
 
 ### Components
@@ -224,9 +322,16 @@ Events from courses are automatically color-coded:
 
 ### Store
 - `useCalendarStore` - Zustand store for calendar management
+- `createCalendarEvent` - Helper function to create calendar events
+- `getContrastColor` - Helper function to get contrasting text color
+
+### Hooks
+- `useCalendarApiConfig()` - Hook to access calendar API endpoint configuration (for future use)
 
 ### Types
-- `CalendarEventType` - Calendar event type (lecture, exercise, exam, deadline, other, meeting, maintenance)
+- `CalendarEvent` - Calendar event interface
+- `CalendarEventType` - Calendar event type enumeration
+- `CalendarApiEndpoints` - API endpoint configuration type (for future use)
 
 ## Features
 

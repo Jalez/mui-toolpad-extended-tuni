@@ -1,11 +1,15 @@
 /** @format */
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import CalendarManager from "./CalendarManager";
 import CalendarEventAggregator from "./CalendarEventAggregator";
+import { registerApiEndpoints } from "@mui-toolpad-extended-tuni/core";
+import type { CalendarApiEndpoints } from "@mui-toolpad-extended-tuni/core";
 
-interface CalendarMicroserviceProps {
+export interface CalendarMicroserviceProps {
   children?: ReactNode;
+  /** API endpoint configuration for the calendar microservice (for future use) */
+  apiEndpoints?: CalendarApiEndpoints;
 }
 
 /**
@@ -34,7 +38,14 @@ interface CalendarMicroserviceProps {
  * </Microservices>
  * ```
  */
-const CalendarMicroservice: React.FC<CalendarMicroserviceProps> = ({ children }) => {
+const CalendarMicroservice: React.FC<CalendarMicroserviceProps> = ({ children, apiEndpoints }) => {
+  // Register API endpoints when component mounts or endpoints change
+  // (Currently calendar doesn't use API, but registered for future-proofing)
+  // Always register (either user-provided or empty to get defaults)
+  useEffect(() => {
+    registerApiEndpoints('calendar', apiEndpoints || {});
+  }, [apiEndpoints]);
+
   return (
     <>
       <CalendarManager />
