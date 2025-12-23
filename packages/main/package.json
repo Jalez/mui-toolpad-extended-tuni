@@ -1,6 +1,6 @@
 {
   "name": "@mui-toolpad-extended-tuni/main",
-  "version": "3.3.0",
+  "version": "3.4.0",
   "description": "Main package for MUI Toolpad Extended TUNI - provides ToolpadProvider, LMS components, and platform features",
   "author": "Jaakko Rajala",
   "type": "module",
@@ -59,7 +59,7 @@
     "uuid": "^10.0.0"
   },
   "peerDependencies": {
-    "@mui-toolpad-extended-tuni/core": "^3.1.0",
+    "@mui-toolpad-extended-tuni/core": "^3.2.0",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
     "@mui/icons-material": "^7.0.0",
