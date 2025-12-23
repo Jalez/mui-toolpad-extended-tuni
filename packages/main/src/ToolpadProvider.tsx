@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect, useState, useMemo, createContext, useContext } from "react";
 import { AppProvider, DashboardLayout, Router, Session } from "@toolpad/core";
-import { useNavigationStore, useCurrentUser, useUserActions, Notifications } from "@mui-toolpad-extended-tuni/core";
+import { useNavigationStore, useCurrentUser, useUserActions, Notifications, ApiConfigProvider } from "@mui-toolpad-extended-tuni/core";
 import useCustomRouter from "./hooks/useCustomRouter";
 import { addIcons } from "./components/tools/addIcons";
 import { addActions } from "./components/tools/addActions";
@@ -24,6 +24,7 @@ import PageContent from "./layout/Content/PageContent";
 import { HeaderWithPageRegistryToolbar } from "./layout/Toolbars/PageToolbar/RegisteredPageTools";
 import { PageContainer } from "@toolpad/core";
 import { useMicroserviceNavigation, GridItemProvider } from "@mui-toolpad-extended-tuni/core";
+import { baseUrl } from "./constants";
 
 export interface LogoConfig {
   sidebarFooter?: {
@@ -218,8 +219,9 @@ const ToolpadProvider: React.FC<ToolpadProviderProps> = ({ children, logos = {} 
   }, [lmsTheme]);
 
   return (
-    <LogoContext.Provider value={logos}>
-      <LocalizationProvider dateAdapter={AdapterLuxon}>
+    <ApiConfigProvider baseUrl={baseUrl}>
+      <LogoContext.Provider value={logos}>
+        <LocalizationProvider dateAdapter={AdapterLuxon}>
         <SnackbarProvider maxSnack={6} autoHideDuration={10000}>
           <GridItemProvider>
             <ThemeProvider theme={lmsTheme}>
@@ -369,6 +371,7 @@ const ToolpadProvider: React.FC<ToolpadProviderProps> = ({ children, logos = {} 
         </SnackbarProvider>
       </LocalizationProvider>
     </LogoContext.Provider>
+    </ApiConfigProvider>
   );
 };
 

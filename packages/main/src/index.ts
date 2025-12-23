@@ -3,6 +3,20 @@
 export { default as ToolpadProvider, useLogoContext } from "./ToolpadProvider";
 export type { ToolpadProviderProps, LogoConfig } from "./ToolpadProvider";
 
+// Re-export API configuration utilities from core (for advanced usage)
+export {
+  useServiceApiConfig,
+  useApiConfigContext,
+  registerApiEndpoints,
+  getApiConfig,
+} from "@mui-toolpad-extended-tuni/core";
+export type {
+  StandardApiEndpoints,
+  CoursesApiEndpoints,
+  UsersApiEndpoints,
+  CalendarApiEndpoints,
+} from "@mui-toolpad-extended-tuni/core";
+
 // Re-export router dependencies that consumers might need
 export {
   BrowserRouter,
