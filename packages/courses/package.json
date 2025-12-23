@@ -1,6 +1,6 @@
 {
   "name": "@mui-toolpad-extended-tuni/courses",
-  "version": "3.0.4",
+  "version": "3.2.0",
   "description": "Courses microservice for MUI Toolpad Extended TUNI",
   "type": "module",
   "main": "./dist/index.cjs",
@@ -36,8 +36,8 @@
     "dev": "vite build --watch"
   },
   "peerDependencies": {
-    "@mui-toolpad-extended-tuni/core": "^3.1.0",
-    "@mui-toolpad-extended-tuni/main": "^3.3.0",
+    "@mui-toolpad-extended-tuni/core": "^3.2.0",
+    "@mui-toolpad-extended-tuni/main": "^3.4.0",
     "@emotion/react": "^11.0.0",
     "@emotion/styled": "^11.0.0",
     "@mui/icons-material": "^7.0.0",
@@ -50,6 +50,6 @@
     "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@mui-toolpad-extended-tuni/main": "^3.3.0"
+    "@mui-toolpad-extended-tuni/main": "^3.4.0"
   }
 }

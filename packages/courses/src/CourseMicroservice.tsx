@@ -1,12 +1,16 @@
 /** @format */
 
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect } from "react";
 import { CourseMicroserviceProvider } from "./context/CourseMicroserviceContext";
 import CourseRoutesProvider from "./CourseRoutesProvider";
 import CourseManager from "./CourseManager";
+import { registerApiEndpoints } from "@mui-toolpad-extended-tuni/core";
+import type { CoursesApiEndpoints } from "@mui-toolpad-extended-tuni/core";
 
-interface CourseMicroserviceProps {
+export interface CourseMicroserviceProps {
   children?: ReactNode;
+  /** API endpoint configuration for the courses microservice */
+  apiEndpoints?: CoursesApiEndpoints;
 }
 
 /**
@@ -45,7 +49,13 @@ interface CourseMicroserviceProps {
  * </CourseMicroservice>
  * ```
  */
-const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children }) => {
+const CourseMicroservice: React.FC<CourseMicroserviceProps> = ({ children, apiEndpoints }) => {
+  // Register API endpoints when component mounts or endpoints change
+  // Always register (either user-provided or empty to get defaults)
+  useEffect(() => {
+    registerApiEndpoints('courses', apiEndpoints || {});
+  }, [apiEndpoints]);
+
   return (
     <CourseMicroserviceProvider>
       <CourseManager />

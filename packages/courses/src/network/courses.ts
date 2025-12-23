@@ -5,7 +5,22 @@ import { axios } from '@mui-toolpad-extended-tuni/main';
 import {
   convertObjectKeysToCamelCase,
   convertObjectKeysToUnderscore,
-} from '@mui-toolpad-extended-tuni/main';
+  getApiConfig,
+  buildUrl,
+} from '@mui-toolpad-extended-tuni/core';
+import type { CoursesApiEndpoints } from '@mui-toolpad-extended-tuni/core';
+
+/**
+ * Helper function to get courses API configuration.
+ * Returns the courses endpoints from the global API config.
+ */
+function getCoursesApiConfig(): CoursesApiEndpoints | undefined {
+  const apiConfig = getApiConfig();
+  if (!apiConfig) {
+    return undefined;
+  }
+  return apiConfig.endpoints.get('courses') as CoursesApiEndpoints | undefined;
+}
 
 const cache = new Map<string, { timestamp: number; data: any }>();
 const CACHE_TTL = 300000; // 5 minutes TTL
@@ -33,7 +48,11 @@ async function fetchWithCache<T>(
 export async function getCourses(): Promise<Course[]> {
   return fetchWithCache("getCourses", async () => {
     try {
-      const response = await axios.get("api/courses/");
+      const apiConfig = getApiConfig();
+      const coursesConfig = getCoursesApiConfig();
+      const endpoint = coursesConfig?.get || 'api/courses/';
+      const url = buildUrl(apiConfig?.baseUrl || '/', endpoint);
+      const response = await axios.get(url);
       // Ensure response.data is an array
       if (!Array.isArray(response.data)) {
         console.error("Expected array but got:", response.data);
@@ -55,7 +74,11 @@ export async function getCourseById(courseId: string): Promise<Course> {
   const cacheKey = `getCourseById_${courseId}`;
   return fetchWithCache(cacheKey, async () => {
     try {
-      const response = await axios.get(`api/courses/${courseId}`);
+      const apiConfig = getApiConfig();
+      const coursesConfig = getCoursesApiConfig();
+      const endpoint = coursesConfig?.getById || 'api/courses/:id';
+      const url = buildUrl(apiConfig?.baseUrl || '/', endpoint, { id: courseId });
+      const response = await axios.get(url);
       return convertObjectKeysToCamelCase(response.data) as Course;
     } catch (error) {
       throw new Error("Failed to retrieve course: " + error);
@@ -73,9 +96,11 @@ export async function getCourseByUrl(url: string): Promise<Course> {
   const cacheKey = `getCourseByUrl_${encodedUrl}`;
   return fetchWithCache(cacheKey, async () => {
     try {
-      const response = await axios.get(
-        `api/courses/?encoded_url=${encodedUrl}`
-      );
+      const apiConfig = getApiConfig();
+      const coursesConfig = getCoursesApiConfig();
+      const endpoint = coursesConfig?.getByUrl || 'api/courses/?encoded_url=:encodedUrl';
+      const urlPath = buildUrl(apiConfig?.baseUrl || '/', endpoint, { encodedUrl });
+      const response = await axios.get(urlPath);
       if (!Array.isArray(response.data) || response.data.length === 0) {
         throw new Error("Course not found");
       }
@@ -94,7 +119,11 @@ export async function getCourseByUrl(url: string): Promise<Course> {
  */
 export async function addCourse(courseData: CourseRaw): Promise<Course> {
   try {
-    const response = await axios.post("api/courses/", courseData);
+    const apiConfig = getApiConfig();
+    const coursesConfig = getCoursesApiConfig();
+    const endpoint = coursesConfig?.post || 'api/courses/';
+    const url = buildUrl(apiConfig?.baseUrl || '/', endpoint);
+    const response = await axios.post(url, courseData);
     return convertObjectKeysToCamelCase(response.data) as Course;
   } catch (error) {
     throw new Error("Failed to add a new course: " + error);
@@ -120,9 +149,13 @@ export const updateCourse = async (course: Course): Promise<Course> => {
   };
 
   try {
+    const apiConfig = getApiConfig();
+    const coursesConfig = getCoursesApiConfig();
+    const endpoint = coursesConfig?.put || 'api/courses/:id/';
+    const url = buildUrl(apiConfig?.baseUrl || '/', endpoint, { id: courseWithDataProcessing.id });
     // Convert camelCase to snake_case for backend
     const response = await axios.put(
-      `api/courses/${courseWithDataProcessing.id}/`,
+      url,
       convertObjectKeysToUnderscore(courseWithDataProcessing)
     );
 
@@ -141,7 +174,11 @@ export const updateCourse = async (course: Course): Promise<Course> => {
  */
 export async function deleteCourse(courseId: string): Promise<Course> {
   try {
-    const response = await axios.delete(`api/chat/courses/${courseId}`);
+    const apiConfig = getApiConfig();
+    const coursesConfig = getCoursesApiConfig();
+    const endpoint = coursesConfig?.delete || 'api/chat/courses/:id';
+    const url = buildUrl(apiConfig?.baseUrl || '/', endpoint, { id: courseId });
+    const response = await axios.delete(url);
     return convertObjectKeysToCamelCase(response.data) as Course;
   } catch (error) {
     throw new Error("Failed to delete the course: " + error);

@@ -15,8 +15,8 @@ npm install @mui-toolpad-extended-tuni/courses @mui-toolpad-extended-tuni/main @
 This package requires the following peer dependencies to be installed:
 
 ### Required Packages
-- **`@mui-toolpad-extended-tuni/main`**: ^3.3.0 - **MUST be installed separately**
-- **`@mui-toolpad-extended-tuni/core`**: ^3.1.0 - **MUST be installed separately** (also required by main)
+- **`@mui-toolpad-extended-tuni/main`**: ^3.4.0 - **MUST be installed separately**
+- **`@mui-toolpad-extended-tuni/core`**: ^3.2.0 - **MUST be installed separately** (also required by main)
 
 ### React & UI Framework
 - `react@^19.0.0`
@@ -38,6 +38,56 @@ npm install @mui-toolpad-extended-tuni/courses @mui-toolpad-extended-tuni/main @
   @mui/material @mui/icons-material @mui/x-date-pickers \
   @emotion/react @emotion/styled \
   axios zustand
+```
+
+## API Configuration
+
+This package uses configurable API endpoints. Each microservice accepts its own `apiEndpoints` prop, allowing you to configure endpoints independently for only the services you use.
+
+### Default Endpoints
+
+If no `apiEndpoints` prop is provided, the package uses these default endpoints:
+
+- `get: "api/courses/"` - GET list of courses
+- `getById: "api/courses/:id"` - GET course by ID (use `:id` placeholder)
+- `getByUrl: "api/courses/?encoded_url=:encodedUrl"` - GET course by URL (use `:encodedUrl` placeholder)
+- `post: "api/courses/"` - POST create new course
+- `put: "api/courses/:id/"` - PUT update course (use `:id` placeholder)
+- `delete: "api/chat/courses/:id"` - DELETE course (use `:id` placeholder)
+
+### Customizing Endpoints
+
+Configure endpoints directly on the `CourseMicroservice` component:
+
+```tsx
+import { CourseMicroservice } from '@mui-toolpad-extended-tuni/courses';
+import type { CoursesApiEndpoints } from '@mui-toolpad-extended-tuni/courses';
+
+const coursesEndpoints: CoursesApiEndpoints = {
+  get: "https://api.example.com/v1/courses",
+  getById: "https://api.example.com/v1/courses/:id",
+  getByUrl: "https://api.example.com/v1/courses?url=:encodedUrl",
+  post: "https://api.example.com/v1/courses",
+  put: "https://api.example.com/v1/courses/:id",
+  delete: "https://api.example.com/v1/courses/:id",
+};
+
+<CourseMicroservice apiEndpoints={coursesEndpoints}>
+  {/* Your course microservices */}
+</CourseMicroservice>
+```
+
+**Note**: You can use either full URLs (`https://api.example.com/courses`) or relative paths (`api/courses/`). Placeholders like `:id` will be replaced with actual values at runtime.
+
+**Partial Configuration**: You can configure only the endpoints you need to customize. Unspecified endpoints will use defaults:
+
+```tsx
+<CourseMicroservice apiEndpoints={{
+  get: "api/v2/courses",  // Only override GET endpoint
+  // Other endpoints use defaults
+}}>
+  {/* Your course microservices */}
+</CourseMicroservice>
 ```
 
 ## Usage
@@ -294,6 +344,338 @@ Course events are published with this structure:
 }
 ```
 
+## API Endpoints
+
+This package makes the following API calls. All endpoints are configurable via `apiConfig`.
+
+### GET `/api/courses/` (or configured `get` endpoint)
+
+Retrieves a list of all courses.
+
+**Request**: No body required
+
+**Response**: `200 OK`
+```json
+[
+  {
+    "id": "course-123",
+    "title": "Introduction to Computer Science",
+    "description": "Basic CS concepts",
+    "code": "COMP.CS.100",
+    "instance": "compcs100-fall-2024",
+    "start_date": "2024-09-01T00:00:00Z",
+    "end_date": "2024-12-15T23:59:59Z",
+    "created_at": "2024-08-01T10:00:00Z",
+    "updated_at": "2024-08-15T14:30:00Z",
+    "visibility": {
+      "mode": "public",
+      "start_date": null,
+      "end_date": null
+    },
+    "events": {
+      "lecture": [],
+      "exercise": [],
+      "exam": [],
+      "deadline": [],
+      "other": []
+    },
+    "data_processing": {
+      "purposes": ["course_delivery", "assessment"],
+      "retention": 365,
+      "third_party_processors": [],
+      "special_categories": false,
+      "legal_basis": "consent"
+    }
+  }
+]
+```
+
+**Response Type**: `Course[]` (array of Course objects)
+
+### GET `/api/courses/:id` (or configured `getById` endpoint)
+
+Retrieves a single course by ID.
+
+**Request Parameters**:
+- `:id` (path parameter) - Course ID
+
+**Response**: `200 OK`
+```json
+{
+  "id": "course-123",
+  "title": "Introduction to Computer Science",
+  "description": "Basic CS concepts",
+  "code": "COMP.CS.100",
+  "instance": "compcs100-fall-2024",
+  // ... same structure as list endpoint
+}
+```
+
+**Response Type**: `Course`
+
+### GET `/api/courses/?encoded_url=:encodedUrl` (or configured `getByUrl` endpoint)
+
+Retrieves a course by URL (base64-encoded).
+
+**Request Parameters**:
+- `encoded_url` (query parameter) - Base64-encoded course URL
+
+**Response**: `200 OK` (array with single course)
+```json
+[
+  {
+    "id": "course-123",
+    // ... course object
+  }
+]
+```
+
+**Response Type**: `Course[]` (array with one Course)
+
+### POST `/api/courses/` (or configured `post` endpoint)
+
+Creates a new course.
+
+**Request Body**: `CourseRaw` (snake_case)
+```json
+{
+  "title": "Introduction to Computer Science",
+  "description": "Basic CS concepts",
+  "code": "COMP.CS.100",
+  "instance": "compcs100-fall-2024",
+  "start_date": "2024-09-01T00:00:00Z",
+  "end_date": "2024-12-15T23:59:59Z",
+  "visibility": {
+    "mode": "public",
+    "start_date": null,
+    "end_date": null
+  },
+  "events": {
+    "lecture": [],
+    "exercise": [],
+    "exam": [],
+    "deadline": [],
+    "other": []
+  },
+  "data_processing": {
+    "purposes": ["course_delivery", "assessment"],
+    "retention": 365,
+    "third_party_processors": [],
+    "special_categories": false,
+    "legal_basis": "consent"
+  }
+}
+```
+
+**Response**: `201 Created`
+```json
+{
+  "id": "course-123",
+  "title": "Introduction to Computer Science",
+  // ... full Course object with generated ID and timestamps
+  "created_at": "2024-08-01T10:00:00Z",
+  "updated_at": "2024-08-01T10:00:00Z"
+}
+```
+
+**Response Type**: `Course`
+
+**Note**: The request body should be in snake_case format. The package automatically converts from camelCase.
+
+### PUT `/api/courses/:id/` (or configured `put` endpoint)
+
+Updates an existing course.
+
+**Request Parameters**:
+- `:id` (path parameter) - Course ID
+
+**Request Body**: `Course` (snake_case, must include `id`)
+```json
+{
+  "id": "course-123",
+  "title": "Updated Course Title",
+  "description": "Updated description",
+  // ... all Course fields
+}
+```
+
+**Response**: `200 OK`
+```json
+{
+  "id": "course-123",
+  "title": "Updated Course Title",
+  // ... updated Course object
+  "updated_at": "2024-08-15T14:30:00Z"
+}
+```
+
+**Response Type**: `Course`
+
+### DELETE `/api/chat/courses/:id` (or configured `delete` endpoint)
+
+Deletes a course.
+
+**Request Parameters**:
+- `:id` (path parameter) - Course ID
+
+**Response**: `200 OK`
+```json
+{
+  "id": "course-123",
+  // ... deleted Course object
+}
+```
+
+**Response Type**: `Course`
+
+## Data Types
+
+### Course
+
+Complete course object returned by API (includes `id`, `createdAt`, `updatedAt`).
+
+```typescript
+interface Course extends CourseRaw {
+  id: string;                    // Unique course ID
+  createdAt: string;             // ISO date string - when course was created
+  updatedAt: string;             // ISO date string - when course was last updated
+}
+```
+
+### CourseRaw
+
+Course data for creating/updating courses (request body format).
+
+```typescript
+interface CourseRaw {
+  title: string;                  // Course title (required)
+  description: string;            // Course description (required)
+  code: string;                  // Course code, e.g., "COMP.CS.300" (required)
+  instance: string;               // Instance identifier, e.g., "compcs300-october-2024" (required)
+  ltiLoginUrl?: string;           // LTI login URL (optional)
+  services?: string[];            // List of services used (optional)
+  image?: {                       // Course images (optional)
+    large: string;                // 1200x800px image URL
+    medium: string;               // 600x400px image URL
+    thumbnail: string;            // 300x200px image URL
+  };
+  startDate: string | null;       // ISO date string - course start date
+  endDate: string | null;         // ISO date string - course end date
+  visibility: {                   // Visibility settings
+    mode: "public" | "enrolled" | "private";
+    startDate: string | null;     // When course becomes visible
+    endDate: string | null;       // When visibility ends
+  };
+  events: {                        // Course events by type
+    lecture: CourseEvent[];
+    exercise: CourseEvent[];
+    exam: CourseEvent[];
+    deadline: CourseEvent[];
+    other: CourseEvent[];
+  };
+  tags?: string[];                 // Course tags for categorization
+  language?: string;              // ISO 639-1 language code
+  dataProcessing: {                // GDPR data processing info
+    purposes: string[];            // What data is used for
+    retention: number;             // Retention period in days
+    thirdPartyProcessors: Array<{
+      name: string;
+      purpose: string;
+      dataShared: string[];
+    }>;
+    specialCategories: boolean;   // Special categories of personal data
+    legalBasis: "consent" | "contract" | "legal_obligation" | "legitimate_interests";
+  };
+  enrollment?: {                    // Enrollment settings
+    startDate: string | null;      // Enrollment opens
+    endDate: string | null;        // Enrollment closes
+    status: {
+      open: boolean;              // Whether new enrollments accepted
+      maxStudents?: number;       // Maximum students (optional)
+    };
+  };
+  relationships?: {                 // Course relationships
+    prerequisites: CourseRelation[];
+    continuations: CourseRelation[];
+    alternatives: CourseRelation[];
+    related: CourseRelation[];
+  };
+  studyModule?: {                   // Study module info
+    name: string;                  // Module name
+    order?: number;                 // Order within module
+    credits: number;                // Credit points
+    level: "basic" | "intermediate" | "advanced";
+  };
+}
+```
+
+### CourseEvent
+
+Individual course event (lecture, exercise, exam, etc.).
+
+```typescript
+interface CourseEvent {
+  id: string;                      // Event ID
+  type: "lecture" | "exercise" | "exam" | "deadline" | "other";
+  title: string;                   // Event title
+  description?: string;             // Event description
+  startTime: string;                // ISO date string - event start
+  endTime?: string;                 // ISO date string - event end
+  location?: string;                // Physical or virtual location
+  teachers?: EnrollmentData[];      // Array of teachers
+  recurring?: {                      // Recurring event settings
+    frequency: "daily" | "weekly" | "biweekly";
+    until: string;                  // ISO date string - when recurrence ends
+    exceptions?: string[];           // ISO date strings - cancelled dates
+  };
+  maxParticipants?: number;          // Maximum participants
+  requiresRegistration?: boolean;   // Whether registration required
+}
+```
+
+### EnrollmentData
+
+User enrollment information for a course.
+
+```typescript
+interface EnrollmentData {
+  courseId: string;                 // Course ID
+  userId: string;                   // User ID
+  name: string;                     // User name
+  email: string;                    // User email
+  role: "student" | "teacher" | "guest";
+  status: "enrolled" | "pending" | "rejected";
+}
+```
+
+### CourseRelation
+
+Relationship between courses (prerequisites, continuations, etc.).
+
+```typescript
+interface CourseRelation {
+  code: string;                     // Related course code
+  type: "prerequisite" | "recommended" | "parallel" | "continues_from" | 
+        "alternative_to" | "part_of" | "prepares_for";
+  description?: string;              // Why courses are related
+  required?: boolean;                // Hard requirement or suggestion
+}
+```
+
+### Type Definitions
+
+```typescript
+type courseRole = "student" | "teacher" | "guest";
+type visibilityMode = "public" | "enrolled" | "private";
+type courseEventType = "lecture" | "exercise" | "exam" | "deadline" | "other";
+type courseEventFrequency = "daily" | "weekly" | "biweekly";
+type legalBasis = "consent" | "contract" | "legal_obligation" | "legitimate_interests";
+type enrollmentStatus = "enrolled" | "pending" | "rejected";
+type courseLevel = "basic" | "intermediate" | "advanced";
+type courseRelationType = "prerequisite" | "recommended" | "parallel" | 
+                          "continues_from" | "alternative_to" | "part_of" | "prepares_for";
+```
+
 ## Exports
 
 ### Components
@@ -309,17 +691,34 @@ Course events are published with this structure:
 
 ### Hooks
 - `useCourseMicroserviceRegistration` - Hook for registering custom course microservices (must be used within `CourseMicroservice` context)
+- `useCoursesApiConfig` - Hook to access courses API endpoint configuration
 
 ### Store
 - `useCourseStore` - Zustand store for course management
 
+### Network Functions
+- `getCourses()` - Fetch all courses
+- `getCourseById(courseId: string)` - Fetch course by ID
+- `getCourseByUrl(url: string)` - Fetch course by URL
+- `addCourse(courseData: CourseRaw)` - Create new course
+- `updateCourse(course: Course)` - Update existing course
+- `deleteCourse(courseId: string)` - Delete course
+
 ### Types
-- `Course` - Course type
-- `CourseRaw` - Raw course data type
+- `Course` - Complete course object (with id, timestamps)
+- `CourseRaw` - Course data for create/update requests
+- `CourseEvent` - Individual course event
+- `EnrollmentData` - User enrollment information
+- `CourseRelation` - Course relationship
+- `CoursesApiEndpoints` - API endpoint configuration type
 - `courseRole` - Course role type
 - `courseLevel` - Course level type
 - `courseEventType` - Course event type
 - `enrollmentStatus` - Enrollment status type
+- `visibilityMode` - Visibility mode type
+- `courseEventFrequency` - Event frequency type
+- `legalBasis` - Legal basis for data processing
+- `courseRelationType` - Course relation type
 
 ## Features
 

@@ -32,3 +32,22 @@ export { addVisitedCourse, getVisitedCourses, onVisitedCoursesUpdate } from './h
 // Export CourseSettings component for dialogs
 export { default as CourseSettings } from './Forms/CourseSettings/CourseSettings';
 
+// Export API configuration types
+export type { CoursesApiEndpoints } from '@mui-toolpad-extended-tuni/core';
+
+// Export CourseMicroserviceProps type
+export type { CourseMicroserviceProps } from './CourseMicroservice';
+
+// Export API configuration hooks
+export { useCoursesApiConfig } from './hooks/useCoursesApiConfig';
+
+// Export network functions
+export {
+  getCourses,
+  getCourseById,
+  getCourseByUrl,
+  addCourse,
+  updateCourse,
+  deleteCourse,
+} from './network/courses';
+
