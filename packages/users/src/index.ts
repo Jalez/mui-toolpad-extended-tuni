@@ -21,3 +21,22 @@ export { default as UserSettings } from './Forms/UserSettings/UserSettings';
 
 // Export UserSwitcher component for dev tools
 export { default as UserSwitcher } from './UserSwitcher';
+
+// Export API configuration types
+export type { UsersApiEndpoints } from '@mui-toolpad-extended-tuni/core';
+
+// Export UserMicroserviceProps type
+export type { UserMicroserviceProps } from './UserMicroservice';
+
+// Export API configuration hooks
+export { useUsersApiConfig } from './hooks/useUsersApiConfig';
+
+// Export network functions
+export {
+  getCurrentUser,
+  getUsers,
+  createUser,
+  updateUser,
+  deleteUser,
+  logoutUser,
+} from './network/users';

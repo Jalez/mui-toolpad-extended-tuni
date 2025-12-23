@@ -30,6 +30,7 @@ export default defineConfig({
         "axios",
         "zustand",
         "@mui-toolpad-extended-tuni/main",
+        "@mui-toolpad-extended-tuni/core", // Peer dependency - must not be bundled
       ],
       treeshake: {
         moduleSideEffects: (id) => {

@@ -4,9 +4,13 @@ import React, { ReactNode, useEffect } from "react";
 import { UserManager } from "./UserManager";
 import UserEventPublisher from "./UserEventPublisher";
 import { configureUserBus } from "./configureUserBus";
+import { registerApiEndpoints } from "@mui-toolpad-extended-tuni/core";
+import type { UsersApiEndpoints } from "@mui-toolpad-extended-tuni/core";
 
-interface UserMicroserviceProps {
+export interface UserMicroserviceProps {
   children?: ReactNode;
+  /** API endpoint configuration for the users microservice */
+  apiEndpoints?: UsersApiEndpoints;
 }
 
 /**
@@ -37,11 +41,17 @@ interface UserMicroserviceProps {
  * </Microservices>
  * ```
  */
-const UserMicroservice: React.FC<UserMicroserviceProps> = ({ children }) => {
+const UserMicroservice: React.FC<UserMicroserviceProps> = ({ children, apiEndpoints }) => {
   // UserBus is already configured synchronously in index.ts, but ensure it's configured as a safety net
   useEffect(() => {
     configureUserBus();
   }, []);
+
+  // Register API endpoints when component mounts or endpoints change
+  // Always register (either user-provided or empty to get defaults)
+  useEffect(() => {
+    registerApiEndpoints('users', apiEndpoints || {});
+  }, [apiEndpoints]);
 
   return (
     <>
