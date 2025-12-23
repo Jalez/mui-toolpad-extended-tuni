@@ -20,7 +20,7 @@ Or update your `package.json`:
 ```json
 {
   "dependencies": {
-    "@mui-toolpad-extended-tuni/main": "^3.3.0"
+    "@mui-toolpad-extended-tuni/main": "^3.4.0"
   }
 }
 ```
@@ -44,7 +44,7 @@ If you're using extension packages (calendar, courses, users), update their peer
 ```json
 {
   "peerDependencies": {
-    "@mui-toolpad-extended-tuni/main": "^3.3.0"
+    "@mui-toolpad-extended-tuni/main": "^3.4.0"
   }
 }
 ```
